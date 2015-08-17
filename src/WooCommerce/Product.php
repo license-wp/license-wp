@@ -14,7 +14,7 @@ class Product {
 			$options['is_api_product_license'] = array(
 				'id'            => '_is_api_product_license',
 				'wrapper_class' => 'show_if_simple show_if_variable',
-				'label'         => __( 'API Product Licence', 'license-wp' ),
+				'label'         => __( 'API Product License', 'license-wp' ),
 				'description'   => __( 'Enable this option if this is a license for an API Product', 'license-wp' )
 			);
 
@@ -85,11 +85,11 @@ class Product {
 	 * @param $i
 	 */
 	public function save_variable_license_data( $variation_id, $i ) {
-		$variation_licence_activation_limit = $_POST['_variation_licence_activation_limit'];
-		$variation_licence_expiry_days      = $_POST['_variation_licence_expiry_days'];
+		$variation_license_activation_limit = $_POST['_variation_license_activation_limit'];
+		$variation_license_expiry_days      = $_POST['_variation_license_expiry_days'];
 
-		update_post_meta( $variation_id, '_licence_activation_limit', sanitize_text_field( $variation_licence_activation_limit[ $i ] ) );
-		update_post_meta( $variation_id, '_licence_expiry_days', sanitize_text_field( $variation_licence_expiry_days[ $i ] ) );
+		update_post_meta( $variation_id, '_license_activation_limit', sanitize_text_field( $variation_license_activation_limit[ $i ] ) );
+		update_post_meta( $variation_id, '_license_expiry_days', sanitize_text_field( $variation_license_expiry_days[ $i ] ) );
 	}
 
 }

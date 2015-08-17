@@ -15,7 +15,7 @@ class WordPressRepository implements Repository {
 
 		$row = $wpdb->get_row( $wpdb->prepare( "
 		SELECT * FROM {$wpdb->prefix}license_wp_licenses
-		WHERE licence_key = %s
+		WHERE license_key = %s
 	", $key ) );
 
 		/**
@@ -54,7 +54,7 @@ class WordPressRepository implements Repository {
 			'order_id'         => '',
 			'activation_email' => '',
 			'user_id'          => '',
-			'licence_key'      => '',
+			'license_key'      => '',
 			'product_id'       => '',
 			'activation_limit' => '',
 			'date_expires'     => '',
@@ -90,7 +90,7 @@ class WordPressRepository implements Repository {
 			$wpdb->update( $wpdb->prefix . 'license_wp_licenses',
 				$data,
 				array(
-					'licence_key' => $license->get_key()
+					'license_key' => $license->get_key()
 				)
 			);
 

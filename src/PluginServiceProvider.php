@@ -30,7 +30,7 @@ class PluginServiceProvider implements Pimple\ServiceProviderInterface {
 		$container['license_manager'] = function () {
 			return new License\Manager();
 		};
-		
+
 	}
 
 }
