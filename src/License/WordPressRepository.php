@@ -3,7 +3,10 @@
 namespace Never5\LicenseWP\License;
 
 class WordPressRepository implements Repository {
+
 	/**
+	 * Retrieve license data from WordPress database
+	 *
 	 * @param string $key
 	 *
 	 * @return \stdClass
@@ -42,6 +45,8 @@ class WordPressRepository implements Repository {
 	}
 
 	/**
+	 * Persist license data in WordPress database
+	 *
 	 * @param License $license
 	 *
 	 * @return bool
