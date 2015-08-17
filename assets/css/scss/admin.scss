@@ -1,0 +1,102 @@
+/* Menu */
+#adminmenu {
+  #menu-posts-api_product {
+    .wp-menu-image:before {
+      content: "\f312";
+      font-family: "dashicons" !important;
+      font-style: normal;
+      font-weight: normal;
+      speak: none;
+
+      display: inline-block;
+      text-decoration: inherit;
+      width: 1em;
+      text-align: center;
+
+      /* For safety - reset parent styles, that can break glyph codes*/
+      font-variant: normal;
+      text-transform: none;
+
+      /* fix buttons height, for twitter bootstrap */
+      line-height: 1em;
+    }
+  }
+  #toplevel_page_wp_plugin_licencing_licences {
+    .wp-menu-image:before {
+      content: "\f173";
+      font-family: "dashicons" !important;
+      font-style: normal;
+      font-weight: normal;
+      speak: none;
+
+      display: inline-block;
+      text-decoration: inherit;
+      width: 1em;
+      text-align: center;
+
+      /* For safety - reset parent styles, that can break glyph codes*/
+      font-variant: normal;
+      text-transform: none;
+
+      /* fix buttons height, for twitter bootstrap */
+      line-height: 1em;
+    }
+  }
+}
+
+#s2id_api_product_permissions {
+  width: 50%;
+}
+
+.license_wp_select2 {
+  width: 500px;
+}
+
+.license_wp_meta_data {
+  p {
+    overflow: hidden;
+    margin: 0 0 1em;
+    padding: 0 0 0 20%;
+    position: relative;
+    line-height: 2em;
+  }
+  label {
+    width: 20%;
+    position: absolute;
+    left: 0;
+    vertical-align: middle;
+  }
+  input {
+    width: 50%;
+    margin: 1px 0;
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box; /* Firefox, other Gecko */
+    box-sizing: border-box; /* Opera/IE 8+ */
+    vertical-align: middle;
+  }
+  input.checkbox {
+    width: auto;
+    margin: 4px 2px;
+  }
+  .description {
+    color: #999;
+    display: block;
+  }
+}
+
+table.wp-list-table {
+  .column-activation_email {
+    width: 14%;
+  }
+  .column-licence_key {
+    width: 15em;
+    code {
+      display: block;
+    }
+  }
+  .column-activations,
+  .column-activation_limit,
+  .column-activation_active {
+    text-align: center;
+  }
+}
