@@ -4,6 +4,9 @@ namespace Never5\LicenseWP\WooCommerce;
 
 class Order {
 
+	/**
+	 * Setup hooks and filters
+	 */
 	public function setup() {
 
 		// display keys in order edit screen
@@ -11,6 +14,9 @@ class Order {
 
 		// hook into WooCommerce order completed status
 		add_action( 'woocommerce_order_status_completed', array( $this, 'order_completed' ) );
+
+		// delete license related data on order delete
+		add_action( 'delete_post', array( $this, 'order_delete' ) );
 	}
 
 	/**
@@ -34,7 +40,6 @@ class Order {
 	 * @param int $order_id
 	 */
 	public function order_completed( $order_id ) {
-		global $wpdb;
 
 		// only continue of this order doesn't have license keys yet
 		if ( get_post_meta( $order_id, 'has_api_product_license_keys', true ) ) {
@@ -129,4 +134,27 @@ class Order {
 		}
 	}
 
+	/**
+	 * On delete post
+	 *
+	 * @param int $order_id
+	 */
+	public function order_delete( $order_id ) {
+		// check if allowed
+		if ( ! current_user_can( 'delete_posts' ) ) {
+			return;
+		}
+
+		// check id
+		if ( $order_id > 0 ) {
+
+			// check post type
+			$post_type = get_post_type( $order_id );
+
+			// only continue on WC shop order
+			if ( 'shop_order' === $post_type ) {
+				license_wp()->service('license_manager')->remove_license_data_by_order( $order_id );
+			}
+		}
+	}
 }
