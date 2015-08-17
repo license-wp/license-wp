@@ -31,4 +31,56 @@ class Manager {
 		return $key;
 	}
 
+	/**
+	 * Get licenses by order ID
+	 *
+	 * @param int $order_id
+	 *
+	 * @return array
+	 */
+	public function get_license_keys_by_order( $order_id ) {
+		global $wpdb;
+
+		// keys
+		$keys = array();
+
+		// fetch keys
+		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->prefix . 'license_wp_licenses WHERE order_id = %d', $order_id ) );
+
+		// count & loop
+		if ( count( $results ) > 0 ) {
+			foreach ( $results as $result ) {
+				// add to array
+				$keys[] = $result->license_key;
+			}
+		}
+
+		// return license keys
+		return $keys;
+	}
+
+	/**
+	 * Remove license by order ID
+	 *
+	 * @param $order_id
+	 */
+	public function remove_license_data_by_order( $order_id ) {
+		global $wpdb;
+
+		// get license keys
+		$license_keys = $this->get_license_keys_by_order( $order_id );
+
+		// count and loop
+		if ( count( $license_keys ) > 0 ) {
+			foreach ( $license_keys as $license_key ) {
+				// delete all data connected to license key
+				$wpdb->delete( "{$wpdb->prefix}license_wp_licenses", array( 'license_key' => $license_key ) );
+				$wpdb->delete( "{$wpdb->prefix}license_wp_activations", array( 'license_key' => $license_key ) );
+				$wpdb->delete( "{$wpdb->prefix}license_wp_download_log", array( 'license_key' => $license_key ) );
+			}
+		}
+
+
+	}
+
 }
