@@ -70,15 +70,23 @@ class Plugin extends Pimple\Container {
 		$api_product = new PostType\ApiProduct();
 		$api_product->setup();
 
+		// WooCommerce product
+		$wc_product = new WooCommerce\Product();
+		$wc_product->setup();
+
+		// WooCommerce order
+		$wc_order = new WooCommerce\Order();
+		$wc_order->setup();
+
+		// WooCommerce email
+		$wc_email = new WooCommerce\Email();
+		$wc_email->setup();
+
 		if ( is_admin() ) { // Backend
 
 			// meta box
 			$mb_api_product_data = new MetaBox\ApiProductData();
 			$mb_api_product_data->register();
-
-			// WooCommerce product adjustments
-			$wc_product = new WooCommerce\Product();
-			$wc_product->setup();
 
 			// admin assets
 			add_action( 'admin_enqueue_scripts', array( 'Never5\\LicenseWP\\Assets', 'enqueue_backend' ) );
