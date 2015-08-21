@@ -20,6 +20,9 @@ class Plugin extends Pimple\Container {
 		// Pimple Container construct
 		parent::__construct();
 
+		// setup custom database tables
+		$this->setup_db_tables();
+
 		// register file service
 		$this['file'] = function () use ( $file ) {
 			return new File( $file );
@@ -30,6 +33,18 @@ class Plugin extends Pimple\Container {
 
 		// load the plugin
 		$this->load();
+	}
+
+	/**
+	 * Setup custom tables to $wpdb object
+	 */
+	private function setup_db_tables() {
+		global $wpdb;
+
+		$wpdb->lwp_licenses     = $wpdb->prefix . 'license_wp_licenses';
+		$wpdb->lwp_activations  = $wpdb->prefix . 'license_wp_activations';
+		$wpdb->lwp_download_log = $wpdb->prefix . 'license_wp_download_log';
+
 	}
 
 	/**
