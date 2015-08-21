@@ -1,6 +1,6 @@
 <?php
 
-namespace Never5\LicenseWP\MetaBox;
+namespace Never5\LicenseWP\Admin\MetaBox;
 
 class ApiProductData {
 
@@ -111,7 +111,7 @@ class ApiProductData {
 		foreach ( $this->get_fields() as $key => $field ) {
 			$type = ! empty( $field['type'] ) ? $field['type'] : 'text';
 
-			$class_name = 'Never5\\LicenseWP\\MetaBox\\Input\\' . ucfirst( ( ( ! empty( $field['type'] ) ) ? $field['type'] : 'text' ) );
+			$class_name = 'Never5\\LicenseWP\\Admin\\MetaBox\\Input\\' . ucfirst( ( ( ! empty( $field['type'] ) ) ? $field['type'] : 'text' ) );
 			if ( class_exists( $class_name ) ) {
 				$input = new $class_name( $key, $field );
 				$input->view();

@@ -100,13 +100,13 @@ class Plugin extends Pimple\Container {
 		if ( is_admin() ) { // Backend
 
 			// meta box
-			$mb_api_product_data = new MetaBox\ApiProductData();
+			$mb_api_product_data = new Admin\MetaBox\ApiProductData();
 			$mb_api_product_data->register();
 
 			// admin assets
 			add_action( 'admin_enqueue_scripts', array( 'Never5\\LicenseWP\\Assets', 'enqueue_backend' ) );
 
-		}else { // Frontend
+		} else { // Frontend
 
 			// setup lost license form shortcode
 			new Shortcode\LostLicenseForm();

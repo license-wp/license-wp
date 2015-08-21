@@ -1,6 +1,6 @@
 <?php
 
-namespace Never5\LicenseWP\MetaBox\Input;
+namespace Never5\LicenseWP\Admin\MetaBox\Input;
 
 class Textarea extends Input {
 
