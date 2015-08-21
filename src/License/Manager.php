@@ -23,7 +23,7 @@ class Manager {
 			) ) );
 
 			// check if exists
-			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT FROM ' . $wpdb->prefix . 'license_wp_licenses WHERE license_key = %s', $key ) );
+			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT FROM ' . $wpdb->lwp_licenses . ' WHERE license_key = %s', $key ) );
 
 		} while ( null !== $result ); // keep generating until we've got a unique key
 
@@ -45,7 +45,7 @@ class Manager {
 		$keys = array();
 
 		// fetch keys
-		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->prefix . 'license_wp_licenses WHERE order_id = %d', $order_id ) );
+		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE order_id = %d', $order_id ) );
 
 		// count & loop
 		if ( count( $results ) > 0 ) {
@@ -74,9 +74,9 @@ class Manager {
 		if ( count( $license_keys ) > 0 ) {
 			foreach ( $license_keys as $license_key ) {
 				// delete all data connected to license key
-				$wpdb->delete( "{$wpdb->prefix}license_wp_licenses", array( 'license_key' => $license_key ) );
-				$wpdb->delete( "{$wpdb->prefix}license_wp_activations", array( 'license_key' => $license_key ) );
-				$wpdb->delete( "{$wpdb->prefix}license_wp_download_log", array( 'license_key' => $license_key ) );
+				$wpdb->delete( $wpdb->lwp_licenses, array( 'license_key' => $license_key ) );
+				$wpdb->delete( $wpdb->lwp_activations, array( 'license_key' => $license_key ) );
+				$wpdb->delete( $wpdb->lwp_download_log, array( 'license_key' => $license_key ) );
 			}
 		}
 
