@@ -103,6 +103,18 @@ class Plugin extends Pimple\Container {
 			$mb_api_product_data = new Admin\MetaBox\ApiProductData();
 			$mb_api_product_data->register();
 
+			// Admin License Page
+			$page_license = new Admin\Page\Licenses();
+			$page_license->setup();
+
+			// Admin Activations Page
+			$page_activations = new Admin\Page\Activations();
+			$page_activations->setup();
+
+			// Admin Add License Page
+			$page_add_license = new Admin\Page\AddLicense();
+			$page_add_license->setup();
+
 			// admin assets
 			add_action( 'admin_enqueue_scripts', array( 'Never5\\LicenseWP\\Assets', 'enqueue_backend' ) );
 
@@ -121,7 +133,6 @@ class Plugin extends Pimple\Container {
 }
 
 
-
 class WP_Plugin_Licencing {
 
 	/**
@@ -129,7 +140,10 @@ class WP_Plugin_Licencing {
 	 */
 	public function __construct() {
 
-		add_action( 'woocommerce_api_wp_plugin_licencing_activation_api', array( $this, 'handle_activation_api_request' ) );
+		add_action( 'woocommerce_api_wp_plugin_licencing_activation_api', array(
+			$this,
+			'handle_activation_api_request'
+		) );
 		add_action( 'woocommerce_api_wp_plugin_licencing_update_api', array( $this, 'handle_update_api_request' ) );
 	}
 
