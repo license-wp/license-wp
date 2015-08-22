@@ -33,12 +33,15 @@ abstract class Page {
 	 * Setup page
 	 */
 	public function setup() {
-		add_action( 'admin_menu', function () {
+		$hook = add_action( 'admin_menu', function () {
 			add_menu_page( $this->get_title(), $this->get_title(), 'manage_options', $this->get_slug(), array(
 				$this,
 				'output'
 			), null, $this->pos );
 		}, 9 );
+
+		// allow for to enqueue page specific styles & scripts
+		add_action( 'admin_print_styles-'. $hook, array( $this, 'page_enqueue' ) );
 	}
 
 	/**
@@ -58,6 +61,11 @@ abstract class Page {
 	protected function get_slug() {
 		return $this->slug;
 	}
+
+	/**
+	 * Method to enqueue page specific styles & scripts
+	 */
+	public function page_enqueue() {}
 
 	/**
 	 * Output page content
