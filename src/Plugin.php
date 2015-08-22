@@ -103,17 +103,9 @@ class Plugin extends Pimple\Container {
 			$mb_api_product_data = new Admin\MetaBox\ApiProductData();
 			$mb_api_product_data->register();
 
-			// Admin License Page
-			$page_license = new Admin\Page\Licenses();
-			$page_license->setup();
-
-			// Admin Activations Page
-			$page_activations = new Admin\Page\Activations();
-			$page_activations->setup();
-
-			// Admin Add License Page
-			$page_add_license = new Admin\Page\AddLicense();
-			$page_add_license->setup();
+			// setup pages
+			$page_manager = new Admin\Page\Manager();
+			$page_manager->setup();
 
 			// admin assets
 			add_action( 'admin_enqueue_scripts', array( 'Never5\\LicenseWP\\Assets', 'enqueue_backend' ) );
