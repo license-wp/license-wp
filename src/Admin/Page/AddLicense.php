@@ -19,8 +19,15 @@ class AddLicense extends SubPage {
 	 * Method to enqueue page specific styles & scripts
 	 */
 	public function page_enqueue() {
-		wp_enqueue_script( 'chosen' ); // @todo this should be replaced with select2
+		wp_enqueue_script( 'select2' );
 		wp_enqueue_script( 'woocommerce_admin' );
+		wp_enqueue_script(
+			'lwp_add_license',
+			license_wp()->service( 'file' )->plugin_url( '/assets/js/add-license' . ( ( ! SCRIPT_DEBUG ) ? '.min' : '' ) . '.js' ),
+			array( 'jquery' ),
+			license_wp()->get_version()
+		);
+
 	}
 
 	/**

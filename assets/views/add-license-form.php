@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<label for="product_id"><?php _e( 'Product', 'license-wp' ); ?></label>
 				</th>
 				<td>
-					<select name="product_id" class="chosen_select" data-placeholder="<?php _e( 'Choose a product&hellip;', 'license-wp' ) ?>" style="width:25em">
+					<select name="product_id" class="lwp-select2" data-placeholder="<?php _e( 'Choose a product&hellip;', 'license-wp' ) ?>" style="width:25em">
 						<?php
 						echo '<option value=""></option>';
 
@@ -67,7 +67,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<label for="user_id"><?php _e( 'Customer', 'license-wp' ); ?></label>
 				</th>
 				<td>
-					<select id="user_id" name="user_id" class="ajax_chosen_select_customer" style="width:25em">
+					<select id="user_id" name="user_id" class="lwp-select2-customer"  style="width:25em">
 						<option value=""><?php _e( 'Guest', 'license-wp' ) ?></option>
 					</select>
 				</td>
