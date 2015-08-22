@@ -16,12 +16,20 @@ class AddLicense extends SubPage {
 	}
 
 	/**
+	 * Method to enqueue page specific styles & scripts
+	 */
+	public function page_enqueue() {
+		wp_enqueue_script( 'chosen' ); // @todo this should be replaced with select2
+		wp_enqueue_script( 'woocommerce_admin' );
+	}
+
+	/**
 	 * Output page content
 	 *
 	 * @return void
 	 */
 	public function output() {
-		echo 'dat overview';
+		wc_get_template( 'add-license-form.php', array(), 'license-wp', license_wp()->service( 'file' )->plugin_path() . '/assets/views/' );
 	}
 
 }
