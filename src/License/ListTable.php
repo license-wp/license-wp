@@ -42,8 +42,6 @@ class ListTable extends \WP_List_Table {
 
 				return ( $product ) ? '<a href="' . admin_url( 'post.php?post=' . absint( $product->ID ) . '&action=edit' ) . '">' . esc_html( $product->post_title ) . '</a>' : __( 'n/a', 'license-wp' );
 			case 'user_id' :
-				$user = get_user_by( 'ID', $item->user_id );
-
 				return ( $item->user_id ) ? '<a href="' . admin_url( 'user-edit.php?user_id=' . absint( $item->user_id ) ) . '">#' . esc_html( $item->user_id ) . '&rarr;</a>' : __( 'n/a', 'license-wp' );
 			case 'activations' :
 				$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT( activation_id ) FROM {$wpdb->lwp_activations} WHERE activation_active = 1 AND license_key=%s;", $item->license_key ) );
