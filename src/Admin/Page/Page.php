@@ -26,22 +26,21 @@ abstract class Page {
 	public function __construct( $title, $pos = null ) {
 		$this->title = $title;
 		$this->slug  = 'license_wp_' . str_ireplace( ' ', '_', strtolower( trim( $title ) ) );
-		$this->pos = $pos;
+		$this->pos   = $pos;
 	}
 
 	/**
 	 * Setup page
 	 */
 	public function setup() {
-		$hook = add_action( 'admin_menu', function () {
-			add_menu_page( $this->get_title(), $this->get_title(), 'manage_options', $this->get_slug(), array(
+		add_action( 'admin_menu', function () {
+			$hook = add_menu_page( $this->get_title(), $this->get_title(), 'manage_options', $this->get_slug(), array(
 				$this,
 				'output'
 			), null, $this->pos );
+			// allow for to enqueue page specific styles & scripts
+			add_action( 'admin_print_styles-' . $hook, array( $this, 'page_enqueue' ) );
 		}, 9 );
-
-		// allow for to enqueue page specific styles & scripts
-		add_action( 'admin_print_styles-'. $hook, array( $this, 'page_enqueue' ) );
 	}
 
 	/**
