@@ -47,7 +47,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								if ( $children_products = get_children( $args_get_children ) ) {
 									echo '<optgroup label="' . esc_attr( $product->post_title ) . '">';
 									foreach ( $children_products as $child ) {
-										$child_product = get_product( $child );
+										$child_product = wc_get_product( $child );
 										$attributes    = $child_product->get_variation_attributes();
 										$extra_data    = ' &ndash; ' . implode( ', ', $attributes ) . ' &ndash; ' . wc_price( $child_product->get_price() );
 										echo '<option value="' . absint( $child->ID ) . '">&nbsp;&nbsp;&mdash;&nbsp;' . $child_product->get_title() . $extra_data . '</option>';
