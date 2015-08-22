@@ -19,7 +19,7 @@ class LostLicenseForm {
 		ob_start();
 
 		// load template file via WooCommerce template function
-		wc_get_template( 'lost-license-form.php', array(), 'license-wp', license_wp()->service( 'File' )->plugin_path() . '/templates/' );
+		wc_get_template( 'lost-license-form.php', array(), 'license-wp', license_wp()->service( 'file' )->plugin_path() . '/templates/' );
 
 		return ob_get_clean();
 	}
