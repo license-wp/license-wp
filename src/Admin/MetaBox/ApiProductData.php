@@ -74,7 +74,7 @@ class ApiProductData {
 				'placeholder' => ''
 			),
 			'_requires_wp_version' => array(
-				'label'       => __( 'Requries at least', 'license-wp' ),
+				'label'       => __( 'Requires at least', 'license-wp' ),
 				'placeholder' => __( 'e.g. 3.8', 'license-wp' )
 			),
 			'_tested_wp_version'   => array(
