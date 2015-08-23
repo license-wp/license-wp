@@ -2,6 +2,8 @@
 
 namespace Never5\LicenseWP\Admin\Page;
 
+use Never5\LicenseWP\Email;
+
 /**
  * Class AddLicenses
  * @package Never5\LicenseWP\Admin\Pages
@@ -13,6 +15,16 @@ class AddLicense extends SubPage {
 	 */
 	public function __construct() {
 		parent::__construct( 'license_wp_licenses', __( 'Add License', 'license-wp' ) );
+
+		// handle save
+		add_action( 'init', function () {
+			if ( isset( $_POST['add_license'] ) ) {
+				$this->save();
+			}
+		} );
+
+		// add custom ajax endpoint
+		add_action( 'wp_ajax_wpl_add_license_get_email', array( $this, 'ajax_get_email' ) );
 	}
 
 	/**
@@ -28,6 +40,32 @@ class AddLicense extends SubPage {
 			license_wp()->get_version()
 		);
 
+	}
+
+	/**
+	 * AJAX wpl_add_license_get_email callback
+	 */
+	public function ajax_get_email() {
+
+		// check AJAX nonce
+		check_ajax_referer( 'search-customers', 'nonce' );
+
+		// check if user is allowed to do this
+		if ( ! current_user_can( 'edit_shop_orders' ) ) {
+			die( - 1 );
+		}
+
+		// id
+		$id = absint( $_POST['id'] );
+
+		// get user
+		$user = get_user_by( 'id', $id );
+
+		// user email address
+		echo $user->user_email;
+
+		// bye
+		exit;
 	}
 
 	/**
