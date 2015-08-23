@@ -6,21 +6,51 @@ jQuery( function ( $ ) {
     // dem ajax fields
     jQuery( '.lwp-select2-customer' ).select2( {
         ajax: {
-            url: ajax_url,
+            url: ajaxurl,
             dataType: 'json',
             delay: 250,
             data: function ( params ) {
                 return {
-                    q: params.term, // search term
-                    page: params.page
+                    action: 'woocommerce_json_search_customers',
+                    security: jQuery( this ).data( 'nonce' ),
+                    term: params
                 };
             },
-            processResults: function ( data, page ) {
+            results: function ( data ) {
+
+                // new customers array
+                var customers = [];
+
+                // JSON to array
+                $.each( data, function ( i, val ) {
+                    customers.push( {
+                        id: i,
+                        text: val.replace( /&ndash;/g, '-' )
+                    } );
+                } );
+
+                // return customers
                 return {
-                    results: data.items
+                    results: customers
                 };
             },
-            cache: true
-        }
+            cache: false
+        },
+        minimumInputLength: 3,
+    } ).change( function () {
+
+        var aef = jQuery( '#activation_email' );
+
+        aef.attr( 'placeholder', 'Loading...' );
+
+        // update activation email field
+        jQuery.post( ajaxurl, {
+            action: 'wpl_add_license_get_email',
+            id: jQuery( this ).val(),
+            nonce: jQuery( this ).data( 'nonce' )
+        }, function ( response ) {
+            aef.attr( 'placeholder', 'Email address used to activate product' );
+            aef.val( response );
+        } );
     } );
 } );
