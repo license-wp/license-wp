@@ -63,7 +63,7 @@ class WordPressRepository implements Repository {
 			'product_id'       => '',
 			'activation_limit' => '',
 			'date_expires'     => '',
-			'date_created'     => current_time( 'mysql' )
+			'date_created'     => new \DateTime()
 		);
 
 		// setup array with data
