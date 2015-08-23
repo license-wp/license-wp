@@ -85,14 +85,14 @@ class WordPressRepository implements Repository {
 			$license->set_key( license_wp()->service( 'license_manager' )->generate_license_key() );
 
 			// insert into WordPress database
-			$wpdb->insert( $wpdb->prefix . 'license_wp_licenses', $data );
+			$wpdb->insert( $wpdb->lwp_licenses, $data );
 		} else { // update
 
 			// unset license from data
 			unset( $data['license_key'] );
 
 			// update database
-			$wpdb->update( $wpdb->prefix . 'license_wp_licenses',
+			$wpdb->update( $wpdb->lwp_licenses,
 				$data,
 				array(
 					'license_key' => $license->get_key()
