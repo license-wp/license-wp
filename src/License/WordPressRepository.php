@@ -49,7 +49,7 @@ class WordPressRepository implements Repository {
 	 *
 	 * @param License $license
 	 *
-	 * @return bool
+	 * @return License
 	 */
 	public function persist( $license ) {
 		global $wpdb;
@@ -101,6 +101,7 @@ class WordPressRepository implements Repository {
 
 		}
 
+		return $license;
 	}
 
 }
