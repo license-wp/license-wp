@@ -31,6 +31,11 @@ class PluginServiceProvider implements Pimple\ServiceProviderInterface {
 			return new License\Manager();
 		};
 
+		// license manager
+		$container['email_manager'] = function () {
+			return new Email\Manager();
+		};
+
 	}
 
 }
