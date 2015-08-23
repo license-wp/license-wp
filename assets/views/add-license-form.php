@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="wrap">
 	<h2><?php _e( 'Add License', 'license-wp' ); ?></h2>
 	<form id="licence-add-form" method="post">
-		<input type="hidden" name="page" value="wp_plugin_licencing_add_licence" />
+		<input type="hidden" name="page" value="license_wp_add_license" />
 		<p><?php _e( 'Create a license manually using the form below. The license key will be generated automatically and will be emailed to the customer.', 'license-wp' ); ?></p>
 		<table class="form-table">
 			<tr>
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<label for="product_id"><?php _e( 'Product', 'license-wp' ); ?></label>
 				</th>
 				<td>
-					<select name="product_id" class="lwp-select2" data-placeholder="<?php _e( 'Choose a product&hellip;', 'license-wp' ) ?>" style="width:25em">
+					<select name="product_id" class="lwp-select2" data-placeholder="<?php _e( 'Choose a product&hellip;', 'license-wp' ) ?>" style="width:30em">
 						<?php
 						echo '<option value=""></option>';
 
@@ -67,9 +67,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<label for="user_id"><?php _e( 'Customer', 'license-wp' ); ?></label>
 				</th>
 				<td>
-					<select id="user_id" name="user_id" class="lwp-select2-customer"  style="width:25em">
-						<option value=""><?php _e( 'Guest', 'license-wp' ) ?></option>
-					</select>
+					<input type="text" name="user_id" class="input-text regular-text lwp-select2-customer" placeholder="<?php _e( 'Guest', 'license-wp' ); ?>" data-nonce="<?php echo wp_create_nonce( "search-customers" ); ?>" style="width:30em" />
 				</td>
 			</tr>
 			<tr>
@@ -77,7 +75,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<label for="activation_email"><?php _e( 'Activation email', 'license-wp' ); ?></label>
 				</th>
 				<td>
-					<input type="email" name="activation_email" id="activation_email" class="input-text regular-text" placeholder="<?php _e( 'Use registered customer email', 'license-wp' ); ?>" />
+					<input type="email" name="activation_email" id="activation_email" class="input-text regular-text" placeholder="<?php _e( 'Email address used to activate product', 'license-wp' ); ?>" style="width:30em" />
 				</td>
 			</tr>
 		</table>
@@ -86,6 +84,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<input type="submit" class="button button-primary" name="add_license" value="<?php _e( 'Add License', 'license-wp' ); ?>" />
 		</p>
 
-		<?php wp_nonce_field( 'add_licence', 'license_wp_licensing_nonce' ); ?>
+		<?php wp_nonce_field( 'add_license', 'license_wp_licensing_nonce' ); ?>
 	</form>
 </div>
