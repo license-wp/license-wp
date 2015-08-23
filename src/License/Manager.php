@@ -23,7 +23,7 @@ class Manager {
 			) ) );
 
 			// check if exists
-			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT FROM ' . $wpdb->lwp_licenses . ' WHERE license_key = %s', $key ) );
+			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE license_key = %s', $key ) );
 
 		} while ( null !== $result ); // keep generating until we've got a unique key
 
