@@ -32,7 +32,7 @@ class Email {
 		if ( null != $licence_keys ) {
 
 			// load our template file
-			wc_get_template( 'email-keys.php', array( 'keys' => $licence_keys ), 'wp-plugin-licencing', license_wp()->service( 'file' )->plugin_path() . '/templates/' );
+			wc_get_template( 'email-keys.php', array( 'keys' => $licence_keys ), 'license-wp', license_wp()->service( 'file' )->plugin_path() . '/templates/' );
 		}
 	}
 
