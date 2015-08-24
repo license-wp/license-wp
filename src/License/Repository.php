@@ -14,7 +14,7 @@ interface Repository {
 	/**
 	 * @param License $license
 	 *
-	 * @return bool
+	 * @return License
 	 */
 	public function persist( $license );
 }
