@@ -1,8 +1,8 @@
 <?php
 
-namespace Never5\LicenseWP\PostType;
+namespace Never5\LicenseWP\ApiProduct;
 
-class ApiProduct {
+class PostType {
 
 	const KEY = 'api_product';
 
