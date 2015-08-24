@@ -110,6 +110,10 @@ class Order {
 							$license->set_product_id( ( $product->variation_id ? $product->variation_id : $product->id ) );
 							$license->set_activation_limit( $activation_limit );
 
+							// set date created
+							$date_created = new \DateTime();
+							$license->set_date_created( $date_created->setTime( 0, 0, 0 ) );
+
 							// set correct expiry days
 							if ( ! empty( $license_expiry_days ) ) {
 								$exp_date = new \DateTime();
