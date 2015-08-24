@@ -92,4 +92,21 @@ class Product {
 		update_post_meta( $variation_id, '_license_expiry_days', sanitize_text_field( $variation_license_expiry_days[ $i ] ) );
 	}
 
+	/**
+	 * Get WooCommerce product, returns parent if product is variable product
+	 *
+	 * @param $id
+	 *
+	 * @return \WP_Post
+	 */
+	public static function get_product( $id ) {
+		if ( 'product_variation' === get_post_type( $id ) ) {
+			$variation  = get_post( $id );
+			$product_id = $variation->post_parent;
+		} else {
+			$product_id = $id;
+		}
+		return get_post( $product_id );
+	}
+
 }
