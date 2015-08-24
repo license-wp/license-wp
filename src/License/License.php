@@ -2,22 +2,34 @@
 
 namespace Never5\LicenseWP\License;
 
+/**
+ * Class License
+ * @package Never5\LicenseWP\License
+ */
 class License {
 
+	/** @var string */
 	private $key = '';
 
+	/** @var int */
 	private $order_id = 0;
 
+	/** @var int */
 	private $user_id = 0;
 
+	/** @var string */
 	private $activation_email = '';
 
+	/** @var int */
 	private $product_id = 0;
 
+	/** @var int */
 	private $activation_limit = 0;
 
+	/** @var \DateTime */
 	private $date_created;
 
+	/** @var \DateTime */
 	private $date_expires;
 
 	/**
@@ -130,6 +142,40 @@ class License {
 	 */
 	public function set_date_expires( $date_expires ) {
 		$this->date_expires = $date_expires;
+	}
+
+	/**
+	 * Get API products this license gives access to
+	 *
+	 * @return array<\Never5\LicenseWP\ApiProduct\ApiProduct>
+	 */
+	public function get_api_products() {
+
+		// get correct product id (variations etc.)
+		if ( 'product_variation' === get_post_type( $this->get_product_id() ) ) {
+			$variation  = get_post( $this->get_product_id() );
+			$product_id = $variation->post_parent;
+		} else {
+			$product_id = $this->get_product_id();
+		}
+
+		// get the api product ids
+		$api_product_ids = (array) json_decode( get_post_meta( $product_id, '_api_product_permissions', true ) );
+
+		// array that stores the api products
+		$api_products = array();
+
+		// check and loop
+		if ( is_array( $api_product_ids ) && count( $api_product_ids ) > 0 ) {
+			foreach ( $api_product_ids as $api_product_id ) {
+
+				// create ApiProduct objects and store them in array
+				$api_products[] = license_wp()->service( 'api_product_factory' )->make( $api_product_id );
+			}
+		}
+
+		// return array
+		return $api_products;
 	}
 
 }
