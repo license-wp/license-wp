@@ -38,11 +38,11 @@ class Manager {
 	 *
 	 * @return array
 	 */
-	public function get_license_keys_by_order( $order_id ) {
+	public function get_licenses_by_order( $order_id ) {
 		global $wpdb;
 
 		// keys
-		$keys = array();
+		$licenses = array();
 
 		// fetch keys
 		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE order_id = %d', $order_id ) );
@@ -51,12 +51,12 @@ class Manager {
 		if ( count( $results ) > 0 ) {
 			foreach ( $results as $result ) {
 				// add to array
-				$keys[] = $result->license_key;
+				$licenses[] = license_wp()->service( 'license_factory' )->make( $result->license_key );
 			}
 		}
 
 		// return license keys
-		return $keys;
+		return $licenses;
 	}
 
 	/**
@@ -68,18 +68,17 @@ class Manager {
 		global $wpdb;
 
 		// get license keys
-		$license_keys = $this->get_license_keys_by_order( $order_id );
+		$licenses = $this->get_licenses_by_order( $order_id );
 
 		// count and loop
-		if ( count( $license_keys ) > 0 ) {
-			foreach ( $license_keys as $license_key ) {
+		if ( count( $licenses ) > 0 ) {
+			foreach ( $licenses as $license ) {
 				// delete all data connected to license key
-				$wpdb->delete( $wpdb->lwp_licenses, array( 'license_key' => $license_key ) );
-				$wpdb->delete( $wpdb->lwp_activations, array( 'license_key' => $license_key ) );
-				$wpdb->delete( $wpdb->lwp_download_log, array( 'license_key' => $license_key ) );
+				$wpdb->delete( $wpdb->lwp_licenses, array( 'license_key' => $license->get_key() ) );
+				$wpdb->delete( $wpdb->lwp_activations, array( 'license_key' => $license->get_key() ) );
+				$wpdb->delete( $wpdb->lwp_download_log, array( 'license_key' => $license->get_key() ) );
 			}
 		}
-
 
 	}
 
