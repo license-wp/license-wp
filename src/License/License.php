@@ -145,6 +145,20 @@ class License {
 	}
 
 	/**
+	 * Return if a license has expired
+	 *
+	 * @return bool
+	 */
+	public function is_expired() {
+
+		// check if license expired
+		if( null !== $this->get_date_expires() && $this->get_date_expires() < new \DateTime() ) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Get API products this license gives access to
 	 *
 	 * @return array<\Never5\LicenseWP\ApiProduct\ApiProduct>
