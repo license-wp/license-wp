@@ -97,6 +97,10 @@ class Plugin extends Pimple\Container {
 		$wc_email = new WooCommerce\Email();
 		$wc_email->setup();
 
+		// WooCommerce my account
+		$wc_my_account = new WooCommerce\MyAccount();
+		$wc_my_account->setup();
+
 		if ( is_admin() ) { // Backend
 
 			// meta box
