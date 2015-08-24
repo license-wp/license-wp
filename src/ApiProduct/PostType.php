@@ -10,10 +10,11 @@ class PostType {
 		self::register();
 
 		// filter title placeholder
-		add_filter( 'enter_title_here', function($text, $post ) {
+		add_filter( 'enter_title_here', function ( $text, $post ) {
 			if ( self::KEY === $post->post_type ) {
 				return __( 'Plugin name', 'license-wp' );
 			}
+
 			return $text;
 		}, 1, 2 );
 
@@ -79,7 +80,7 @@ class PostType {
 	 *
 	 * @return array
 	 */
-	public function columns($columns){
+	public function columns( $columns ) {
 		if ( ! is_array( $columns ) ) {
 			$columns = array();
 		}
