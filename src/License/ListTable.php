@@ -2,6 +2,8 @@
 
 namespace Never5\LicenseWP\License;
 
+use Never5\LicenseWP\WooCommerce;
+
 if ( ! class_exists( '\WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
@@ -39,13 +41,8 @@ class ListTable extends \WP_List_Table {
 			case 'activation_email' :
 				return $item->activation_email;
 			case 'product_id' :
-				if ( 'product_variation' === get_post_type( $item->product_id ) ) {
-					$variation  = get_post( $item->product_id );
-					$product_id = $variation->post_parent;
-				} else {
-					$product_id = $item->product_id;
-				}
-				$product = get_post( $product_id );
+
+				$product = WooCommerce\Product::get_product( $item->product_id );
 
 				return ( $product ) ? '<a href="' . admin_url( 'post.php?post=' . absint( $product->ID ) . '&action=edit' ) . '">' . esc_html( $product->post_title ) . '</a>' : __( 'n/a', 'license-wp' );
 			case 'user_id' :
