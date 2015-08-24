@@ -16,7 +16,7 @@ abstract class Assets {
 		global $pagenow, $post;
 
 		// only load WP media assets on correct page
-		if ( ( $pagenow == 'post.php' && isset( $post ) && PostType\ApiProduct::KEY === $post->post_type ) || ( $pagenow == 'post-new.php' && isset( $_GET['post_type'] ) && PostType\ApiProduct::KEY == $_GET['post_type'] ) ) {
+		if ( ( $pagenow == 'post.php' && isset( $post ) && ApiProduct\PostType::KEY === $post->post_type ) || ( $pagenow == 'post-new.php' && isset( $_GET['post_type'] ) && ApiProduct\PostType::KEY == $_GET['post_type'] ) ) {
 			wp_enqueue_media();
 		}
 
