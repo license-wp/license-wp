@@ -82,7 +82,7 @@ class Plugin extends Pimple\Container {
 		$container = $this;
 
 		// Backend & Frontend
-		$api_product = new PostType\ApiProduct();
+		$api_product = new ApiProduct\PostType();
 		$api_product->setup();
 
 		// WooCommerce product
