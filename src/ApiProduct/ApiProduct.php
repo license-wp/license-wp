@@ -228,4 +228,19 @@ class ApiProduct {
 	public function set_changelog( $changelog ) {
 		$this->changelog = $changelog;
 	}
+
+	/**
+	 * Get API product download URL
+	 *
+	 * @param \Never5\LicenseWP\License\License $license
+	 *
+	 * @return string
+	 */
+	public function download_url( $license ) {
+		return add_query_arg( array(
+			'download_api_product' => $this->get_id(),
+			'licence_key'          => $license->get_key(),
+			'activation_email'     => $license->get_activation_email()
+		), home_url( '/' ) );
+	}
 }
