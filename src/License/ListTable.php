@@ -53,7 +53,7 @@ class ListTable extends \WP_List_Table {
 			case 'activations' :
 				$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT( activation_id ) FROM {$wpdb->lwp_activations} WHERE activation_active = 1 AND license_key=%s;", $item->license_key ) );
 
-				return '<a href="' . admin_url( 'admin.php?page=wp_plugin_licencing_activations&amp;license_key=' . $item->license_key ) . '">' . absint( $count ) . ' &rarr;</a>';
+				return '<a href="' . admin_url( 'admin.php?page=license_wp_activations&amp;license_key=' . $item->license_key ) . '">' . absint( $count ) . ' &rarr;</a>';
 			case 'activation_limit' :
 				return $item->activation_limit ? sprintf( __( '%d per product', 'license-wp' ), absint( $item->activation_limit ) ) : __( 'n/a', 'license-wp' );
 			case 'order_id' :
