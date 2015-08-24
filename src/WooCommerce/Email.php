@@ -22,7 +22,7 @@ class Email {
 
 		// check and get order
 		if ( ! is_object( $order ) ) {
-			$order = new WC_Order( $order );
+			$order = new \WC_Order( $order );
 		}
 
 		// fetch license keys
