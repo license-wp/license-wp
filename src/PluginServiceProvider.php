@@ -4,6 +4,7 @@ namespace Never5\LicenseWP;
 
 use Never5\LicenseWP\License;
 use Never5\LicenseWP\ApiProduct;
+use Never5\LicenseWP\Activation;
 
 class PluginServiceProvider implements Pimple\ServiceProviderInterface {
 
@@ -50,6 +51,21 @@ class PluginServiceProvider implements Pimple\ServiceProviderInterface {
 		// API product manager
 		$container['api_product_manager'] = function () {
 			return new ApiProduct\Manager();
+		};
+
+		// Activation repository
+		$container['activation_repository'] = function () {
+			return new Activation\WordPressRepository();
+		};
+
+		// Activation factory
+		$container['activation_factory'] = function () use ( $container ) {
+			return new Activation\Factory( $container['activation_repository'] );
+		};
+
+		// Activation manager
+		$container['activation_manager'] = function () {
+			return new Activation\Manager();
 		};
 
 	}
