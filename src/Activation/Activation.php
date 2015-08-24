@@ -106,4 +106,18 @@ class Activation {
 		$this->activation_active = $activation_active;
 	}
 
+	/**
+	 * Returns URL to deactivate activation
+	 *
+	 * @param \Never5\LicenseWP\License\License $license
+	 *
+	 * @return string
+	 */
+	public function get_deactivate_url( $license ) {
+		return esc_url( add_query_arg( array(
+			'deactivate_licence' => $this->get_id(),
+			'licence_key'        => $license->get_key(),
+			'activation_email'   => $license->get_activation_email()
+		) ) );
+	}
 }
