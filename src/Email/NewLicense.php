@@ -7,13 +7,13 @@ class NewLicense extends Email {
 	/**
 	 * __construct
 	 *
-	 * @param string $license_key
+	 * @param \Never5\LicenseWP\License\License $license
 	 * @param string $first_name
 	 */
-	public function __construct( $license_key, $first_name ) {
+	public function __construct( $license, $first_name ) {
 		$subject = sprintf( 'Your %s license keys', get_bloginfo( 'name' ) );
 		parent::__construct( $subject, 'new-licence-email.php', array(
-			'key'             => $license_key,
+			'license'         => $license,
 			'user_first_name' => $first_name
 		) );
 	}
