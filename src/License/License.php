@@ -178,4 +178,14 @@ class License {
 		return $api_products;
 	}
 
+	/**
+	 * Get activations of license
+	 * Uses Activations\Manager:get_activations
+	 *
+	 * @return array
+	 */
+	public function get_activations() {
+		return license_wp()->service( 'activation_manager' )->get_activations( $this );
+	}
+
 }
