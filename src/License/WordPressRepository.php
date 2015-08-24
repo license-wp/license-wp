@@ -17,7 +17,7 @@ class WordPressRepository implements Repository {
 		$data = new \stdClass();
 
 		$row = $wpdb->get_row( $wpdb->prepare( "
-		SELECT * FROM {$wpdb->prefix}license_wp_licenses
+		SELECT * FROM {$wpdb->lwp_licenses}
 		WHERE license_key = %s
 	", $key ) );
 

@@ -34,7 +34,7 @@ class Factory {
 			// fetch data from repository
 			$data = $this->repository->retrieve( $id );
 
-			// set data from repository in license object
+			// set data from repository in API product object
 			foreach ( $data as $dkey => $dval ) {
 				$method = 'set_' . $dkey;
 				if ( method_exists( $product, $method ) ) {
