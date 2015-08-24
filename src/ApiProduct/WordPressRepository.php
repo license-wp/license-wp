@@ -22,16 +22,16 @@ class WordPressRepository implements Repository {
 			$data->id                = $post->ID;
 			$data->name              = $post->post_title;
 			$data->slug              = $post->post_name;
-			$data->version           = get_post_meta( '_version', $post->ID, true );
-			$data->date              = get_post_meta( '_date', $post->ID, true );
-			$data->package           = get_post_meta( '_package', $post->ID, true );
-			$data->uri               = get_post_meta( '_plugin_uri', $post->ID, true );
-			$data->author            = get_post_meta( '_author', $post->ID, true );
-			$data->author_uri        = get_post_meta( '_author_uri ', $post->ID, true );
-			$data->requires_at_least = get_post_meta( '_requires_wp_version ', $post->ID, true );
-			$data->tested_up_to      = get_post_meta( '_tested_wp_version ', $post->ID, true );
+			$data->version           = get_post_meta( $post->ID, '_version', true );
+			$data->date              = get_post_meta( $post->ID, '_date', true );
+			$data->package           = get_post_meta( $post->ID, '_package', true );
+			$data->uri               = get_post_meta( $post->ID, '_plugin_uri', true );
+			$data->author            = get_post_meta( $post->ID, '_author', true );
+			$data->author_uri        = get_post_meta( $post->ID, '_author_uri ', true );
+			$data->requires_at_least = get_post_meta( $post->ID, '_requires_wp_version ', true );
+			$data->tested_up_to      = get_post_meta( $post->ID, '_tested_wp_version ', true );
 			$data->description       = $post->post_content;
-			$data->changelog         = get_post_meta( '_changelog ', $post->ID, true );
+			$data->changelog         = get_post_meta( $post->ID, '_changelog ', true );
 		}
 
 		return $data;
