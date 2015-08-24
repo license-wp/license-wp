@@ -11,7 +11,7 @@ class ListTable extends \WP_List_Table {
 	/**
 	 * Constructor
 	 */
-	public function __construct(){
+	public function __construct() {
 		//Set parent defaults
 		parent::__construct( array(
 			'singular' => 'license key',
@@ -24,6 +24,7 @@ class ListTable extends \WP_List_Table {
 	 * Column default
 	 *
 	 * @access public
+	 *
 	 * @param object $item
 	 * @param array $column_name
 	 *
@@ -32,13 +33,19 @@ class ListTable extends \WP_List_Table {
 	public function column_default( $item, $column_name ) {
 		global $wpdb;
 
-		switch( $column_name ) {
+		switch ( $column_name ) {
 			case 'license_key' :
 				return '<code>' . $item->license_key . '</code>';
 			case 'activation_email' :
 				return $item->activation_email;
 			case 'product_id' :
-				$product = wppl_get_license_product( $item->product_id );
+				if ( 'product_variation' === get_post_type( $item->product_id ) ) {
+					$variation  = get_post( $item->product_id );
+					$product_id = $variation->post_parent;
+				} else {
+					$product_id = $item->product_id;
+				}
+				$product = get_post( $product_id );
 
 				return ( $product ) ? '<a href="' . admin_url( 'post.php?post=' . absint( $product->ID ) . '&action=edit' ) . '">' . esc_html( $product->post_title ) . '</a>' : __( 'n/a', 'license-wp' );
 			case 'user_id' :
@@ -50,7 +57,7 @@ class ListTable extends \WP_List_Table {
 			case 'activation_limit' :
 				return $item->activation_limit ? sprintf( __( '%d per product', 'license-wp' ), absint( $item->activation_limit ) ) : __( 'n/a', 'license-wp' );
 			case 'order_id' :
-				return $item->order_id > 0 ? '<a href="' . admin_url( 'post.php?post=' . absint( $item->order_id ) . '&action=edit' ) . '">#' . absint( $item->order_id  ) . ' &rarr;</a>' : __( 'n/a', 'license-wp' );
+				return $item->order_id > 0 ? '<a href="' . admin_url( 'post.php?post=' . absint( $item->order_id ) . '&action=edit' ) . '">#' . absint( $item->order_id ) . ' &rarr;</a>' : __( 'n/a', 'license-wp' );
 			case 'date_created' :
 				return ( $item->date_created ) ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_created ) ) : __( 'n/a', 'license-wp' );
 			case 'date_expires' :
@@ -62,11 +69,12 @@ class ListTable extends \WP_List_Table {
 	 * Column callback
 	 *
 	 * @access public
+	 *
 	 * @param mixed $item
 	 *
 	 * @return string
 	 */
-	public function column_cb( $item ){
+	public function column_cb( $item ) {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			'license_key',
@@ -79,7 +87,7 @@ class ListTable extends \WP_List_Table {
 	 *
 	 * @access public
 	 */
-	public function get_columns(){
+	public function get_columns() {
 		$columns = array(
 			'cb'               => '<input type="checkbox" />',
 			'license_key'      => __( 'License key', 'license-wp' ),
@@ -92,6 +100,7 @@ class ListTable extends \WP_List_Table {
 			'date_created'     => __( 'Date created', 'license-wp' ),
 			'date_expires'     => __( 'Date expires', 'license-wp' )
 		);
+
 		return $columns;
 	}
 
@@ -109,6 +118,7 @@ class ListTable extends \WP_List_Table {
 			'product_id'       => array( 'product_id', false ),
 			'activation_email' => array( 'activation_email', false ),
 		);
+
 		return $sortable_columns;
 	}
 
@@ -121,6 +131,7 @@ class ListTable extends \WP_List_Table {
 			'deactivate' => __( 'Deactivate', 'license-wp' ),
 			'delete'     => __( 'Delete', 'license-wp' )
 		);
+
 		return $actions;
 	}
 
