@@ -63,7 +63,6 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 			<?php
 			/** @var \Never5\LicenseWP\Activation\Activation $activation */
 			$activation = $activation;
-			// @todo fix deactivate URL
 			?>
 			<tr>
 				<td colspan="3">
