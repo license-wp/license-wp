@@ -122,6 +122,10 @@ class Plugin extends Pimple\Container {
 			// frontend assets
 			add_action( 'wp_enqueue_scripts', array( 'Never5\\LicenseWP\\Assets', 'enqueue_frontend' ) );
 
+			// listen to API Product download requests
+			$download_handler = new ApiProduct\DownloadHandler();
+			$download_handler->listen();
+
 		}
 
 	}
