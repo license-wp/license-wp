@@ -120,19 +120,19 @@ class ListTable extends \WP_List_Table {
 			switch ( $this->current_action() ) {
 				case 'activate' :
 					foreach ( $items as $id ) {
-						$wpdb->update( "{$wpdb->prefix}wp_plugin_licencing_activations", array( 'activation_active' => 1 ), array( 'activation_id' => $id ) );
+						$wpdb->update( "{$wpdb->lwp_activations}", array( 'activation_active' => 1 ), array( 'activation_id' => $id ) );
 					}
 					echo '<div class="updated"><p>' . sprintf( __( '%d activations activated', 'license-wp' ), sizeof( $items ) ) . '</p></div>';
 					break;
 				case 'deactivate' :
 					foreach ( $items as $id ) {
-						$wpdb->update( "{$wpdb->prefix}wp_plugin_licencing_activations", array( 'activation_active' => 0 ), array( 'activation_id' => $id ) );
+						$wpdb->update( "{$wpdb->lwp_activations}", array( 'activation_active' => 0 ), array( 'activation_id' => $id ) );
 					}
 					echo '<div class="updated"><p>' . sprintf( __( '%d activations deactivated', 'license-wp' ), sizeof( $items ) ) . '</p></div>';
 					break;
 				case 'delete' :
 					foreach ( $items as $id ) {
-						$wpdb->delete( "{$wpdb->prefix}wp_plugin_licencing_activations", array( 'activation_id' => $id ) );
+						$wpdb->delete( "{$wpdb->lwp_activations}", array( 'activation_id' => $id ) );
 					}
 					echo '<div class="updated"><p>' . sprintf( __( '%d activations deleted', 'license-wp' ), sizeof( $items ) ) . '</p></div>';
 					break;
