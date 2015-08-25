@@ -33,4 +33,23 @@ class Manager {
 		return $activations;
 	}
 
+	/**
+	 * Deactivate an activation
+	 *
+	 * @param Activation $activation
+	 *
+	 * @return bool
+	 */
+	public function deactivate( $activation ) {
+		// set active to 0
+		$activation->set_activation_active( 0 );
+
+
+		// persists activation
+		$activation = license_wp()->service( 'activation_repository' )->persist( $activation );
+
+		// return true of active is set to 0
+		return ( $activation->get_activation_active() == 0 );
+	}
+
 }
