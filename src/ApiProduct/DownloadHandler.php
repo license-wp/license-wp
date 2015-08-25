@@ -45,7 +45,7 @@ class DownloadHandler {
 
 		// check if license exists
 		if ( empty( $license->get_key() ) ) {
-			wp_die( __( 'Invalid or expired license key.', 'license-wp' ) );
+			wp_die( __( 'Invalid license key.', 'license-wp' ) );
 		}
 
 		// check if license expired
