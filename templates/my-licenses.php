@@ -66,7 +66,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 			?>
 			<tr>
 				<td colspan="3">
-					<?php echo get_the_title( get_post( $activation->get_api_product_id() ) ); ?> &mdash; <a href="<?php echo esc_attr( $activation->get_instance() ); ?>" target="_blank"><?php echo esc_html( $activation->get_instance() ); ?></a> <a class="button" style="float:right" href="<?php echo $activation->get_deactivate_url($license); ?>"><?php _e( 'Deactivate', 'license-wp' ); ?></a>
+					<?php echo get_the_title(  $activation->get_api_product_post_id() ); ?> &mdash; <a href="<?php echo esc_attr( $activation->get_instance() ); ?>" target="_blank"><?php echo esc_html( $activation->get_instance() ); ?></a> <a class="button" style="float:right" href="<?php echo $activation->get_deactivate_url($license); ?>"><?php _e( 'Deactivate', 'license-wp' ); ?></a>
 				</td>
 			</tr>
 		<?php endforeach; ?>
