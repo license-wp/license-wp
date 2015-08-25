@@ -209,7 +209,7 @@ class License {
 	 */
 	public function get_renewal_url() {
 		return add_query_arg( array(
-			'renew_licence'    => $this->get_key(),
+			'renew_license'    => $this->get_key(),
 			'activation_email' => $this->get_activation_email()
 		), WC()->cart->get_cart_url() );
 	}
