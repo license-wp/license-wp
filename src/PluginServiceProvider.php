@@ -5,6 +5,7 @@ namespace Never5\LicenseWP;
 use Never5\LicenseWP\License;
 use Never5\LicenseWP\ApiProduct;
 use Never5\LicenseWP\Activation;
+use Never5\LicenseWP\Log;
 
 class PluginServiceProvider implements Pimple\ServiceProviderInterface {
 
@@ -66,6 +67,11 @@ class PluginServiceProvider implements Pimple\ServiceProviderInterface {
 		// Activation manager
 		$container['activation_manager'] = function () {
 			return new Activation\Manager();
+		};
+
+		// Log
+		$container['log'] = function () {
+			return new Log\Log();
 		};
 
 	}
