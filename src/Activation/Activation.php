@@ -2,6 +2,8 @@
 
 namespace Never5\LicenseWP\Activation;
 
+use Never5\LicenseWP\ApiProduct;
+
 class Activation {
 
 	/** @var int */
@@ -62,6 +64,16 @@ class Activation {
 	 */
 	public function set_api_product_id( $api_product_id ) {
 		$this->api_product_id = $api_product_id;
+	}
+
+	/**
+	 * Get API Product post ID
+	 *
+	 * @return int
+	 */
+	public function get_api_product_post_id() {
+		$api_product = get_page_by_path( $this->get_api_product_id(), OBJECT, ApiProduct\PostType::KEY );
+		return isset( $api_product->ID ) ? $api_product->ID : 0;
 	}
 
 	/**
