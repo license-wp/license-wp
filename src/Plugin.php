@@ -97,10 +97,6 @@ class Plugin extends Pimple\Container {
 		$wc_email = new WooCommerce\Email();
 		$wc_email->setup();
 
-		// WooCommerce my account
-		$wc_my_account = new WooCommerce\MyAccount();
-		$wc_my_account->setup();
-
 		if ( is_admin() ) { // Backend
 
 			// meta box
@@ -125,6 +121,14 @@ class Plugin extends Pimple\Container {
 			// listen to API Product download requests
 			$download_handler = new ApiProduct\DownloadHandler();
 			$download_handler->listen();
+
+			// WooCommerce my account
+			$wc_my_account = new WooCommerce\MyAccount();
+			$wc_my_account->setup();
+
+			// WooCommerce license renewals
+			$renewals = new WooCommerce\Renewal();
+			$renewals->setup();
 
 		}
 
