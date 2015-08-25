@@ -239,7 +239,7 @@ class ApiProduct {
 	public function download_url( $license ) {
 		return add_query_arg( array(
 			'download_api_product' => $this->get_id(),
-			'licence_key'          => $license->get_key(),
+			'license_key'          => $license->get_key(),
 			'activation_email'     => $license->get_activation_email()
 		), home_url( '/' ) );
 	}

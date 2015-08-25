@@ -28,7 +28,7 @@ class Factory {
 		// empty license object
 		$license = new License();
 
-		// check if id is sset
+		// check if id is set
 		if ( '' !== $key ) {
 
 			// fetch data from repository
