@@ -73,6 +73,7 @@ class Activation {
 	 */
 	public function get_api_product_post_id() {
 		$api_product = get_page_by_path( $this->get_api_product_id(), OBJECT, ApiProduct\PostType::KEY );
+
 		return isset( $api_product->ID ) ? $api_product->ID : 0;
 	}
 
@@ -119,6 +120,15 @@ class Activation {
 	}
 
 	/**
+	 * Returns is activation is active
+	 *
+	 * @return bool
+	 */
+	public function is_active() {
+		return ( 1 == $this->activation_active );
+	}
+
+	/**
 	 * Returns URL to deactivate activation
 	 *
 	 * @param \Never5\LicenseWP\License\License $license
@@ -127,9 +137,10 @@ class Activation {
 	 */
 	public function get_deactivate_url( $license ) {
 		return esc_url( add_query_arg( array(
-			'deactivate_licence' => $this->get_id(),
-			'licence_key'        => $license->get_key(),
+			'deactivate_license' => $this->get_id(),
+			'license_key'        => $license->get_key(),
 			'activation_email'   => $license->get_activation_email()
 		) ) );
 	}
+
 }
