@@ -30,7 +30,7 @@ class License {
 	private $date_created;
 
 	/** @var \DateTime */
-	private $date_expires;
+	private $date_expires = null;
 
 	/**
 	 * @return string
