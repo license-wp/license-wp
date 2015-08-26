@@ -88,6 +88,34 @@ class Manager {
 	}
 
 	/**
+	 * Get licenses by email addresses
+	 *
+	 * @param string $email
+	 *
+	 * @return array
+	 */
+	public function get_licenses_by_email( $email ) {
+		global $wpdb;
+
+		// keys
+		$licenses = array();
+
+		// fetch keys
+		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE activation_email = %s', $email ) );
+
+		// count & loop
+		if ( count( $results ) > 0 ) {
+			foreach ( $results as $result ) {
+				// add to array
+				$licenses[] = license_wp()->service( 'license_factory' )->make( $result->license_key );
+			}
+		}
+
+		// return license keys
+		return $licenses;
+	}
+
+	/**
 	 * Remove license by order ID
 	 *
 	 * @param $order_id
