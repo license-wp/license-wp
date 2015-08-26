@@ -9,9 +9,11 @@ class Manager {
 	 *
 	 * @param Email $email
 	 * @param string $recipient
+	 *
+	 * @return bool
 	 */
 	public function send( Email $email, $recipient ) {
-		wp_mail( $recipient, $email->get_subject(), $email->get_content() );
+		return wp_mail( $recipient, $email->get_subject(), $email->get_content() );
 	}
 
 }
