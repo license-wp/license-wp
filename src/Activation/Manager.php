@@ -8,14 +8,25 @@ class Manager {
 	 * Get activated activations by license
 	 *
 	 * @param \Never5\LicenseWP\License\License $license
+	 * @param bool $only_active
 	 *
 	 * @return array
 	 */
-	public function get_activations( $license ) {
+	public function get_activations( $license, $only_active=true ) {
 		global $wpdb;
 
+		// dat SQL
+		$sql = "SELECT `activation_id` FROM {$wpdb->lwp_activations} WHERE license_key=%s";
+
+		// add if only_active is true
+		if( $only_active ) {
+			$sql .= " AND activation_active = 1";
+		}
+
+		$sql .= ";";
+
 		// get activation rows
-		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT `activation_id` FROM {$wpdb->lwp_activations} WHERE activation_active = 1 AND license_key=%s;", $license->get_key() ) );
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $license->get_key() ) );
 
 		// array that stores the api products
 		$activations = array();
