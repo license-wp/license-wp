@@ -97,6 +97,10 @@ class Plugin extends Pimple\Container {
 		$wc_email = new WooCommerce\Email();
 		$wc_email->setup();
 
+		// WooCommerce API
+		$api_activation = new API\Activation();
+		$api_activation->setup();
+
 		if ( is_admin() ) { // Backend
 
 			// meta box
@@ -138,19 +142,6 @@ class Plugin extends Pimple\Container {
 
 
 class WP_Plugin_Licencing {
-
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-
-		add_action( 'woocommerce_api_wp_plugin_licencing_activation_api', array(
-			$this,
-			'handle_activation_api_request'
-		) );
-		add_action( 'woocommerce_api_wp_plugin_licencing_update_api', array( $this, 'handle_update_api_request' ) );
-	}
-
 
 	/**
 	 * Activation
