@@ -21,7 +21,7 @@ class Activation {
 	/** @var \DateTime */
 	private $activation_date;
 
-	/** @var \DateTime */
+	/** @var int */
 	private $activation_active = 0;
 
 	/**
@@ -106,14 +106,14 @@ class Activation {
 	}
 
 	/**
-	 * @return \DateTime
+	 * @return int
 	 */
 	public function get_activation_active() {
 		return $this->activation_active;
 	}
 
 	/**
-	 * @param \DateTime $activation_active
+	 * @param int $activation_active
 	 */
 	public function set_activation_active( $activation_active ) {
 		$this->activation_active = $activation_active;
