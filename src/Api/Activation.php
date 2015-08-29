@@ -97,7 +97,7 @@ class Activation {
 					$this->activate( $license, $request );
 					break;
 				case 'deactivate' :
-					$this->deactivate();
+					$this->deactivate( $license, $request );
 					break;
 				default :
 					throw new ApiException( __( 'Invalid API Request.', 'license-wp' ), 100 );
@@ -117,7 +117,7 @@ class Activation {
 	}
 
 	/**
-	 * Activate an instance to a license
+	 * Activate an instance of a license
 	 *
 	 * @param \Never5\LicenseWP\License\License $license
 	 * @param array $request
@@ -197,11 +197,11 @@ class Activation {
 		}
 
 		// calculate activations left
-		error_log(count( $license->get_activations() ), 0);
 		$activations_left = ( ( $license->get_activation_limit() > 0 ) ? $license->get_activation_limit() - count( $license->get_activations() ) : - 1 );
 
 		// response
 		$response = apply_filters( 'license_wp_api_activation_response', array(
+			'success'   => true,
 			'activated' => true,
 			'remaining' => $activations_left
 		) );
@@ -212,4 +212,56 @@ class Activation {
 
 	}
 
+	/**
+	 * Deactivates an instance of a license
+	 *
+	 * @param \Never5\LicenseWP\License\License $license
+	 * @param array $request
+	 *
+	 * @throws ApiException
+	 */
+	private function deactivate( $license, $request ) {
+
+		// get activations
+		$activations = $license->get_activations();
+
+		// check & loop
+		if ( count( $activations ) > 0 ) {
+
+			/** @var \Never5\LicenseWP\Activation\Activation $activation */
+			foreach ( $activations as $activation ) {
+
+
+				// check if given instance equals activation instance
+				if ( $request['instance'] == $activation->get_instance() ) {
+
+					// set activation to not active
+					$activation->set_activation_active( 0 );
+
+					// set activation date to now
+					$activation->set_activation_date( new \DateTime() );
+
+					// persist activation
+					$activation = license_wp()->service( 'activation_repository' )->persist( $activation );
+
+					// check if deactivation was successful
+					if ( $activation->is_active() ) {
+						throw new ApiException( __( 'Deactivation error: Could not deactivate license key. Please contact support.', 'license-wp' ), 108 );
+					}
+
+					// response
+					$response = apply_filters( 'license_wp_api_activation_response', array(
+						'success' => true,
+					) );
+
+					// send JSON the WP way
+					wp_send_json( $response );
+					exit;
+				}
+			}
+		}
+
+		throw new ApiException( __( 'Deactivation error: instance not found.', 'license-wp' ), 109 );
+
+	}
 }
