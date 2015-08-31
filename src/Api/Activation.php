@@ -62,20 +62,13 @@ class Activation {
 				throw new ApiException( __( 'Activation error: The provided licence has expired.', 'license-wp' ), 110 ); // @todo add renew link
 			}
 
-			// get api products linked to license
-			$api_products = $license->get_api_products();
+			// get api product by given api product id (slug)
+			$api_product = $license->get_api_product_by_slug( $request['api_product_id'] );
 
-			// store api product ids in array
-			$api_products_ids = array();
-			if ( count( $api_products ) > 0 ) {
-				foreach ( $api_products as $api_product ) {
-					$api_products_ids[] = $api_product->get_slug();
-				}
-			}
 
 			// check if license grants access to request api product
-			if ( ! in_array( $request['api_product_id'], $api_products_ids ) ) {
-				throw new ApiException( sprintf( __( 'This license does not allow access to the requested product.', 'license-wp' ), $request['email'] ), 104 );
+			if ( null === $api_product ) {
+				throw new ApiException( __( 'This license does not allow access to the requested product.', 'license-wp' ), 104 );
 			}
 
 			switch ( $request['request'] ) {
