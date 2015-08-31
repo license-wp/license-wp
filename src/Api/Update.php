@@ -25,7 +25,7 @@ class Update {
 
 		// send no-cache header
 		nocache_headers();
-		
+
 		// set request
 		$request = array_map( 'sanitize_text_field', apply_filters( 'license_wp_api_update_request', $_GET ) );
 
@@ -53,12 +53,12 @@ class Update {
 
 			// check if license exists
 			if ( empty( $license->get_key() ) ) {
-				throw new UpdateException( __( 'Update error: The provided licence is invalid.', 'license-wp' ), 'invalid_key' );
+				throw new UpdateException( __( 'Update error: The provided license is invalid.', 'license-wp' ), 'invalid_key' );
 			}
 
 			// check if license expired
 			if ( $license->is_expired() ) {
-				throw new UpdateException( __( 'Update error: The provided licence has expired.', 'license-wp' ), 'expired_key' );
+				throw new UpdateException( __( 'Update error: The provided license has expired.', 'license-wp' ), 'expired_key' );
 			}
 
 			// get api product by given api product id (slug)

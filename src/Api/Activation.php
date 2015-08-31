@@ -40,7 +40,7 @@ class Activation {
 
 			// check for license var
 			if ( ! isset( $request['license_key'] ) || empty( $request['license_key'] ) ) {
-				throw new ApiException( __( 'Activation error: The provided licence is invalid.', 'license-wp' ), 101 );
+				throw new ApiException( __( 'Activation error: The provided license is invalid.', 'license-wp' ), 101 );
 			}
 
 			// check for api product ID var
@@ -54,12 +54,12 @@ class Activation {
 
 			// check if license exists
 			if ( empty( $license->get_key() ) ) {
-				throw new ApiException( __( 'Activation error: The provided licence is invalid.', 'license-wp' ), 101 );
+				throw new ApiException( __( 'Activation error: The provided license is invalid.', 'license-wp' ), 101 );
 			}
 
 			// check if license expired
 			if ( $license->is_expired() ) {
-				throw new ApiException( __( 'Activation error: The provided licence has expired.', 'license-wp' ), 110 ); // @todo add renew link
+				throw new ApiException( __( 'Activation error: The provided license has expired.', 'license-wp' ), 110 ); // @todo add renew link
 			}
 
 			// get api product by given api product id (slug)
