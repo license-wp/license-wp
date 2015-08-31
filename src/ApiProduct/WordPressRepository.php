@@ -27,11 +27,11 @@ class WordPressRepository implements Repository {
 			$data->package           = get_post_meta( $post->ID, '_package', true );
 			$data->uri               = get_post_meta( $post->ID, '_plugin_uri', true );
 			$data->author            = get_post_meta( $post->ID, '_author', true );
-			$data->author_uri        = get_post_meta( $post->ID, '_author_uri ', true );
-			$data->requires_at_least = get_post_meta( $post->ID, '_requires_wp_version ', true );
-			$data->tested_up_to      = get_post_meta( $post->ID, '_tested_wp_version ', true );
+			$data->author_uri        = get_post_meta( $post->ID, '_author_uri', true );
+			$data->requires_at_least = get_post_meta( $post->ID, '_requires_wp_version', true );
+			$data->tested_up_to      = get_post_meta( $post->ID, '_tested_wp_version', true );
 			$data->description       = $post->post_content;
-			$data->changelog         = get_post_meta( $post->ID, '_changelog ', true );
+			$data->changelog         = get_post_meta( $post->ID, '_changelog', true );
 		}
 
 		return $data;
