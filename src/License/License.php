@@ -193,6 +193,27 @@ class License {
 	}
 
 	/**
+	 * Get API product of license by slug
+	 *
+	 * @param $slug
+	 *
+	 * @return \Never5\LicenseWP\ApiProduct\ApiProduct
+	 */
+	public function get_api_product_by_slug( $slug ) {
+		$api_products = $this->get_api_products();
+
+		if ( count( $api_products ) > 0 ) {
+			foreach ( $api_products as $api_product ) {
+				if( $api_product->get_slug() == $slug ) {
+					return $api_product;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get activations of license
 	 * Uses Activations\Manager:get_activations
 	 *
