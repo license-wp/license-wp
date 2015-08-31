@@ -97,9 +97,13 @@ class Plugin extends Pimple\Container {
 		$wc_email = new WooCommerce\Email();
 		$wc_email->setup();
 
-		// WooCommerce API
+		// WooCommerce API Activation
 		$api_activation = new API\Activation();
 		$api_activation->setup();
+
+		// WooCommerce API Update
+		$api_update = new API\Update();
+		$api_update->setup();
 
 		if ( is_admin() ) { // Backend
 
@@ -138,24 +142,4 @@ class Plugin extends Pimple\Container {
 
 	}
 
-}
-
-
-class WP_Plugin_Licencing {
-
-	/**
-	 * Activation
-	 */
-	public function handle_activation_api_request() {
-		include_once( 'includes/class-wp-plugin-licencing-activation-api.php' );
-		new WP_Plugin_Licencing_Activation_API( $_REQUEST );
-	}
-
-	/**
-	 * Plugin updates
-	 */
-	public function handle_update_api_request() {
-		include_once( 'includes/class-wp-plugin-licencing-update-api.php' );
-		new WP_Plugin_Licencing_Update_API( $_REQUEST );
-	}
 }
