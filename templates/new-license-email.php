@@ -21,7 +21,7 @@ $api_products = $license->get_api_products();
 if ( isset( $api_products ) && count( $api_products ) > 0 ) {
 	foreach ( $api_products as $api_product ) {
 		echo "\n====================\n";
-		echo esc_html( get_the_title( $api_product->get_id() ) ) . ': ' . $api_product->download_url( $license ) . "\n";
+		echo esc_html( get_the_title( $api_product->get_id() ) ) . ': ' . $api_product->get_download_url( $license ) . "\n";
 		echo $license->get_key() . "";
 		echo "\n====================\n\n";
 	}

@@ -236,7 +236,7 @@ class ApiProduct {
 	 *
 	 * @return string
 	 */
-	public function download_url( $license ) {
+	public function get_download_url( $license ) {
 		return add_query_arg( array(
 			'download_api_product' => $this->get_id(),
 			'license_key'          => $license->get_key(),
