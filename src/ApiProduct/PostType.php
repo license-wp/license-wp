@@ -18,6 +18,9 @@ class PostType {
 			return $text;
 		}, 1, 2 );
 
+		// add custom scripts
+		add_action( 'admin_enqueue_scripts', array( $this, 'page_enqueue' ) );
+
 		// add custom columns
 		add_filter( 'manage_edit-api_product_columns', array( $this, 'columns' ) );
 
@@ -71,6 +74,20 @@ class PostType {
 			'has_archive'         => false,
 			'show_in_nav_menus'   => false
 		) );
+	}
+
+	/**
+	 * Method to enqueue page specific styles & scripts
+	 */
+	public function page_enqueue( $hook ) {
+		if ( 'post-new.php' === $hook || 'post.php' === $hook ) {
+			wp_enqueue_script(
+				'lwp_add_api_product',
+				license_wp()->service( 'file' )->plugin_url( '/assets/js/add-api-product' . ( ( ! SCRIPT_DEBUG ) ? '.min' : '' ) . '.js' ),
+				array( 'jquery', 'jquery-ui-datepicker' ),
+				license_wp()->get_version()
+			);
+		}
 	}
 
 	/**
