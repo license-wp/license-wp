@@ -6,5 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Parsedown' => array($vendorDir . '/erusev/parsedown'),
     '' => array($vendorDir . '/wpupdatephp/wp-update-php/src'),
 );
