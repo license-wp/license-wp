@@ -3,6 +3,7 @@
     "psr-4": {"Never5\\LicenseWP\\": "src/"}
   },
   "require": {
-    "wpupdatephp/wp-update-php": "~1.0"
+    "wpupdatephp/wp-update-php": "~1.0",
+    "erusev/parsedown": "~1.5.4"
   }
 }
