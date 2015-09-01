@@ -105,7 +105,6 @@ class AddLicense extends SubPage {
 			}
 
 			// get WooCommerce product
-//			var_dump($product_id);
 			$product = \wc_get_product( $product_id );
 
 			// product must be an API license product
