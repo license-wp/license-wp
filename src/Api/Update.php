@@ -175,6 +175,7 @@ class Update {
 		// check if transient exists
 		if ( false === ( $data = get_transient( $transient_name ) ) ) {
 
+			// set data properties
 			$data               = new \stdClass();
 			$data->name         = $api_product->get_name();
 			$data->plugin       = $request['plugin_name'];
@@ -189,27 +190,16 @@ class Update {
 				$data->author = $api_product->get_author();
 			}
 
+			// set properties
 			$data->requires = $api_product->get_requires_at_least();
 			$data->tested   = $api_product->get_tested_up_to();
 			$data->homepage = $api_product->get_uri();
+
+			// set sections
 			$data->sections = array(
-				'description' => wpautop( $api_product->get_description() ),
-				'changelog'   => $api_product->get_changelog()
+				'description' => wpautop( \Parsedown::instance()->text( $api_product->get_description() ) ),
+				'changelog'   => \Parsedown::instance()->text( $api_product->get_changelog() )
 			);
-
-			require_once 'Markdown.php';
-
-			// parse markdown in sections
-			foreach ( $data->sections as $key => $section ) {
-				$data->sections[ $key ] = str_replace( array( "\r\n", "\r" ), "\n", $data->sections[ $key ] );
-				$data->sections[ $key ] = trim( $data->sections[ $key ] );
-				if ( 0 === strpos( $data->sections[ $key ], "\xEF\xBB\xBF" ) ) {
-					$data->sections[ $key ] = substr( $data->sections[ $key ], 3 );
-				}
-				// Markdown transformations
-				$data->sections[ $key ] = preg_replace( '/^[\s]*=[\s]+(.+?)[\s]+=/m', '<h4>$1</h4>', $data->sections[ $key ] );
-				$data->sections[ $key ] = Markdown( $data->sections[ $key ] );
-			}
 
 			set_transient( $transient_name, $data, DAY_IN_SECONDS );
 		}
