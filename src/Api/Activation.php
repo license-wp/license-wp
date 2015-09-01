@@ -53,7 +53,7 @@ class Activation {
 			$license = license_wp()->service( 'license_factory' )->make( $request['license_key'] );
 
 			// check if license exists
-			if ( empty( $license->get_key() ) ) {
+			if ( '' == $license->get_key() ) {
 				throw new ApiException( __( 'Activation error: The provided license is invalid.', 'license-wp' ), 101 );
 			}
 

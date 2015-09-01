@@ -158,7 +158,7 @@ class AddLicense extends SubPage {
 			$license = license_wp()->service( 'license_repository' )->persist( $license );
 
 			// check if license was stored
-			if ( ! empty( $license->get_key() ) ) {
+			if ( '' != $license->get_key() ) {
 
 				// try to get a first name
 				if ( ! empty( $user ) && ! empty( $user->first_name ) ) {

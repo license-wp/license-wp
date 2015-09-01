@@ -46,7 +46,7 @@ class MyAccount {
 			$license = license_wp()->service( 'license_factory' )->make( $license_key );
 
 			// check if license exists
-			if ( empty( $license->get_key() ) ) {
+			if ( '' == $license->get_key() ) {
 				wp_die( __( 'Invalid or expired license key.', 'license-wp' ) );
 			}
 

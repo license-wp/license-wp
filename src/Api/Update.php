@@ -52,7 +52,7 @@ class Update {
 			$license = license_wp()->service( 'license_factory' )->make( $request['license_key'] );
 
 			// check if license exists
-			if ( empty( $license->get_key() ) ) {
+			if ( '' == $license->get_key() ) {
 				throw new UpdateException( __( 'Update error: The provided license is invalid.', 'license-wp' ), 'invalid_key' );
 			}
 
