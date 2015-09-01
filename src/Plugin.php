@@ -98,11 +98,11 @@ class Plugin extends Pimple\Container {
 		$wc_email->setup();
 
 		// WooCommerce API Activation
-		$api_activation = new API\Activation();
+		$api_activation = new Api\Activation();
 		$api_activation->setup();
 
 		// WooCommerce API Update
-		$api_update = new API\Update();
+		$api_update = new Api\Update();
 		$api_update->setup();
 
 		if ( is_admin() ) { // Backend
