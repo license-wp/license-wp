@@ -84,7 +84,7 @@ class DownloadHandler {
 		$api_product = license_wp()->service( 'api_product_factory' )->make( $product_id );
 
 		// check if there's a package defined
-		if ( empty( $api_product->get_package() ) ) {
+		if ( $api_product->get_package() == '' ) {
 			wp_die( __( 'Download package is missing.', 'license-wp' ) );
 		}
 

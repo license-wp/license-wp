@@ -184,7 +184,7 @@ class Update {
 			$data->last_updated = $api_product->get_date();
 
 			// set author
-			if ( ! empty( $api_product->get_author_uri() ) ) {
+			if ( '' != $api_product->get_author_uri() ) {
 				$data->author = '<a href="' . $api_product->get_author_uri() . '">' . $api_product->get_author() . '</a>';
 			} else {
 				$data->author = $api_product->get_author();
