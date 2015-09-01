@@ -20,15 +20,7 @@ class WordPressRepository implements Repository {
 		SELECT * FROM {$wpdb->lwp_licenses}
 		WHERE license_key = %s
 	", $key ) );
-
-		/**
-		 * AND (
-		 * date_expires IS NULL
-		 * OR date_expires = '0000-00-00 00:00:00'
-		 * OR date_expires > NOW()
-		 * )
-		 */
-
+		
 		// set data if row found
 		if ( null !== $row ) {
 			$data->key              = $row->license_key;
