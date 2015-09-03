@@ -35,17 +35,29 @@ class Manager {
 	 * Get licenses by order ID
 	 *
 	 * @param int $order_id
-	 *
+	 * @param bool $active Whether or not to return only active licenses. Default false.
+
 	 * @return array
 	 */
-	public function get_licenses_by_order( $order_id ) {
+	public function get_licenses_by_order( $order_id, $active = false ) {
 		global $wpdb;
 
 		// keys
 		$licenses = array();
 
+		// generate query
+		$sql = $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE order_id = %d', $order_id );
+
+		if ( $active ) {
+			$sql .= " AND (
+				date_expires IS NULL
+				OR date_expires = '0000-00-00 00:00:00'
+				OR date_expires > NOW()
+			)";
+		}
+
 		// fetch keys
-		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE order_id = %d', $order_id ) );
+		$results = $wpdb->get_results( $sql );
 
 		// count & loop
 		if ( count( $results ) > 0 ) {
@@ -63,17 +75,29 @@ class Manager {
 	 * Get licenses by user ID
 	 *
 	 * @param int $user_id
+	 * @param bool $active Whether or not to return only active licenses. Default false.
 	 *
 	 * @return array
 	 */
-	public function get_licenses_by_user( $user_id ) {
+	public function get_licenses_by_user( $user_id, $active = false ) {
 		global $wpdb;
 
 		// keys
 		$licenses = array();
 
+		// generate query
+		$sql = $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE user_id = %d', $user_id );
+
+		if ( $active ) {
+			$sql .= " AND (
+				date_expires IS NULL
+				OR date_expires = '0000-00-00 00:00:00'
+				OR date_expires > NOW()
+			)";
+		}
+
 		// fetch keys
-		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE user_id = %d', $user_id ) );
+		$results = $wpdb->get_results( $sql );
 
 		// count & loop
 		if ( count( $results ) > 0 ) {
@@ -91,17 +115,29 @@ class Manager {
 	 * Get licenses by email addresses
 	 *
 	 * @param string $email
-	 *
+	 * @param bool $active Whether or not to return only active licenses. Default false.
+
 	 * @return array
 	 */
-	public function get_licenses_by_email( $email ) {
+	public function get_licenses_by_email( $email, $active = false ) {
 		global $wpdb;
 
 		// keys
 		$licenses = array();
 
+		// generate query
+		$sql = $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE activation_email = %d', $email );
+
+		if ( $active ) {
+			$sql .= " AND (
+				date_expires IS NULL
+				OR date_expires = '0000-00-00 00:00:00'
+				OR date_expires > NOW()
+			)";
+		}
+
 		// fetch keys
-		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE activation_email = %s', $email ) );
+		$results = $wpdb->get_results( $sql );
 
 		// count & loop
 		if ( count( $results ) > 0 ) {
