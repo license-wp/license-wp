@@ -20,7 +20,7 @@ class WordPressRepository implements Repository {
 		SELECT * FROM {$wpdb->lwp_licenses}
 		WHERE license_key = %s
 	", $key ) );
-		
+
 		// set data if row found
 		if ( null !== $row ) {
 			$data->key              = $row->license_key;
