@@ -141,7 +141,7 @@ class Activation {
 		}
 
 		// check if activation limit is reached and the requested instance isn't already activated
-		if ( count( $license->get_activations() ) >= $license->get_activation_limit() && ! in_array( $request['instance'], $existing_active_activation_instances ) ) {
+		if ( $license->get_activation_limit() > 0 && count( $license->get_activations() ) >= $license->get_activation_limit() && ! in_array( $request['instance'], $existing_active_activation_instances ) ) {
 			throw new ApiException( sprintf( __( 'Activation error: Activation limit reached. Please deactivate an install first at your My Account page: %s.', 'license-wp' ), get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) ), 105 );
 		}
 
