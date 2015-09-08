@@ -31,7 +31,7 @@ class ListTable extends \WP_List_Table {
 	public function column_default( $item, $column_name ) {
 		switch( $column_name ) {
 			case 'license_key' :
-				return '<a href="' . admin_url( 'admin.php?page=license_wp_licenses&amp;license_key=' . $item->license_key ) . '">' . '<code>' . $item->license_key . '</code>' . '</a>';
+				return '<a href="' . admin_url( 'admin.php?page=license_wp_licenses&amp;license_key=' . esc_attr( $item->license_key ) ) . '">' . '<code>' . esc_html( $item->license_key ) . '</code>' . '</a>';
 			case 'api_product_id' :
 				return esc_html( $item->api_product_id );
 			case 'instance' :
@@ -165,9 +165,11 @@ class ListTable extends \WP_List_Table {
 		$this->process_bulk_action();
 
 		$where = array( 'WHERE 1=1' );
+
 		if ( $license_key ) {
 			$where[] = "AND license_key='{$license_key}'";
 		}
+
 		$where = implode( ' ', $where );
 
 		/**
