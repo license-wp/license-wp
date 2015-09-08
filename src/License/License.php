@@ -222,7 +222,7 @@ class License {
 	 *
 	 * @return array
 	 */
-	public function get_activations( $api_product ) {
+	public function get_activations( $api_product=null ) {
 		return license_wp()->service( 'activation_manager' )->get_activations( $this, $api_product );
 	}
 

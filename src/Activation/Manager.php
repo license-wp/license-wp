@@ -13,11 +13,16 @@ class Manager {
 	 *
 	 * @return array
 	 */
-	public function get_activations( $license, $api_product, $only_active = true ) {
+	public function get_activations( $license, $api_product = null, $only_active = true ) {
 		global $wpdb;
 
 		// dat SQL
-		$sql = "SELECT `activation_id` FROM {$wpdb->lwp_activations} WHERE `license_key`=%s AND `api_product_id`=%s";
+		$sql = "SELECT `activation_id` FROM {$wpdb->lwp_activations} WHERE `license_key`=%s";
+
+		// add API product ID if !== null
+		if ( null !== $api_product ) {
+			$sql .= $wpdb->prepare( " AND `api_product_id`=%s ", $api_product->get_slug() );
+		}
 
 		// add if only_active is true
 		if ( $only_active ) {
@@ -27,7 +32,7 @@ class Manager {
 		$sql .= ";";
 
 		// get activation rows
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $license->get_key(), $api_product->get_slug() ) );
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $license->get_key() ) );
 
 		// array that stores the api products
 		$activations = array();
