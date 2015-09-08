@@ -70,7 +70,7 @@ class Update {
 			}
 
 			// get activations
-			$activations = $license->get_activations();
+			$activations = $license->get_activations( $api_product );
 
 			// store if activation is found
 			$is_activated = false;

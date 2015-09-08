@@ -65,7 +65,6 @@ class Activation {
 			// get api product by given api product id (slug)
 			$api_product = $license->get_api_product_by_slug( $request['api_product_id'] );
 
-
 			// check if license grants access to request api product
 			if ( null === $api_product ) {
 				throw new ApiException( __( 'This license does not allow access to the requested product.', 'license-wp' ), 104 );
@@ -87,10 +86,10 @@ class Activation {
 					}
 
 					// activate the license
-					$this->activate( $license, $request );
+					$this->activate( $license, $api_product, $request );
 					break;
 				case 'deactivate' :
-					$this->deactivate( $license, $request );
+					$this->deactivate( $license, $api_product, $request );
 					break;
 				default :
 					throw new ApiException( __( 'Invalid API Request.', 'license-wp' ), 100 );
@@ -113,14 +112,15 @@ class Activation {
 	 * Activate an instance of a license
 	 *
 	 * @param \Never5\LicenseWP\License\License $license
+	 * @param \Never5\LicenseWP\ApiProduct\ApiProduct $api_product
 	 * @param array $request
 	 *
 	 * @throws ApiException
 	 */
-	private function activate( $license, $request ) {
+	private function activate( $license, $api_product, $request ) {
 
 		// get all activation, including deactivated activations
-		$existing_activations = license_wp()->service( 'activation_manager' )->get_activations( $license, false );
+		$existing_activations = license_wp()->service( 'activation_manager' )->get_activations( $license, $api_product, false );
 
 		// existing active activation instances
 		$existing_active_activation_instances = array();
@@ -141,7 +141,7 @@ class Activation {
 		}
 
 		// check if activation limit is reached and the requested instance isn't already activated
-		if ( $license->get_activation_limit() > 0 && count( $license->get_activations() ) >= $license->get_activation_limit() && ! in_array( $request['instance'], $existing_active_activation_instances ) ) {
+		if ( $license->get_activation_limit() > 0 && count( $license->get_activations( $api_product ) ) >= $license->get_activation_limit() && ! in_array( $request['instance'], $existing_active_activation_instances ) ) {
 			throw new ApiException( sprintf( __( 'Activation error: Activation limit reached. Please deactivate an install first at your My Account page: %s.', 'license-wp' ), get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) ), 105 );
 		}
 
@@ -190,7 +190,7 @@ class Activation {
 		}
 
 		// calculate activations left
-		$activations_left = ( ( $license->get_activation_limit() > 0 ) ? $license->get_activation_limit() - count( $license->get_activations() ) : - 1 );
+		$activations_left = ( ( $license->get_activation_limit() > 0 ) ? $license->get_activation_limit() - count( $license->get_activations( $api_product ) ) : - 1 );
 
 		// response
 		$response = apply_filters( 'license_wp_api_activation_response', array(
@@ -209,14 +209,15 @@ class Activation {
 	 * Deactivates an instance of a license
 	 *
 	 * @param \Never5\LicenseWP\License\License $license
+	 * @param \Never5\LicenseWP\ApiProduct\ApiProduct $api_product
 	 * @param array $request
 	 *
 	 * @throws ApiException
 	 */
-	private function deactivate( $license, $request ) {
+	private function deactivate( $license, $api_product, $request ) {
 
 		// get activations
-		$activations = $license->get_activations();
+		$activations = $license->get_activations( $api_product );
 
 		// check & loop
 		if ( count( $activations ) > 0 ) {

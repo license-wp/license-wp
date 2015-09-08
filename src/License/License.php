@@ -152,9 +152,10 @@ class License {
 	public function is_expired() {
 
 		// check if license expired
-		if( null !== $this->get_date_expires() && $this->get_date_expires() < new \DateTime() ) {
+		if ( null !== $this->get_date_expires() && $this->get_date_expires() < new \DateTime() ) {
 			return true;
 		}
+
 		return false;
 	}
 
@@ -204,7 +205,7 @@ class License {
 
 		if ( count( $api_products ) > 0 ) {
 			foreach ( $api_products as $api_product ) {
-				if( $api_product->get_slug() == $slug ) {
+				if ( $api_product->get_slug() == $slug ) {
 					return $api_product;
 				}
 			}
@@ -217,10 +218,12 @@ class License {
 	 * Get activations of license
 	 * Uses Activations\Manager:get_activations
 	 *
+	 * @param \Never5\LicenseWP\ApiProduct\ApiProduct $api_product
+	 *
 	 * @return array
 	 */
-	public function get_activations() {
-		return license_wp()->service( 'activation_manager' )->get_activations( $this );
+	public function get_activations( $api_product ) {
+		return license_wp()->service( 'activation_manager' )->get_activations( $this, $api_product );
 	}
 
 	/**
