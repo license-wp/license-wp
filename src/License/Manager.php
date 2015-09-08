@@ -126,7 +126,7 @@ class Manager {
 		$licenses = array();
 
 		// generate query
-		$sql = $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE activation_email = %d', $email );
+		$sql = $wpdb->prepare( 'SELECT `license_key` FROM ' . $wpdb->lwp_licenses . ' WHERE activation_email = %s', $email );
 
 		if ( $active ) {
 			$sql .= " AND (
