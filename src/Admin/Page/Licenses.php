@@ -23,10 +23,10 @@ class Licenses extends Page {
 	 * @return void
 	 */
 	public function output() {
-		
+
 		// create list table
-		$list_table = new License\ListTable(); 
-		
+		$list_table = new License\ListTable();
+
 		// prepare items in list table
 		$list_table->prepare_items();
 		?>
@@ -35,7 +35,7 @@ class Licenses extends Page {
 					href="<?php echo admin_url( 'admin.php?page=license_wp_add_license' ); ?>"
 					class="add-new-h2"><?php _e( 'Add License', 'license-wp' ); ?></a></h2>
 
-			<form id="licence-management" method="post">
+			<form id="license-management" method="post">
 				<input type="hidden" name="page" value="license_wp_licenses"/>
 				<?php $list_table->display() ?>
 				<?php wp_nonce_field( 'save', 'license_wp_licensing_nonce' ); ?>

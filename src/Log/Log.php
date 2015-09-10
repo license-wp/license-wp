@@ -24,7 +24,7 @@ class Log {
 
 		// insert into db
 		$wpdb->insert( $wpdb->lwp_download_log, array(
-			'licence_key'      => $license_key,
+			'license_key'      => $license_key,
 			'activation_email' => $activation_email,
 			'api_product_id'   => $product_id,
 			'date_downloaded'  => current_time( 'mysql' ),
