@@ -176,6 +176,7 @@ class ListTable extends \WP_List_Table {
 		$orderby      = ! empty( $_REQUEST['orderby'] ) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'date_created';
 		$order        = empty( $_REQUEST['order'] ) || $_REQUEST['order'] === 'asc' ? 'ASC' : 'DESC';
 		$order_id     = ! empty( $_REQUEST['order_id'] ) ? absint( $_REQUEST['order_id'] ) : '';
+		$license_key  = ! empty( $_REQUEST['license_key'] ) ? sanitize_text_field( $_REQUEST['license_key'] ) : '';
 
 		// column headers
 		$this->_column_headers = array( $this->get_columns(), array(), $this->get_sortable_columns() );
@@ -184,9 +185,15 @@ class ListTable extends \WP_List_Table {
 		$this->process_bulk_action();
 
 		$where = array( 'WHERE 1=1' );
+
 		if ( $order_id ) {
 			$where[] = 'AND order_id=' . $order_id;
 		}
+
+		if ( $license_key ) {
+			$where[] = "AND license_key='{$license_key}'";
+		}
+
 		$where = implode( ' ', $where );
 
 		// fetch matx

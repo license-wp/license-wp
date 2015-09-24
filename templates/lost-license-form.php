@@ -1,6 +1,6 @@
 <?php
 /**
- * Lost licence form
+ * Lost license form
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

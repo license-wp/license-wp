@@ -20,27 +20,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php endif; ?>
 
-	<?php woocommerce_wp_text_input( array( 
-		'id'                => '_license_activation_limit', 
-		'label'             => __( 'Licence activation limit', 'wp-plugin-licencing' ),
+	<?php woocommerce_wp_text_input( array(
+		'id'                => '_license_activation_limit',
+		'label'             => __( 'License activation limit', 'wp-plugin-licencing' ),
 		'placeholder'       => __( 'Unlimited', 'wp-plugin-licencing' ),
-		'description'       => __( 'The maximum number of activations allowed. Leave blank for unlimited.', 'wp-plugin-licencing' ), 
+		'description'       => __( 'The maximum number of activations allowed. Leave blank for unlimited.', 'wp-plugin-licencing' ),
 		'value'             => get_post_meta( $post_id, '_license_activation_limit', true ),
-		'desc_tip'          => true, 
-		'type'              => 'number', 
+		'desc_tip'          => true,
+		'type'              => 'number',
 		'custom_attributes' => array(
 			'min'   => '',
 			'step' 	=> '1'
 		) ) ); ?>
 
-	<?php woocommerce_wp_text_input( array( 
-		'id'                => '_license_expiry_days', 
-		'label'             => __( 'Licence expiry days', 'wp-plugin-licencing' ), 
+	<?php woocommerce_wp_text_input( array(
+		'id'                => '_license_expiry_days',
+		'label'             => __( 'License expiry days', 'wp-plugin-licencing' ),
 		'placeholder'       => __( 'Never expire', 'wp-plugin-licencing' ),
-		'description'       => __( 'How many days until the license expires. Leave blank for never.', 'wp-plugin-licencing' ), 
+		'description'       => __( 'How many days until the license expires. Leave blank for never.', 'wp-plugin-licencing' ),
 		'value'             => get_post_meta( $post_id, '_license_expiry_days', true ),
-		'desc_tip'          => true, 
-		'type'              => 'number', 
+		'desc_tip'          => true,
+		'type'              => 'number',
 		'custom_attributes' => array(
 			'min'   => '',
 			'step' 	=> '1'

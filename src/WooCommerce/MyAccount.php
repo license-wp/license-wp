@@ -76,7 +76,7 @@ class MyAccount {
 
 			// deactivate activation
 			if ( license_wp()->service( 'activation_manager' )->deactivate( $activation ) ) {
-				wc_add_notice( __( 'Licence successfully deactivated.', 'license-wp' ), 'success' );
+				wc_add_notice( __( 'License successfully deactivated.', 'license-wp' ), 'success' );
 			}
 
 		}

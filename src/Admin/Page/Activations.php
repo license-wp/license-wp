@@ -32,7 +32,7 @@ class Activations extends SubPage {
 		<div class="wrap">
 			<h2><?php _e( 'Activations', 'license-wp' ); ?></h2>
 
-			<form id="licence-management" method="post">
+			<form id="license-management" method="post">
 				<input type="hidden" name="page" value="license_wp_licenses"/>
 				<?php $list_table->display() ?>
 				<?php wp_nonce_field( 'save', 'license_wp_licensing_nonce' ); ?>

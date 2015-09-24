@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="wrap">
 	<h2><?php _e( 'Add License', 'license-wp' ); ?></h2>
-	<form id="licence-add-form" method="post">
+	<form id="license-add-form" method="post">
 		<input type="hidden" name="page" value="license_wp_add_license" />
 		<p><?php _e( 'Create a license manually using the form below. The license key will be generated automatically and will be emailed to the customer.', 'license-wp' ); ?></p>
 		<table class="form-table">
