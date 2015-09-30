@@ -2,6 +2,8 @@
 
 namespace Never5\LicenseWP\License;
 
+use Never5\LicenseWP\Email;
+
 class Manager {
 
 	/**
@@ -36,7 +38,7 @@ class Manager {
 	 *
 	 * @param int $order_id
 	 * @param bool $active Whether or not to return only active licenses. Default false.
-
+	 *
 	 * @return array
 	 */
 	public function get_licenses_by_order( $order_id, $active = false ) {
@@ -116,7 +118,7 @@ class Manager {
 	 *
 	 * @param string $email
 	 * @param bool $active Whether or not to return only active licenses. Default false.
-
+	 *
 	 * @return array
 	 */
 	public function get_licenses_by_email( $email, $active = false ) {
@@ -172,6 +174,129 @@ class Manager {
 			}
 		}
 
+	}
+
+	/**
+	 * Get License object that expire on given date
+	 *
+	 * @param \DateTime $date
+	 *
+	 * @return array<License>
+	 */
+	public function get_licenses_that_expire_on( $date ) {
+		global $wpdb;
+
+		// keys
+		$licenses = array();
+
+		// generate query
+		$sql = $wpdb->prepare( "SELECT `license_key` FROM " . $wpdb->lwp_licenses . " WHERE `date_expires` = '%s' ", $date->format( 'Y-m-d' ) );
+
+
+		// fetch keys
+		$results = $wpdb->get_results( $sql );
+
+		// count & loop
+		if ( count( $results ) > 0 ) {
+			foreach ( $results as $result ) {
+				// add to array
+				$licenses[] = license_wp()->service( 'license_factory' )->make( $result->license_key );
+			}
+		}
+
+		// return license keys
+		return $licenses;
+	}
+
+	/**
+	 * Send all expiration emails
+	 *
+	 * @todo decide if this is the rigth place for this method
+	 * @todo load moments from options when they're set in options
+	 * @todo setup this method on wp_cron
+	 */
+	public function send_expiration_emails() {
+
+		// load emails
+		$emails = apply_filters( 'license_wp_renewal_emails', array() );
+
+		// check if we have at least 1 email
+		if ( is_array( $emails ) && count( $emails ) > 0 ) {
+
+			// loop through emails
+			foreach ( $emails as $email_data ) {
+
+				// create \DateTime of today
+				$date = new \DateTime();
+				$date->setTime( 0, 0, 0 );
+
+				// try to modify object with $email_data['date_modify']
+				if ( false !== $date->modify( $email_data['date_modify'] ) ) {
+
+					// get licenses that expire on modified date object
+					$licenses = $this->get_licenses_that_expire_on( $date );
+
+					// check if there are licenses
+					if ( count( $licenses ) > 0 ) {
+
+						/** @var License $license */
+						foreach ( $licenses as $license ) {
+
+							// prep body, replace vars for correct content
+							$body = $this->replace_expiration_vars( $email_data['body'], $license );
+
+							// setup email object
+							$email = new Email\ExpiringLicense( $email_data['subject'], $body, $license );
+
+							// send email
+							license_wp()->service( 'email_manager' )->send( $email, $license->get_activation_email() );
+
+//							printf( 'Email sent to <strong>%s</strong><br/>', $license->get_activation_email() );
+						}
+					}
+
+
+				}
+
+
+			}
+
+		}
+
+	}
+
+	/**
+	 * @param string $content
+	 * @param License $license
+	 *
+	 * @return string
+	 */
+	private function replace_expiration_vars( $content, $license ) {
+
+		// get user
+		$user = get_user_by( 'id', $license->get_user_id() );
+
+		// get first name
+		$fname = 'there';
+		if ( ! empty( $user ) && ! empty( $user->first_name ) ) {
+			$fname = $user->first_name;
+		}
+
+		// get WooCommerce product object
+		$wc_product = new \WC_Product( $license->get_product_id() );
+
+		// get parent product if the product has one
+		if ( 0 != $wc_product->get_parent() ) {
+			$wc_product = new \WC_Product( $wc_product->get_parent() );
+		}
+
+		$content = str_ireplace( ':fname:', $fname, $content );
+		$content = str_ireplace( ':product:', $wc_product->get_title(), $content );
+		$content = str_ireplace( ':license-key:', $license->get_key(), $content );
+		$content = str_ireplace( ':license-expiration-date:', $license->get_date_expires()->format( 'M d Y' ), $content );
+		$content = str_ireplace( ':renewal-link:', $license->get_renewal_url(), $content );
+
+		return $content;
 	}
 
 }
