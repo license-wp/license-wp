@@ -21,6 +21,7 @@ abstract class Email {
 	 *
 	 * @param $subject
 	 * @param $template
+	 * @param array $args
 	 */
 	public function __construct( $subject, $template, $args = array() ) {
 		$this->subject  = $subject;
