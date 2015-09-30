@@ -13,7 +13,9 @@ class Manager {
 	 * @return bool
 	 */
 	public function send( Email $email, $recipient ) {
-		return wp_mail( $recipient, $email->get_subject(), $email->get_content() );
+		$wc_emails = new \WC_Emails();
+
+		return $wc_emails->send( $recipient, $email->get_subject(), $email->get_content() );
 	}
 
 }
