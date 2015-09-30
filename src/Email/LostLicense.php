@@ -13,8 +13,9 @@ class LostLicense extends Email {
 	public function __construct( $licenses, $first_name ) {
 		$subject = sprintf( 'Your %s license keys', get_bloginfo( 'name' ) );
 		parent::__construct( $subject, 'lost-license-email.php', array(
-			'licenses'         => $licenses,
-			'user_first_name' => $first_name
+			'licenses'        => $licenses,
+			'user_first_name' => $first_name,
+			'email_heading'   => $subject
 		) );
 	}
 

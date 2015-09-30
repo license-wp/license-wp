@@ -14,7 +14,8 @@ class NewLicense extends Email {
 		$subject = sprintf( 'Your %s license keys', get_bloginfo( 'name' ) );
 		parent::__construct( $subject, 'new-license-email.php', array(
 			'license'         => $license,
-			'user_first_name' => $first_name
+			'user_first_name' => $first_name,
+			'email_heading'   => $subject
 		) );
 	}
 
