@@ -6,13 +6,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
 
+do_action( 'woocommerce_email_header', $email_heading );
+
 if ( $user_first_name ) {
-	echo sprintf( __( "Hello %s,", 'license-wp' ), $user_first_name ) . "\n\n";
+	echo sprintf( __( "Hello %s,", 'license-wp' ), $user_first_name ) . "<br/><br/>";
 } else {
-	echo __( "Hi there,", 'license-wp' ) . "\n\n";
+	echo __( "Hi there,", 'license-wp' ) . "<br/><br/>";
 }
 _e( "A license has just been created for you. The details are as follows:", 'license-wp' );
-echo "\n";
+echo "<br/>";
 
 // license products
 $api_products = $license->get_api_products();
@@ -20,17 +22,26 @@ $api_products = $license->get_api_products();
 // check & loop
 if ( isset( $api_products ) && count( $api_products ) > 0 ) {
 	foreach ( $api_products as $api_product ) {
-		echo "\n====================\n";
-		echo esc_html( get_the_title( $api_product->get_id() ) ) . ': ' . $api_product->get_download_url( $license ) . "\n";
-		echo $license->get_key() . "";
-		echo "\n====================\n\n";
+		?>
+		<table cellspacing="0" cellpadding="0" border="0" style="padding: 0;margin:0;">
+			<tr>
+				<td style="padding-left:0 !important;"><?php echo esc_html( get_the_title( $api_product->get_id() ) ); ?></td>
+				<td><?php echo $license->get_key(); ?></td>
+				<td>
+					<a href="<?php echo $api_product->get_download_url( $license ); ?>"><?php _e( 'Download', 'license-wp' ); ?></a>
+				</td>
+			</tr>
+		</table>
+		<?php
 	}
 }
 
 _e( "You can manage your licenses and download your products from your My Account page.", 'license-wp' );
-echo "\n";
-echo "\n";
+echo "<br/>";
+echo "<br/>";
 
-// Footer
-echo '--' . "\n";
-echo apply_filters( 'woocommerce_email_footer_text', get_option( 'woocommerce_email_footer_text' ) );
+_e( "Best regards,", 'license-wp' );
+echo '<br/>';
+printf( __( "The %s team", 'license-wp' ), get_bloginfo( 'name' ) );
+
+do_action( 'woocommerce_email_footer' );
