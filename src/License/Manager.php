@@ -210,10 +210,6 @@ class Manager {
 
 	/**
 	 * Send all expiration emails
-	 *
-	 * @todo decide if this is the rigth place for this method
-	 * @todo load moments from options when they're set in options
-	 * @todo setup this method on wp_cron
 	 */
 	public function send_expiration_emails() {
 
@@ -250,14 +246,10 @@ class Manager {
 
 							// send email
 							license_wp()->service( 'email_manager' )->send( $email, $license->get_activation_email() );
-
-//							printf( 'Email sent to <strong>%s</strong><br/>', $license->get_activation_email() );
 						}
 					}
-
-
+					
 				}
-
 
 			}
 
