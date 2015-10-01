@@ -222,7 +222,7 @@ class License {
 	 *
 	 * @return array
 	 */
-	public function get_activations( $api_product=null ) {
+	public function get_activations( $api_product = null ) {
 		return license_wp()->service( 'activation_manager' )->get_activations( $this, $api_product );
 	}
 
@@ -235,7 +235,7 @@ class License {
 		return add_query_arg( array(
 			'renew_license'    => $this->get_key(),
 			'activation_email' => $this->get_activation_email()
-		), WC()->cart->get_cart_url() );
+		), apply_filters( 'woocommerce_get_cart_url', wc_get_page_permalink( 'cart' ) ) );
 	}
 
 }
