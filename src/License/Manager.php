@@ -190,9 +190,8 @@ class Manager {
 		$licenses = array();
 
 		// generate query
-		$sql = $wpdb->prepare( "SELECT `license_key` FROM " . $wpdb->lwp_licenses . " WHERE `date_expires` = '%s' ", $date->format( 'Y-m-d' ) );
-
-
+		$sql = $wpdb->prepare( "SELECT `license_key` FROM " . $wpdb->lwp_licenses . " WHERE DATE_FORMAT( `date_expires`, '%%Y-%%c-%%e' ) = '%s' ", $date->format( 'Y-m-d' ) );
+		
 		// fetch keys
 		$results = $wpdb->get_results( $sql );
 
@@ -231,7 +230,7 @@ class Manager {
 
 					// get licenses that expire on modified date object
 					$licenses = $this->get_licenses_that_expire_on( $date );
-					
+
 					// check if there are licenses
 					if ( count( $licenses ) > 0 ) {
 
