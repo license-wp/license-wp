@@ -231,7 +231,7 @@ class Manager {
 
 					// get licenses that expire on modified date object
 					$licenses = $this->get_licenses_that_expire_on( $date );
-
+					
 					// check if there are licenses
 					if ( count( $licenses ) > 0 ) {
 
@@ -248,7 +248,7 @@ class Manager {
 							license_wp()->service( 'email_manager' )->send( $email, $license->get_activation_email() );
 						}
 					}
-					
+
 				}
 
 			}

@@ -105,6 +105,9 @@ class Plugin extends Pimple\Container {
 		$api_update = new Api\Update();
 		$api_update->setup();
 
+		// License renewal cron callback
+		add_action( 'license_wp_license_expiring_email', array( $this['license_manager'], 'send_expiration_emails' ) );
+
 		if ( is_admin() ) { // Backend
 
 			// meta box
