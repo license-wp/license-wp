@@ -61,4 +61,7 @@ if ( $updatePhp->does_it_meet_required_php_version( PHP_VERSION ) ) {
 
 	// Activation hook
 	register_activation_hook( __FILE__, array( 'Never5\\LicenseWP\\Installer', 'install' ) );
+
+	// Deactivation hook
+	register_deactivation_hook( __FILE__, array( 'Never5\\LicenseWP\\Installer', 'uninstall' ) );
 }

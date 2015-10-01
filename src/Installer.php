@@ -2,6 +2,8 @@
 
 namespace Never5\LicenseWP;
 
+use Never5\LicenseWP\License;
+
 class Installer {
 
 	/**
@@ -9,6 +11,19 @@ class Installer {
 	 */
 	public static function install() {
 		self::db();
+
+		// set renewal email cron
+		$cron = new License\Cron();
+		$cron->schedule();
+	}
+
+	/**
+	 * Uninstall plugin
+	 */
+	public static function uninstall() {
+		// unset renewal email cron
+		$cron = new License\Cron();
+		$cron->unschedule();
 	}
 
 	/**
