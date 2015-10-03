@@ -190,7 +190,7 @@ class Manager {
 		$licenses = array();
 
 		// generate query
-		$sql = $wpdb->prepare( "SELECT `license_key` FROM " . $wpdb->lwp_licenses . " WHERE DATE_FORMAT( `date_expires`, '%%Y-%%c-%%e' ) = '%s' ", $date->format( 'Y-m-d' ) );
+		$sql = $wpdb->prepare( "SELECT `license_key` FROM " . $wpdb->lwp_licenses . " WHERE DATE_FORMAT( `date_expires`, '%%Y-%%c-%%d' ) = '%s' ", $date->format( 'Y-m-d' ) );
 		
 		// fetch keys
 		$results = $wpdb->get_results( $sql );
