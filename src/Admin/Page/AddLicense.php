@@ -23,23 +23,9 @@ class AddLicense extends SubPage {
 			}
 		} );
 
+
 		// add custom ajax endpoint
-		add_action( 'wp_ajax_wpl_add_license_get_email', array( $this, 'ajax_get_email' ) );
-	}
-
-	/**
-	 * Method to enqueue page specific styles & scripts
-	 */
-	public function page_enqueue() {
-		wp_enqueue_script( 'select2' );
-		wp_enqueue_script( 'woocommerce_admin' );
-		wp_enqueue_script(
-			'lwp_add_license',
-			license_wp()->service( 'file' )->plugin_url( '/assets/js/add-license' . ( ( ! SCRIPT_DEBUG ) ? '.min' : '' ) . '.js' ),
-			array( 'jquery' ),
-			license_wp()->get_version()
-		);
-
+		add_action( 'wp_ajax_wpl_add_license_get_email', array( $this, 'ajax_get_email' ) );		
 	}
 
 	/**
@@ -66,6 +52,19 @@ class AddLicense extends SubPage {
 
 		// bye
 		exit;
+	}
+
+	/**
+	 * Method to enqueue page specific styles & scripts
+	 */
+	public function page_enqueue() {
+		wp_enqueue_script(
+			'lwp_add_license',
+			license_wp()->service( 'file' )->plugin_url( '/assets/js/add-license' . ( ( ! SCRIPT_DEBUG ) ? '.min' : '' ) . '.js' ),
+			array( 'jquery', 'jquery-ui-datepicker', 'select2' ),
+			license_wp()->get_version()
+		);
+
 	}
 
 	/**

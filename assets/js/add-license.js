@@ -1,5 +1,12 @@
 jQuery( function ( $ ) {
 
+    jQuery( '.license-wp-datepicker' ).datepicker({
+        defaultDate:     '',
+		dateFormat:      'yy-mm-dd',
+		numberOfMonths:  1,
+		showButtonPanel: true,
+    });
+
     // normal select2 field
     jQuery( '.lwp-select2' ).select2();
 

@@ -16,7 +16,7 @@ class Manager {
 		add_filter( 'woocommerce_screen_ids', function ( $ids ) {
 			$screen_id = strtolower( __( 'Licenses', 'woocommerce' ) );
 			$ids[]     = $screen_id . '_page_license_wp_add_license';
-
+			$ids[]     = 'toplevel_page_license_wp_licenses';
 			return $ids;
 		} );
 
@@ -68,5 +68,4 @@ class Manager {
 
 		return $modified_menu_order;
 	}
-
 }

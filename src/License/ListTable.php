@@ -37,7 +37,7 @@ class ListTable extends \WP_List_Table {
 
 		switch ( $column_name ) {
 			case 'license_key' :
-				return '<code>' . $item->license_key . '</code>';
+				return '<a href="' . admin_url( 'admin.php?page=license_wp_licenses&amp;edit=' . $item->license_key ) . '"><code>' . $item->license_key . '</code></a>';
 			case 'activation_email' :
 				return $item->activation_email;
 			case 'product_id' :

@@ -29,8 +29,8 @@ class License {
 	/** @var \DateTime */
 	private $date_created;
 
-	/** @var \DateTime */
-	private $date_expires = null;
+	/** @var \DateTime|bool */
+	private $date_expires = false;
 
 	/**
 	 * @return string
@@ -138,7 +138,7 @@ class License {
 	}
 
 	/**
-	 * @param \DateTime $date_expires
+	 * @param \DateTime|bool $date_expires or false if never expires
 	 */
 	public function set_date_expires( $date_expires ) {
 		$this->date_expires = $date_expires;
@@ -152,7 +152,7 @@ class License {
 	public function is_expired() {
 
 		// check if license expired
-		if ( null !== $this->get_date_expires() && $this->get_date_expires() < new \DateTime() ) {
+		if ( $this->get_date_expires() && $this->get_date_expires() < new \DateTime() ) {
 			return true;
 		}
 

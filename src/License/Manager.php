@@ -191,7 +191,7 @@ class Manager {
 
 		// generate query
 		$sql = $wpdb->prepare( "SELECT `license_key` FROM " . $wpdb->lwp_licenses . " WHERE DATE_FORMAT( `date_expires`, '%%Y-%%c-%%d' ) = '%s' ", $date->format( 'Y-m-d' ) );
-		
+
 		// fetch keys
 		$results = $wpdb->get_results( $sql );
 
@@ -284,7 +284,7 @@ class Manager {
 		$content = str_ireplace( ':fname:', $fname, $content );
 		$content = str_ireplace( ':product:', $wc_product->get_title(), $content );
 		$content = str_ireplace( ':license-key:', $license->get_key(), $content );
-		$content = str_ireplace( ':license-expiration-date:', $license->get_date_expires()->format( 'M d Y' ), $content );
+		$content = str_ireplace( ':license-expiration-date:', $license->get_date_expires() ? $license->get_date_expires()->format( 'M d Y' ) : '', $content );
 		$content = str_ireplace( ':renewal-link:', $license->get_renewal_url(), $content );
 
 		return $content;

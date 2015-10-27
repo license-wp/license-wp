@@ -31,7 +31,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 					<code style="display:block;"><?php echo $license->get_key(); ?></code>
 					<small>
 						<?php printf( __( 'Activation email: %s', 'license-wp' ), $license->get_activation_email() ); ?><br/>
-						<?php if ( null !== $license->get_date_expires() ) : ?>
+						<?php if ( $license->get_date_expires() ) : ?>
 							<?php if ( ! $license->is_expired() ) : ?>
 								<?php printf( __( 'Expiry date: %s.', 'license-wp' ), $license->get_date_expires()->format( get_option( 'date_format' ) ) ); ?>
 							<?php else: ?>
