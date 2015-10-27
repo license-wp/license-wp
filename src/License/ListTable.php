@@ -56,9 +56,9 @@ class ListTable extends \WP_List_Table {
 			case 'order_id' :
 				return $item->order_id > 0 ? '<a href="' . admin_url( 'post.php?post=' . absint( $item->order_id ) . '&action=edit' ) . '">#' . absint( $item->order_id ) . ' &rarr;</a>' : __( 'n/a', 'license-wp' );
 			case 'date_created' :
-				return ( $item->date_created ) ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_created ) ) : __( 'n/a', 'license-wp' );
+				return $item->date_created > 0 ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_created ) ) : __( 'n/a', 'license-wp' );
 			case 'date_expires' :
-				return ( $item->date_expires ) ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_expires ) ) : __( 'n/a', 'license-wp' );
+				return $item->date_expires > 0 ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_expires ) ) : __( 'n/a', 'license-wp' );
 		}
 	}
 
