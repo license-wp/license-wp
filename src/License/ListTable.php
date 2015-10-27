@@ -74,7 +74,7 @@ class ListTable extends \WP_List_Table {
 	public function column_cb( $item ) {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
-			'license_key',
+			'license_key_id',
 			$item->license_key
 		);
 	}
@@ -138,11 +138,11 @@ class ListTable extends \WP_List_Table {
 	public function process_bulk_action() {
 		global $wpdb;
 
-		if ( ! isset( $_POST['license_key'] ) ) {
+		if ( ! isset( $_POST['license_key_id'] ) ) {
 			return;
 		}
 
-		$items = array_map( 'sanitize_text_field', $_POST['license_key'] );
+		$items = array_map( 'sanitize_text_field', $_POST['license_key_id'] );
 
 		if ( $items ) {
 			switch ( $this->current_action() ) {
