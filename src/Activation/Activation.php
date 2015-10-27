@@ -78,17 +78,32 @@ class Activation {
 	}
 
 	/**
+	 * Get the instance (URL)
+	 *
+	 * When comparing instances, the http/https prefixes are not important so strip them out. This also allows users to switch protocol without breaking updates.
+	 *
 	 * @return string
 	 */
 	public function get_instance() {
-		return $this->instance;
+		return $this->format_instance( $this->instance );
 	}
 
 	/**
 	 * @param string $instance
 	 */
 	public function set_instance( $instance ) {
-		$this->instance = $instance;
+		$this->instance = $this->format_instance( $instance );
+	}
+
+	/**
+	 * Format the instance.
+	 *
+	 * When comparing instances, the http/https prefixes are not important so strip them out. This also allows users to switch protocol without breaking updates.
+	 *
+	 * @return string
+	 */
+	public function format_instance( $instance ) {
+		return str_replace( array( 'http://', 'https://' ), '', trim( $instance ) );
 	}
 
 	/**

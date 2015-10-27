@@ -79,7 +79,7 @@ class Update {
 			if ( count( $activations ) > 0 ) {
 				/** @var \Never5\LicenseWP\Activation\Activation $activation */
 				foreach ( $activations as $activation ) {
-					if ( $activation->get_instance() == $request['instance'] ) {
+					if ( $activation->get_instance() === $activation->format_instance( $request['instance'] ) ) {
 						$is_activated = true;
 						break;
 					}

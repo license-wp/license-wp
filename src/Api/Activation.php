@@ -141,7 +141,7 @@ class Activation {
 		}
 
 		// check if activation limit is reached and the requested instance isn't already activated
-		if ( $license->get_activation_limit() > 0 && count( $license->get_activations( $api_product ) ) >= $license->get_activation_limit() && ! in_array( $request['instance'], $existing_active_activation_instances ) ) {
+		if ( $license->get_activation_limit() > 0 && count( $license->get_activations( $api_product ) ) >= $license->get_activation_limit() && ! in_array( $activation->format_instance( $request['instance'] ), $existing_active_activation_instances ) ) {
 			throw new ApiException( sprintf( __( 'Activation error: Activation limit reached. Please deactivate an install first at your My Account page: %s.', 'license-wp' ), get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) ), 105 );
 		}
 
@@ -153,7 +153,7 @@ class Activation {
 			foreach ( $existing_activations as $existing_activation ) {
 
 				// check if request instance equals activation instance
-				if ( $request['instance'] == $existing_activation->get_instance() ) {
+				if ( $activation->format_instance( $request['instance'] ) === $existing_activation->get_instance() ) {
 					$activation = $existing_activation;
 					break;
 				}
@@ -227,7 +227,7 @@ class Activation {
 
 
 				// check if given instance equals activation instance
-				if ( $request['instance'] == $activation->get_instance() ) {
+				if ( $activation->format_instance( $request['instance'] ) === $activation->get_instance() ) {
 
 					// set activation to not active
 					$activation->set_activation_active( 0 );

@@ -37,7 +37,7 @@ class ListTable extends \WP_List_Table {
 			case 'instance' :
 				return $item->instance ? esc_html( $item->instance ) : __( 'n/a', 'license-wp' );
 			case 'activation_date' :
-				return ( $item->activation_date ) ? date_i18n( get_option( 'date_format' ), strtotime( $item->activation_date ) ) : __( 'n/a', 'license-wp' );
+				return $item->activation_date > 0 ? date_i18n( get_option( 'date_format' ), strtotime( $item->activation_date ) ) : __( 'n/a', 'license-wp' );
 			case 'activation_active' :
 				return $item->activation_active ? '&#10004;' : '-';
 		}
