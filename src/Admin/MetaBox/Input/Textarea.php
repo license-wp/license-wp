@@ -24,8 +24,8 @@ class Textarea extends Input {
 		}
 		?>
 		<p class="form-field">
-			<label for="<?php echo esc_attr( $this->get_key() ); ?>"><?php echo esc_html( $field['label'] ); ?>:</label>
-			<textarea name="<?php echo esc_attr( $this->get_key() ); ?>" id="<?php echo esc_attr( $this->get_key() ); ?>" placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>" cols="25" rows="3"><?php echo esc_html( $field['value'] ); ?></textarea>
+			<label for="<?php echo esc_attr( 'license_wp_field_' . $this->get_key() ); ?>"><?php echo esc_html( $field['label'] ); ?>:</label>
+			<textarea name="<?php echo esc_attr( $this->get_key() ); ?>" id="<?php echo esc_attr( 'license_wp_field_' . $this->get_key() ); ?>" placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>" cols="25" rows="3"><?php echo esc_html( $field['value'] ); ?></textarea>
 			<?php if ( ! empty( $field['description'] ) ) : ?>
 				<span class="description"><?php echo $field['description']; ?></span><?php endif; ?>
 		</p>

@@ -26,9 +26,9 @@ class File extends Input {
 
 		?>
 		<p class="form-field">
-			<label for="<?php echo esc_attr( $this->get_key() ); ?>"><?php echo esc_html( $field['label'] ); ?>:</label>
+			<label for="<?php echo esc_attr( 'license_wp_field_' . $this->get_key() ); ?>"><?php echo esc_html( $field['label'] ); ?>:</label>
 			<input type="text" class="file_url" name="<?php echo esc_attr( $this->get_key() ); ?>"
-			       id="<?php echo esc_attr( $this->get_key() ); ?>" placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>"
+			       id="<?php echo esc_attr( 'license_wp_field_' . $this->get_key() ); ?>" placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>"
 			       value="<?php echo esc_attr( $field['value'] ); ?>"/>
 			<button class="button upload_image_button"
 			        data-uploader_button_text="<?php _e( 'Use file', 'wp-plugin-licencing' ); ?>"><?php _e( 'Upload', 'wp-plugin-licencing' ); ?></button> <?php if ( ! empty( $field['description'] ) ) : ?>

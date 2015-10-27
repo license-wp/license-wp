@@ -25,8 +25,8 @@ class Text extends Input {
 
 		?>
 		<p class="form-field">
-		<label for="<?php echo esc_attr( $this->get_key() ); ?>"><?php echo esc_html( $field['label'] ); ?>:</label>
-		<input type="text" name="<?php echo esc_attr( $this->get_key() ); ?>" id="<?php echo esc_attr( $this->get_key() ); ?>"
+		<label for="<?php echo esc_attr( 'license_wp_field_' . $this->get_key() ); ?>"><?php echo esc_html( $field['label'] ); ?>:</label>
+		<input type="text" name="<?php echo esc_attr( $this->get_key() ); ?>" id="<?php echo esc_attr( 'license_wp_field_' . $this->get_key() ); ?>"
 		       placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>"
 		       value="<?php echo esc_attr( $field['value'] ); ?>"/>
 		<?php if ( ! empty( $field['description'] ) ) : ?>
