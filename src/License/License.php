@@ -190,7 +190,7 @@ class License {
 		}
 
 		// return array
-		return $api_products;
+		return array_filter( $api_products );
 	}
 
 	/**

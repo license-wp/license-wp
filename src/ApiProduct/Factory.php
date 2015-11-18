@@ -21,7 +21,7 @@ class Factory {
 	 *
 	 * @param int $id
 	 *
-	 * @return ApiProduct
+	 * @return ApiProduct|bool False if doesn't exist.
 	 */
 	public function make( $id = 0 ) {
 
@@ -30,9 +30,13 @@ class Factory {
 
 		// check if id is sset
 		if ( $id > 0 ) {
-
 			// fetch data from repository
 			$data = $this->repository->retrieve( $id );
+
+			// If there is no data, the API product may no longer exist.
+			if ( empty( $data->id ) ) {
+				return false;
+			}
 
 			// set data from repository in API product object
 			foreach ( $data as $dkey => $dval ) {
@@ -41,7 +45,6 @@ class Factory {
 					$product->$method( $dval );
 				}
 			}
-
 		}
 
 		// return product
