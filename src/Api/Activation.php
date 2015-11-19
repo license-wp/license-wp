@@ -153,7 +153,7 @@ class Activation {
 			foreach ( $existing_activations as $existing_activation ) {
 
 				// check if request instance equals activation instance
-				if ( $activation->format_instance( $request['instance'] ) === $existing_activation->get_instance() ) {
+				if ( $existing_activation->format_instance( $request['instance'] ) === $existing_activation->get_instance() ) {
 					$activation = $existing_activation;
 					break;
 				}
