@@ -52,7 +52,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 						if ( count( $api_products ) > 0 ) {
 							echo '<ul class="digital-downloads">';
 							foreach ( $api_products as $api_product ) {
-								echo '<li><a class="download-button" href="' . $api_product->get_download_url( $license ) . '">' . $api_product->get_name() . ' (v' . $api_product->get_version() . ')</a></li>';
+								echo '<li><a class="lwp-download-button" href="' . $api_product->get_download_url( $license ) . '">' . $api_product->get_name() . ' (v' . $api_product->get_version() . ')</a></li>';
 							}
 							echo '</ul>';
 						}
