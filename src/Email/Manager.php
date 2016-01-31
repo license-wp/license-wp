@@ -13,7 +13,7 @@ class Manager {
 	 * @return bool
 	 */
 	public function send( Email $email, $recipient ) {
-		$wc_emails = new \WC_Emails();
+		$wc_emails = \WC_Emails::instance();
 
 		return $wc_emails->send( $recipient, $email->get_subject(), $email->get_content() );
 	}
