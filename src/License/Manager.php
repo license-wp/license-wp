@@ -285,7 +285,7 @@ class Manager {
 		$content = str_ireplace( ':product:', $wc_product->get_title(), $content );
 		$content = str_ireplace( ':license-key:', $license->get_key(), $content );
 		$content = str_ireplace( ':license-expiration-date:', $license->get_date_expires() ? $license->get_date_expires()->format( 'M d Y' ) : '', $content );
-		$content = str_ireplace( ':renewal-link:', $license->get_renewal_url(), $content );
+		$content = str_ireplace( ':renewal-link:', apply_filters( 'license_wp_license_renewal_url_email', $license->get_renewal_url(), $license ), $content );
 
 		return $content;
 	}

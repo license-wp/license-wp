@@ -126,6 +126,9 @@ class Plugin extends Pimple\Container {
 			// setup lost license form shortcode
 			new Shortcode\LostLicenseForm();
 
+			// setup upgrade license form shortcode
+			new Shortcode\UpgradeLicenseForm();
+
 			// frontend assets
 			add_action( 'wp_enqueue_scripts', array( 'Never5\\LicenseWP\\Assets', 'enqueue_frontend' ) );
 

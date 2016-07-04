@@ -7,6 +7,13 @@ abstract class Assets {
 	 * Enqueue frontend assets
 	 */
 	public static function enqueue_frontend() {
+		// frontend CSS
+		wp_enqueue_style(
+			'license_wp_style_frontend',
+			license_wp()->service( 'file' )->plugin_url( '/assets/css/frontend.css' ),
+			array(),
+			license_wp()->get_version()
+		);
 	}
 
 	/**
@@ -22,7 +29,7 @@ abstract class Assets {
 
 		// admin CSS
 		wp_enqueue_style(
-			'license_wp_style',
+			'license_wp_style_admin',
 			license_wp()->service( 'file' )->plugin_url( '/assets/css/admin.css' ),
 			array(),
 			license_wp()->get_version()
