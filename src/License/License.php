@@ -238,4 +238,30 @@ class License {
 		), apply_filters( 'woocommerce_get_cart_url', wc_get_page_permalink( 'cart' ) ) ), $this );
 	}
 
+	/**
+	 * Return upgrade URL
+	 *
+	 * @return string
+	 */
+	public function get_upgrade_url() {
+		return 'laat me met rust';
+	}
+
+	/**
+	 * Calculate the $ worth of the
+	 *
+	 * @return int
+	 */
+	public function calculate_worth() {
+
+		/** @var \WC_Order $order */
+		$order = wc_get_order( $this->get_order_id() );
+
+//		$order->get_lin
+
+		var_dump($order);
+		
+		return 0;
+	}
+
 }
