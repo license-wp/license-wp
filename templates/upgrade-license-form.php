@@ -127,6 +127,12 @@ foreach ( $available_variations as $variation ) {
 			</select>
 		</p>
 
+		<p class="form-row form-row-wide">
+			<label for="license-product"><?php _e( 'Price to Upgrade', 'license-wp' ); ?></label>
+			<span class="lwp-upgrade-license-price">$39.00</span>
+		</p>
+
+
 		<?php
 		/*
 		<p class="form-row form-row-wide">
@@ -138,8 +144,10 @@ foreach ( $available_variations as $variation ) {
 
 	</div>
 
+	<?php /*
 	<div class="lwp-upgrade-license-block lwp-upgrade-license-new-license">
 		<h3><?php _e( 'Price', 'license-wp' ); ?></h3>
+
 
 		<p class="form-row form-row-wide">
 			<label for="license-product"><?php _e( 'License Price', 'license-wp' ); ?></label>
@@ -159,7 +167,7 @@ foreach ( $available_variations as $variation ) {
 		<?php do_action( 'license_wp_license_upgrade_fields_after_price' ); ?>
 
 	</div>
-
+*/ ?>
 
 	<div class="clear"></div>
 	<p>
