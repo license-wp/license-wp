@@ -4,16 +4,88 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
-var_dump($license);
+//var_dump($license);
 
-var_dump($product);
+//var_dump($product);
 
 /** @var $license \Never5\LicenseWP\License\License */
-/** @var $product WC_Product */
-//$license;
+/** @var $product WC_Product_Variable */
+
+// we need a license at this point
+if ( empty( $license ) ) {
+	return;
+}
+
+// we need a product
+if ( empty( $product ) ) {
+	return;
+}
+
+// our product needs to be a variation
+if ( 'variation' != $product->product_type ) {
+	return;
+}
+
+// our product parent must be a variable
+if ( 'variable' != $product->parent->product_type ) {
+	return;
+}
+
+
+// get variation related data
+$available_variations = $product->parent->get_available_variations();
+//$attributes           = $product->parent->get_variation_attributes();
+
+//var_dump($available_variations);
+//var_dump($attributes);
+
+// we need available variations
+if ( empty( $available_variations ) ) {
+	return;
+}
+
+// fetch and store license options in variable
+$license_options = array();
+
+// loop and check a bunch of license variation required props
+foreach ( $available_variations as $variation ) {
+	if ( is_array( $variation ) ) {
+
+		// get variation product
+		$variation_product = wc_get_product( $variation['variation_id'] );
+
+		// check
+		if ( ! empty( $variation_product ) && $variation_product->is_purchasable() && absint( $variation_product->license_activation_limit ) > $license->get_activation_limit() ) {
+
+			// take first variation attribute of an API licensed product
+			foreach ( $variation_product->get_variation_attributes() as $vp_key => $vp_val ) {
+
+				// get attr tax slug from attr name
+				$attr_slug = sanitize_title( substr( $vp_key, 10 ) );
+
+				// check if exists
+				if ( taxonomy_exists( $attr_slug ) ) {
+
+					// get term
+					$term = get_term_by( 'slug', $vp_val, $attr_slug );
+
+					// finally add to array
+					$license_options[ esc_attr( $term->slug ) ] = array(
+						'title' => $term->name . ' - ' . sprintf( __( 'Up to %d Websites', 'license-wp' ), absint( $variation_product->license_activation_limit ) ),
+						'price' => $variation_product->get_price()
+					);
+
+					// got term, break
+					break;
+				}
+			}
+		}
+	}
+}
+
 ?>
 
 <?php wc_print_notices(); ?>
@@ -30,13 +102,10 @@ var_dump($product);
 		</p>
 
 		<p class="form-row form-row-wide">
-			<label for="license-product"><?php _e( 'Product', 'license-wp' ); ?></label>
-			<span><?php echo $product->get_title(); ?></span>
-		</p>
-
-		<p class="form-row form-row-wide">
 			<label for="license-product"><?php _e( 'Current License', 'license-wp' ); ?></label>
-			<span><?php echo $product->get_title(); ?> (<?php echo( ( $license->get_activation_limit() > 0 ) ? sprintf( __( '%d websites per product', 'license-wp' ), absint( $license->get_activation_limit() ) ) : __( 'Unlimited', 'license-wp' ) ); ?>)</span>
+			<span><?php echo $product->get_title(); ?>
+				(<?php echo( ( $license->get_activation_limit() > 0 ) ? sprintf( __( '%d websites per product', 'license-wp' ), absint( $license->get_activation_limit() ) ) : __( 'Unlimited', 'license-wp' ) ); ?>
+				)</span>
 		</p>
 
 		<p class="form-row form-row-wide">
@@ -50,15 +119,22 @@ var_dump($product);
 		<p class="form-row form-row-wide">
 			<label for="license-key"><?php _e( 'Select New License', 'license-wp' ); ?></label>
 			<select name="new_license">
-				<option value="0">Business License - 5 websites</option>
-				<option value="0">Test Option 2</option>
+				<?php if ( ! empty( $license_options ) ) : ?>
+					<?php foreach ( $license_options as $lk => $lv ) : ?>
+						<option value="<?php echo $lk; ?>" data-price="<?php absint($lv['price']); ?>"><?php echo $lv['title']; ?></option>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</select>
 		</p>
 
+		<?php
+		/*
 		<p class="form-row form-row-wide">
 			<label for="license-product"><?php _e( 'Expiration Date', 'license-wp' ); ?></label>
 			<span><?php echo $license->get_date_expires()->format( get_option( 'date_format' ) ); ?></span>
 		</p>
+		*/
+		?>
 
 	</div>
 
@@ -85,12 +161,10 @@ var_dump($product);
 	</div>
 
 
-
-
-
 	<div class="clear"></div>
 	<p>
-		<input type="submit" class="button" name="submit_upgrade_license" value="<?php _e( 'Upgrade License', 'license-wp' ); ?>" />
+		<input type="submit" class="button" name="submit_upgrade_license"
+		       value="<?php _e( 'Upgrade License', 'license-wp' ); ?>"/>
 	</p>
 
 	<?php do_action( 'license_wp_license_upgrade_after_fields' ); ?>
