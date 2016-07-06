@@ -17,8 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 $pa = $product->get_variation_attributes();
 $current_license_term = get_term_by( 'slug', reset( $pa ), sanitize_title( substr( key( $pa ), 10 ) ) );
 
-var_dump($license->calculate_worth());
-
 // we need a license at this point
 if ( empty( $license ) ) {
 	return;
@@ -50,6 +48,9 @@ if ( empty( $available_variations ) ) {
 // fetch and store license options in variable
 $license_options = array();
 
+// store license worth in var
+$license_worth = $license->calculate_worth();
+
 // loop and check a bunch of license variation required props
 foreach ( $available_variations as $variation ) {
 	if ( is_array( $variation ) ) {
@@ -75,7 +76,8 @@ foreach ( $available_variations as $variation ) {
 					// finally add to array
 					$license_options[ esc_attr( $term->slug ) ] = array(
 						'title' => $term->name . ' - ' . sprintf( __( 'Up to %d Websites', 'license-wp' ), absint( $variation_product->license_activation_limit ) ),
-						'price' => $variation_product->get_price()
+						'price' => $variation_product->get_price(),
+						'upgrade_price' => $variation_product->get_price() - $license_worth
 					);
 
 					// got term, break
@@ -97,19 +99,19 @@ foreach ( $available_variations as $variation ) {
 	<div class="lwp-upgrade-license-block lwp-upgrade-license-current-license">
 		<h3><?php _e( 'Current License', 'license-wp' ); ?></h3>
 		<p class="form-row form-row-wide">
-			<label for="license-key"><?php _e( 'License Key', 'license-wp' ); ?></label>
+			<label><?php _e( 'License Key', 'license-wp' ); ?></label>
 			<span><?php echo $license->get_key(); ?></span>
 		</p>
 
 		<p class="form-row form-row-wide">
-			<label for="license-product"><?php _e( 'Current License', 'license-wp' ); ?></label>
+			<label><?php _e( 'Current License', 'license-wp' ); ?></label>
 			<span><?php echo $product->get_title(); ?> - <?php echo $current_license_term->name;; ?>
 				<small>(<?php echo( ( $license->get_activation_limit() > 0 ) ? sprintf( __( '%d websites per product', 'license-wp' ), absint( $license->get_activation_limit() ) ) : __( 'Unlimited', 'license-wp' ) ); ?>
 				)</small></span>
 		</p>
 
 		<p class="form-row form-row-wide">
-			<label for="license-product"><?php _e( 'Expiration Date', 'license-wp' ); ?></label>
+			<label><?php _e( 'Expiration Date', 'license-wp' ); ?></label>
 			<span><?php echo $license->get_date_expires()->format( get_option( 'date_format' ) ); ?></span>
 		</p>
 	</div>
@@ -117,19 +119,19 @@ foreach ( $available_variations as $variation ) {
 	<div class="lwp-upgrade-license-block lwp-upgrade-license-new-license">
 		<h3><?php _e( 'Upgrade Options', 'license-wp' ); ?></h3>
 		<p class="form-row form-row-wide">
-			<label for="license-key"><?php _e( 'Select New License', 'license-wp' ); ?></label>
-			<select name="new_license">
+			<label for="lwp_new_license"><?php _e( 'Select New License', 'license-wp' ); ?></label>
+			<select name="new_license" id="lwp_new_license">
 				<?php if ( ! empty( $license_options ) ) : ?>
 					<?php foreach ( $license_options as $lk => $lv ) : ?>
-						<option value="<?php echo $lk; ?>" data-price="<?php echo absint($lv['price']); ?>"><?php echo $lv['title']; ?></option>
+						<option value="<?php echo $lk; ?>" data-upgrade_price="<?php echo esc_attr( $lv['upgrade_price'] ); ?>"><?php echo $lv['title']; ?></option>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</select>
 		</p>
 
 		<p class="form-row form-row-wide">
-			<label for="license-product"><?php _e( 'Price to Upgrade', 'license-wp' ); ?></label>
-			<span class="lwp-upgrade-license-price">$39.00</span>
+			<label><?php _e( 'Price to Upgrade', 'license-wp' ); ?></label>
+			<span class="lwp-upgrade-license-price" id="lwp-upgrade-license-price">&nbsp;</span>
 		</p>
 		<?php do_action( 'license_wp_license_upgrade_fields_after_price' ); ?>
 

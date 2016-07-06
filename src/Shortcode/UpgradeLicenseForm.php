@@ -1,6 +1,8 @@
 <?php
 namespace Never5\LicenseWP\Shortcode;
 
+use Never5\LicenseWP;
+
 class UpgradeLicenseForm {
 
 	private $license_key = '';
@@ -11,6 +13,8 @@ class UpgradeLicenseForm {
 	 * __constructor
 	 */
 	public function __construct() {
+
+		// add shortcode
 		add_shortcode( 'upgrade_license_key_form', array( $this, 'callback' ) );
 	}
 
@@ -151,7 +155,11 @@ class UpgradeLicenseForm {
 
 		if ( ! empty( $this->license_key ) && ! is_null( $this->license ) ) {
 
-			$product = wc_get_product($this->license->get_product_id());
+			// enqueue JS
+			LicenseWP\Assets::enqueue_shortcode_upgrade_license();
+
+			// get product
+			$product = wc_get_product( $this->license->get_product_id() );
 
 			// load template file via WooCommerce template function
 			wc_get_template( 'upgrade-license-form.php', array(

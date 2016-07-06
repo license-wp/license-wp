@@ -37,4 +37,17 @@ abstract class Assets {
 
 	}
 
+	/**
+	 * Enqueue upgrade license JS
+	 */
+	public static function enqueue_shortcode_upgrade_license() {
+		wp_enqueue_script(
+			'lwp_js_upgrade_license',
+			license_wp()->service( 'file' )->plugin_url( '/assets/js/upgrade-license' . ( ( ! SCRIPT_DEBUG ) ? '.min' : '' ) . '.js' ),
+			array( 'jquery' ),
+			license_wp()->get_version(),
+			true
+		);
+	}
+
 }
