@@ -74,9 +74,11 @@ foreach ( $available_variations as $variation ) {
 					$term = get_term_by( 'slug', $vp_val, $attr_slug );
 
 					// finally add to array
-					$license_options[ esc_attr( $term->slug ) ] = array(
-						'title' => $term->name . ' - ' . sprintf( __( 'Up to %d Websites', 'license-wp' ), absint( $variation_product->license_activation_limit ) ),
-						'price' => $variation_product->get_price(),
+					$license_options[] = array(
+						'id'            => $variation_product->get_id(),
+						'slug'          => $term->slug,
+						'title'         => $term->name . ' - ' . sprintf( __( 'Up to %d Websites', 'license-wp' ), absint( $variation_product->license_activation_limit ) ),
+						'price'         => $variation_product->get_price(),
 						'upgrade_price' => $variation_product->get_price() - $license_worth
 					);
 
@@ -105,9 +107,8 @@ foreach ( $available_variations as $variation ) {
 
 		<p class="form-row form-row-wide">
 			<label><?php _e( 'Current License', 'license-wp' ); ?></label>
-			<span><?php echo $product->get_title(); ?> - <?php echo $current_license_term->name;; ?>
-				<small>(<?php echo( ( $license->get_activation_limit() > 0 ) ? sprintf( __( '%d websites per product', 'license-wp' ), absint( $license->get_activation_limit() ) ) : __( 'Unlimited', 'license-wp' ) ); ?>
-				)</small></span>
+			<span><?php echo $product->get_title(); ?> - <?php echo $current_license_term->name; ?>
+				<small>(<?php echo( ( $license->get_activation_limit() > 0 ) ? sprintf( __( '%d websites per product', 'license-wp' ), absint( $license->get_activation_limit() ) ) : __( 'Unlimited', 'license-wp' ) ); ?>)</small></span>
 		</p>
 
 		<p class="form-row form-row-wide">
@@ -122,8 +123,8 @@ foreach ( $available_variations as $variation ) {
 			<label for="lwp_new_license"><?php _e( 'Select New License', 'license-wp' ); ?></label>
 			<select name="new_license" id="lwp_new_license">
 				<?php if ( ! empty( $license_options ) ) : ?>
-					<?php foreach ( $license_options as $lk => $lv ) : ?>
-						<option value="<?php echo $lk; ?>" data-upgrade_price="<?php echo esc_attr( $lv['upgrade_price'] ); ?>"><?php echo $lv['title']; ?></option>
+					<?php foreach ( $license_options as $license_option ) : ?>
+						<option value="<?php echo esc_attr( $license_option['id'] ); ?>" data-upgrade_price="<?php echo esc_attr( $license_option['upgrade_price'] ); ?>"><?php echo $license_option['title']; ?></option>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</select>

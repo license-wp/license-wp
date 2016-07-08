@@ -16,6 +16,18 @@ class UpgradeLicenseForm {
 
 		// add shortcode
 		add_shortcode( 'upgrade_license_key_form', array( $this, 'callback' ) );
+
+		// set license key
+		$this->set_license_key();
+
+		// load license
+		$this->load_license();
+		
+		// process the post
+		if ( ! empty( $_POST['new_license'] ) ) {
+			$this->process_post();
+		}
+
 	}
 
 	/**
@@ -63,19 +75,6 @@ class UpgradeLicenseForm {
 	 * Callback
 	 */
 	public function callback() {
-
-		// set license key
-		$this->set_license_key();
-
-		// load license
-		$this->load_license();
-
-
-		// process the post
-//		if ( ! empty( $_POST['submit_lost_license_form'] ) ) {
-//			$this->process_post();
-//		}
-
 		// load view
 		return $this->view();
 	}
@@ -85,63 +84,22 @@ class UpgradeLicenseForm {
 	 */
 	private function process_post() {
 
-		echo 'todo';
-		exit;
+		if ( ! empty( $this->license_key ) && ! is_null( $this->license ) && isset( $_POST['new_license'] ) && ! empty( $_POST['new_license'] ) ) {
 
-		/*
-		// sanitize text field
-		$activation_email = sanitize_text_field( $_POST['activation_email'] );
+			// new license
+			$new_license = absint( $_POST['new_license'] );
 
-		// check email address
-		if ( ! is_email( $activation_email ) ) {
-			wc_add_notice( __( 'Invalid email address.', 'license-wp' ), 'error' );
+			// setup add-to-cart upgrade URL
+			$redirect_url = apply_filters( 'license_wp_license_upgrade_url_cart', add_query_arg( array(
+				'upgrade_license' => $this->license->get_key(),
+				'new_license'     => $new_license
+			), apply_filters( 'woocommerce_get_cart_url', wc_get_page_permalink( 'cart' ) ) ), $this->license );
 
-			return;
-		}
-
-		// get license by email address
-		$licenses = license_wp()->service( 'license_manager' )->get_licenses_by_email( $activation_email );
-
-		// loop
-		foreach ( $licenses as $license_key => $license ) {
-
-			// unset when license has expired
-			if ( $license->is_expired() ) {
-				unset( $licenses[ $license_key ] );
-			}
+			// redirect to cart
+			wp_redirect( $redirect_url );
+			exit;
 
 		}
-
-		// check if we found licenses
-		if ( count( $licenses ) > 0 ) {
-
-			// get user email address
-			$user = get_user_by( 'email', $activation_email );
-
-			// try to get a first name
-			if ( ! empty( $user ) && ! empty( $user->first_name ) ) {
-				$user_first_name = $user->first_name;
-			} else {
-				$user_first_name = false;
-			}
-
-			// send email to activation email
-			$sent = license_wp()->service( 'email_manager' )->send( new Email\LostLicense(
-				$licenses,
-				$user_first_name
-			), $activation_email );
-
-			// correct notice
-			if ( $sent ) {
-				wc_add_notice( sprintf( __( 'Your licenses have been emailed to %s.', 'license-wp' ), $activation_email ), 'success' );
-			} else {
-				wc_add_notice( __( 'Your licenses could not be sent. Please contact us for support.', 'license-wp' ), 'error' );
-			}
-
-		} else {
-			wc_add_notice( __( 'No active licenses found.', 'license-wp' ), 'error' );
-		}
-		*/
 
 	}
 
