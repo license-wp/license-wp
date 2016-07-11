@@ -70,6 +70,14 @@ class Order {
 						$license_expiry_days = get_post_meta( $product->id, '_license_expiry_days', true );
 					}
 
+					// search for upgrade key
+					$_upgrading_key = false;
+					foreach ( $item['item_meta'] as $meta_key => $meta_value ) {
+						if ( $meta_key == '_upgrading_key' ) {
+							$_upgrading_key = $meta_value[0];
+						}
+					}
+
 					// search for renewal key
 					$_renewing_key = false;
 					foreach ( $item['item_meta'] as $meta_key => $meta_value ) {
@@ -90,6 +98,34 @@ class Order {
 							$current_datetime = $license->get_date_expires() ? $license->get_date_expires() : new \DateTime();
 							$license->set_date_expires( $current_datetime->modify( "+{$license_expiry_days} days" ) );
 						}
+
+						// set new order id for license, store old order id with new order
+						update_post_meta( $order_id, 'original_order_id', $license->get_order_id() );
+						$license->set_order_id( $order_id );
+
+						// store license
+						license_wp()->service( 'license_repository' )->persist( $license );
+
+					} else if ( $_upgrading_key ) {
+
+						// get license
+						/** @var \Never5\LicenseWP\License\License $license */
+						$license = license_wp()->service( 'license_factory' )->make( $_upgrading_key );
+
+						// set new expiration date
+						if ( ! empty( $license_expiry_days ) ) {
+							$current_datetime = new \DateTime();
+							$license->set_date_expires( $current_datetime->modify( "+{$license_expiry_days} days" ) );
+						}
+
+						// set new activation limit
+						if ( ! empty( $activation_limit ) ) {
+							$license->set_activation_limit( $activation_limit );
+						}
+
+						// set new order id for license, store old order id with new order
+						update_post_meta( $order_id, 'original_order_id', $license->get_order_id() );
+						$license->set_order_id( $order_id );
 
 						// store license
 						license_wp()->service( 'license_repository' )->persist( $license );
@@ -157,7 +193,7 @@ class Order {
 
 			// only continue on WC shop order
 			if ( 'shop_order' === $post_type ) {
-				license_wp()->service('license_manager')->remove_license_data_by_order( $order_id );
+				license_wp()->service( 'license_manager' )->remove_license_data_by_order( $order_id );
 			}
 		}
 	}

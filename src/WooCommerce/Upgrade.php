@@ -11,7 +11,7 @@ class Upgrade {
 		add_action( 'wp', function () {
 
 			// check if we need to renew a license
-			if ( isset( $_GET['upgrade_license'] ) ) {
+			if ( isset( $_GET['upgrade_license'] ) && ! empty( $_GET['upgrade_license'] ) ) {
 
 				// add renewal to cart
 				$this->add_upgrade_to_cart( $_GET['upgrade_license'], $_GET['new_license'] );
