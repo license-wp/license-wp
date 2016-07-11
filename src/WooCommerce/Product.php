@@ -109,4 +109,17 @@ class Product {
 		return get_post( $product_id );
 	}
 
+	/**
+	 * Get WordPress term object of license of WC_Product_Variable
+	 *
+	 * @param \WC_Product_Variable $product
+	 *
+	 * @return object
+	 */
+	public static function get_license_term_of_product( $product ) {
+		$pa = $product->get_variation_attributes();
+
+		return get_term_by( 'slug', reset( $pa ), sanitize_title( substr( key( $pa ), 10 ) ) );
+	}
+
 }
