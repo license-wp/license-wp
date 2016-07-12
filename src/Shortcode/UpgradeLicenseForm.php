@@ -118,33 +118,34 @@ class UpgradeLicenseForm {
 	 * @return string
 	 */
 	private function view() {
-
-		// bail if not upgradable
-		if ( ! $this->is_upgradable ) {
-			return;
-		}
-
 		ob_start();
 
-		if ( ! empty( $this->license_key ) && ! is_null( $this->license ) ) {
+		// print WC notices
+		wc_print_notices();
 
-			// enqueue JS
-			LicenseWP\Assets::enqueue_shortcode_upgrade_license();
+		// only load view if is upgrable
+		if ( $this->is_upgradable ) {
 
-			// get product
-			$product = wc_get_product( $this->license->get_product_id() );
+			if ( ! empty( $this->license_key ) && ! is_null( $this->license ) ) {
 
-			// load template file via WooCommerce template function
-			wc_get_template( 'upgrade-license-form.php', array(
-				'license' => $this->license,
-				'product' => $product
-			), 'license-wp', license_wp()->service( 'file' )->plugin_path() . '/templates/' );
-		} else {
+				// enqueue JS
+				LicenseWP\Assets::enqueue_shortcode_upgrade_license();
 
-			// load template file via WooCommerce template function
-			wc_get_template( 'upgrade-license-form-find-license.php', array(), 'license-wp', license_wp()->service( 'file' )->plugin_path() . '/templates/' );
+				// get product
+				$product = wc_get_product( $this->license->get_product_id() );
+
+				// load template file via WooCommerce template function
+				wc_get_template( 'upgrade-license-form.php', array(
+					'license' => $this->license,
+					'product' => $product
+				), 'license-wp', license_wp()->service( 'file' )->plugin_path() . '/templates/' );
+			} else {
+
+				// load template file via WooCommerce template function
+				wc_get_template( 'upgrade-license-form-find-license.php', array(), 'license-wp', license_wp()->service( 'file' )->plugin_path() . '/templates/' );
+			}
+
 		}
-
 
 		return ob_get_clean();
 	}

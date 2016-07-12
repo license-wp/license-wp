@@ -8,8 +8,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
-<?php wc_print_notices(); ?>
-
 <form method="post">
 
 	<p><?php _e( 'Please enter your license key below to locate your license.', 'license-wp' ); ?></p>

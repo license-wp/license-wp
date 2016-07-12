@@ -33,8 +33,6 @@ $license_options = \Never5\LicenseWP\WooCommerce\Product::get_available_upgrade_
 
 ?>
 
-<?php wc_print_notices(); ?>
-
 <form method="post" id="lwp-upgrade-license-form">
 
 	<p><?php _e( "Please review your license data below and select the license you'd like to upgrade to.", 'license-wp' ); ?></p>
