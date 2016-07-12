@@ -247,8 +247,8 @@ class License {
 		$page = get_page_by_title( apply_filters( 'license_wp_license_upgrade_page_title', 'upgrade license' ) );
 
 		return apply_filters( 'license_wp_license_upgrade_url', add_query_arg( array(
-			'license_key'    => $this->get_key()
-		),  get_permalink($page->ID) ) );
+			'license_key' => $this->get_key()
+		), get_permalink( $page->ID ) ) );
 	}
 
 	/**
@@ -260,6 +260,11 @@ class License {
 
 		/** @var \WC_Order $order */
 		$order = wc_get_order( $this->get_order_id() );
+
+		// worth is 0 if there is no order
+		if ( false === $order ) {
+			return 0;
+		}
 
 		/** @var \WC_Product_Variable $product */
 		$product = wc_get_product( $this->get_product_id() ); // most likely a variable product
@@ -293,9 +298,9 @@ class License {
 				}
 			}
 		}
-		
+
 		// if price is 0 (or for some extremely odd reason below 0), return a worth of 0
-		if( $price <= 0) {
+		if ( $price <= 0 ) {
 			return 0;
 		}
 
