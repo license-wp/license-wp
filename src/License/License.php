@@ -244,7 +244,11 @@ class License {
 	 * @return string
 	 */
 	public function get_upgrade_url() {
-		return 'laat me met rust';
+		$page = get_page_by_title( apply_filters( 'license_wp_license_upgrade_page_title', 'upgrade license' ) );
+
+		return apply_filters( 'license_wp_license_upgrade_url', add_query_arg( array(
+			'license_key'    => $this->get_key()
+		),  get_permalink($page->ID) ) );
 	}
 
 	/**
