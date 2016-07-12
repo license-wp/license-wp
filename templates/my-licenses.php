@@ -42,12 +42,15 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 					if ( $license->get_activation_limit() > 0 ) {
 						printf( __( '%d per product', 'license-wp' ), absint( $license->get_activation_limit() ) );
 
-						// get available upgrade license options
-						$license_options = \Never5\LicenseWP\WooCommerce\Product::get_available_upgrade_options( wc_get_product( $license->get_product_id() ), $license );
+						// only show upgrade for non-expired
+						if( ! $license->is_expired() ) {
+							// get available upgrade license options
+							$license_options = \Never5\LicenseWP\WooCommerce\Product::get_available_upgrade_options( wc_get_product( $license->get_product_id() ), $license );
 
-						// check if there are upgrade options available
-						if ( count( $license_options ) > 0 ) {
-							echo '<br/><a class="button" href="' . $license->get_upgrade_url() . '">' . __( 'Upgrade License', 'license-wp' ) . '</a>';
+							// check if there are upgrade options available
+							if ( count( $license_options ) > 0 ) {
+								echo '<br/><a class="button" href="' . $license->get_upgrade_url() . '">' . __( 'Upgrade License', 'license-wp' ) . '</a>';
+							}
 						}
 
 					} else {
