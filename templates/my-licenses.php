@@ -24,7 +24,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 			$activations = $license->get_activations();
 			?>
 			<tr>
-				<td rowspan="<?php echo sizeof( $activations ) + 1; ?>"><?php echo esc_html( $wc_product->post_title ); ?></td>
+				<td rowspan="<?php echo( ( ! $license->is_expired() ) ? sizeof( $activations ) + 1 : 1 ); ?>"><?php echo esc_html( $wc_product->post_title ); ?></td>
 				<td>
 					<code style="display:block;"><?php echo $license->get_key(); ?></code>
 					<small>
@@ -79,7 +79,6 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 			<?php foreach ( $activations as $activation ) : ?>
 			<?php
 			/** @var \Never5\LicenseWP\Activation\Activation $activation */
-			$activation = $activation;
 			?>
 			<tr>
 				<td colspan="3">
