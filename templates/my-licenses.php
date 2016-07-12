@@ -75,6 +75,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 					}
 					?></td>
 			</tr>
+			<?php if( ! $license->is_expired() ) : ?>
 			<?php foreach ( $activations as $activation ) : ?>
 			<?php
 			/** @var \Never5\LicenseWP\Activation\Activation $activation */
@@ -86,6 +87,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>
+		<?php endif; ?>
 		<?php endforeach; ?>
 		</tbody>
 	</table>
