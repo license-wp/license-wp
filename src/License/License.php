@@ -322,7 +322,7 @@ class License {
 		 * amount of days used = $diff_used->days
 		 * amount of days license is valid from creation to expiry date = $diff_exp->days
 		 */
-		return round( $price - ( ( $price / $diff_exp->days ) * $diff_used->days ), 2 );
+		return apply_filters( 'license_wp_license_worth', round( $price - ( ( $price / $diff_exp->days ) * $diff_used->days ), 2 ), $this );
 	}
 
 }
