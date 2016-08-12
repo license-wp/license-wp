@@ -87,8 +87,8 @@ class Order {
 
 						// set new expiration date
 						if ( ! empty( $license_expiry_days ) ) {
-							$current_datetime = $license->get_date_expires() ? $license->get_date_expires() : new \DateTime();
-							$license->set_date_expires( $current_datetime->modify( "+{$license_expiry_days} days" ) );
+							$renew_datetime = $license->get_date_expires() && ! $license->is_expired() ? $license->get_date_expires() : new \DateTime();
+							$license->set_date_expires( $renew_datetime->modify( "+{$license_expiry_days} days" ) );
 						}
 
 						// store license
