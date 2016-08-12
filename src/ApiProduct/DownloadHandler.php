@@ -50,7 +50,7 @@ class DownloadHandler {
 
 		// check if license expired
 		if ( $license->is_expired() ) {
-			wp_die( sprintf( __( 'License has expires. You can renew it here: %s', 'license-wp' ), $license->get_renewal_url() ) );
+			wp_die( sprintf( __( 'License has expired. You can renew it here: %s', 'license-wp' ), $license->get_renewal_url() ) );
 		}
 
 		// check if this license is owned by logged in user
