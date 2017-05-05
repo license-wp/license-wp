@@ -19,12 +19,13 @@ if ( empty( $product ) ) {
 }
 
 // our product needs to be a variation
-if ( 'variation' != $product->product_type ) {
+if ( 'variation' != $product->get_type() ) {
 	return;
 }
 
 // our product parent must be a variable
-if ( 'variable' != $product->parent->product_type ) {
+$parent = wc_get_product( $product->get_parent_id() );
+if ( 'variable' != $parent->get_type() ) {
 	return;
 }
 

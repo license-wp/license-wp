@@ -278,13 +278,13 @@ class License {
 			foreach ( $line_items as $line_item ) {
 
 				// check if products match
-				if ( $line_item['product_id'] == $product->id ) {
+				if ( $line_item['product_id'] == $product->get_parent_id() ) {
 
 					// check if the WooCommerce product the license is linked to is a variation
-					if ( 'variation' == $product->product_type ) {
+					if ( 'variation' == $product->get_type() ) {
 
 						// if license is linked to variation, the variation_id must also match
-						if ( $line_item['variation_id'] != $product->variation_id ) {
+						if ( $line_item['variation_id'] != $product->get_id() ) {
 							continue;
 						}
 					}

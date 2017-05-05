@@ -125,34 +125,35 @@ class Product {
 
 	/**
 	 * Get available upgrade options
-	 * 
+	 *
 	 * @param \WC_Product_Variable $product
 	 * @param \Never5\LicenseWP\License\License $license
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function get_available_upgrade_options( $product, $license ) {
 		// fetch and store license options in variable
 		$license_options = array();
-		
+
 		// our product needs to be a variation
-		if ( 'variation' != $product->product_type ) {
+		if ( 'variation' != $product->get_type() ) {
 			return $license_options;
 		}
 
 		// our product parent must be a variable
-		if ( 'variable' != $product->parent->product_type ) {
+		$parent = wc_get_product( $product->get_parent_id() );
+		if ( 'variable' != $parent->get_type() ) {
 			return $license_options;
 		}
 
 		// get variation related data
-		$available_variations = $product->parent->get_available_variations();
+		$available_variations = $parent->get_available_variations();
 
 		// we need available variations
 		if ( empty( $available_variations ) ) {
 			return $license_options;
 		}
-		
+
 		// store license worth in var
 		$license_worth = $license->calculate_worth();
 
@@ -194,7 +195,7 @@ class Product {
 				}
 			}
 		}
-		
+
 		return $license_options;
 	}
 
