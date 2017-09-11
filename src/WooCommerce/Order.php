@@ -55,19 +55,22 @@ class Order {
 			foreach ( $order->get_items() as $item ) {
 
 				// get product
-				$product = $order->get_product_from_item( $item );
+				/**
+				 * @var \WC_Product $product
+				 */
+				$product = $item->get_product();
 
 				// check if this is an API license product
-				if ( 'yes' === get_post_meta( $product->id, '_is_api_product_license', true ) ) {
+				if ( 'yes' === get_post_meta( $product->get_id(), '_is_api_product_license', true ) ) {
 
 					// get activation limit
-					if ( ! $product->variation_id || ( ! $activation_limit = get_post_meta( $product->variation_id, '_license_activation_limit', true ) ) ) {
-						$activation_limit = get_post_meta( $product->id, '_license_activation_limit', true );
+					if ( ! $product->get_id() || ( ! $activation_limit = get_post_meta( $product->get_id(), '_license_activation_limit', true ) ) ) {
+						$activation_limit = get_post_meta( $product->get_id(), '_license_activation_limit', true );
 					}
 
 					// get expiry days
-					if ( ! $product->variation_id || ( ! $license_expiry_days = get_post_meta( $product->variation_id, '_license_expiry_days', true ) ) ) {
-						$license_expiry_days = get_post_meta( $product->id, '_license_expiry_days', true );
+					if ( ! $product->get_id() || ( ! $license_expiry_days = get_post_meta( $product->get_id(), '_license_expiry_days', true ) ) ) {
+						$license_expiry_days = get_post_meta( $product->get_id(), '_license_expiry_days', true );
 					}
 
 					// search for renewal key
@@ -105,9 +108,9 @@ class Order {
 
 							// set license data, key is generated when persisting license
 							$license->set_order_id( $order_id );
-							$license->set_activation_email( $order->billing_email );
-							$license->set_user_id( $order->customer_user );
-							$license->set_product_id( ( $product->variation_id ? $product->variation_id : $product->id ) );
+							$license->set_activation_email( $order->get_billing_email() );
+							$license->set_user_id( $order->get_customer_id() );
+							$license->set_product_id( $product->get_id() );
 							$license->set_activation_limit( $activation_limit );
 
 							// set date created
