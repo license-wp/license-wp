@@ -238,4 +238,96 @@ class License {
 		), apply_filters( 'woocommerce_get_cart_url', wc_get_page_permalink( 'cart' ) ) ), $this );
 	}
 
+	/**
+	 * Return upgrade URL
+	 *
+	 * @return string
+	 */
+	public function get_upgrade_url() {
+		$page = get_page_by_title( apply_filters( 'license_wp_license_upgrade_page_title', 'upgrade license' ) );
+
+		return apply_filters( 'license_wp_license_upgrade_url', add_query_arg( array(
+			'license_key' => $this->get_key()
+		), get_permalink( $page->ID ) ) );
+	}
+
+	/**
+	 * Calculate the $ worth of the
+	 *
+	 * @return int
+	 */
+	public function calculate_worth() {
+
+		/** @var \WC_Order $order */
+		$order = wc_get_order( $this->get_order_id() );
+
+		// worth is 0 if there is no order
+		if ( false === $order ) {
+			return 0;
+		}
+
+		/** @var \WC_Product_Variable $product */
+		$product = wc_get_product( $this->get_product_id() ); // most likely a variable product
+
+		// original price
+		$price = 0;
+
+		// search for the WooCommerce product that this license is attached to
+		$line_items = $order->get_items( 'line_item' );
+		if ( ! empty( $line_items ) ) {
+			foreach ( $line_items as $line_item ) {
+
+				// check if products match
+				if ( $line_item['product_id'] == $product->get_parent_id() ) {
+
+					// check if the WooCommerce product the license is linked to is a variation
+					if ( 'variation' == $product->get_type() ) {
+
+						// if license is linked to variation, the variation_id must also match
+						if ( $line_item['variation_id'] != $product->get_id() ) {
+							continue;
+						}
+					}
+
+					// set price
+					$price = floatval( $line_item['line_total'] );
+
+					// and done
+					break;
+
+				}
+			}
+		}
+
+		// if price is 0 (or for some extremely odd reason below 0), return a worth of 0
+		if ( $price <= 0 ) {
+			return 0;
+		}
+
+		// license is worth full price if it never expires
+		if ( false === $this->get_date_expires() ) {
+			return $price;
+		}
+
+		// now
+		$now = new \DateTime();
+
+		// datetime difference between today and creation date
+		$diff_used = $now->diff( $this->get_date_created() );
+
+		// datetime difference between creation date and expiration date
+		$diff_exp = $this->get_date_created()->diff( $this->get_date_expires() );
+
+		// amount of days used = $diff_used->days
+		// amount of days used = $diff_exp->days
+
+		/**
+		 * calculate worth
+		 *
+		 * amount of days used = $diff_used->days
+		 * amount of days license is valid from creation to expiry date = $diff_exp->days
+		 */
+		return apply_filters( 'license_wp_license_worth', round( $price - ( ( $price / $diff_exp->days ) * $diff_used->days ), 2 ), $this );
+	}
+
 }

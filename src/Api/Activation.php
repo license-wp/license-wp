@@ -33,6 +33,8 @@ class Activation {
 
 		try {
 
+			$purchase_url = get_permalink( woocommerce_get_page_id( 'shop' ) );
+
 			// check for request var
 			if ( ! isset( $request['request'] ) || empty( $request['request'] ) ) {
 				throw new ApiException( __( 'Invalid API Request.', 'license-wp' ), 100 );
@@ -40,12 +42,12 @@ class Activation {
 
 			// check for license var
 			if ( ! isset( $request['license_key'] ) || empty( $request['license_key'] ) ) {
-				throw new ApiException( __( 'Activation error: The provided license is invalid.', 'license-wp' ), 101 );
+				throw new ApiException( __( '<strong>Activation error:</strong> The provided license is invalid.', 'license-wp' ), 101 );
 			}
 
 			// check for api product ID var
 			if ( ! isset( $request['api_product_id'] ) || empty( $request['api_product_id'] ) ) {
-				throw new ApiException( __( 'Activation error: Invalid API Product ID.', 'license-wp' ), 102 );
+				throw new ApiException( __( '<strong>Activation error:</strong> Invalid API Product ID.', 'license-wp' ), 102 );
 			}
 
 			// get license
@@ -54,12 +56,12 @@ class Activation {
 
 			// check if license exists
 			if ( '' == $license->get_key() ) {
-				throw new ApiException( __( 'Activation error: The provided license is invalid.', 'license-wp' ), 101 );
+				throw new ApiException( sprintf( __( '<strong>Activation error:</strong> The provided license is invalid. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 101 );
 			}
 
 			// check if license expired
 			if ( $license->is_expired() ) {
-				throw new ApiException( __( 'Activation error: The provided license has expired.', 'license-wp' ), 110 ); // @todo add renew link
+				throw new ApiException( sprintf( __( '<strong>Activation error:</strong> Your license has expired. You must <a href="%s" target="_blank">renew your license</a> if you want to use it again.', 'license-wp' ), $license->get_renewal_url() ), 110 ); // @todo add renew link
 			}
 
 			// get api product by given api product id (slug)
@@ -67,7 +69,7 @@ class Activation {
 
 			// check if license grants access to request api product
 			if ( null === $api_product ) {
-				throw new ApiException( __( 'This license does not allow access to the requested product.', 'license-wp' ), 104 );
+				throw new ApiException( sprintf( __( '<strong>Activation error:</strong> This license does not allow access to the requested product. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 104 );
 			}
 
 			switch ( $request['request'] ) {
@@ -75,14 +77,16 @@ class Activation {
 
 					// we do the email check here because email var is not passed for deactivations
 
+					$email_err_message = __( '<strong>Activation error:</strong> The email provided (%s) is invalid. Please enter the correct email address or <a href="%s" target="_blank">purchase a valid license</a> to receive updates and support.', 'license-wp' );
+
 					// check for email var
 					if ( ! isset( $request['email'] ) || empty( $request['email'] ) ) {
-						throw new ApiException( sprintf( __( 'Activation error: The email provided (%s) is invalid.', 'license-wp' ), $request['email'] ), 103 );
+						throw new ApiException( sprintf( $email_err_message, $request['email'], $purchase_url ), 103 );
 					}
 
 					// check if activation email is correct
 					if ( ! is_email( $request['email'] ) || $request['email'] != $license->get_activation_email() ) {
-						throw new ApiException( sprintf( __( 'Activation error: The email provided (%s) is invalid.', 'license-wp' ), $request['email'] ), 103 );
+						throw new ApiException( sprintf( $email_err_message, $request['email'], $purchase_url ), 103 );
 					}
 
 					// activate the license
@@ -145,7 +149,7 @@ class Activation {
 
 		// check if activation limit is reached and the requested instance isn't already activated
 		if ( $license->get_activation_limit() > 0 && count( $license->get_activations( $api_product ) ) >= $license->get_activation_limit() && ! in_array( $request['instance'], $existing_active_activation_instances ) ) {
-			throw new ApiException( sprintf( __( 'Activation error: Activation limit reached. Please deactivate an install first at your My Account page: %s.', 'license-wp' ), get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) ), 105 );
+			throw new ApiException( sprintf( __( '<strong>Activation error:</strong> Activation limit reached. Please deactivate another website or upgrade your license at your <a href="%s" target="_blank">My Account page</a>.', 'license-wp' ), get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) ), 105 );
 		}
 
 		// the activation
@@ -189,7 +193,7 @@ class Activation {
 
 		// check if activation was saved
 		if ( $activation->get_id() == 0 ) {
-			throw new ApiException( __( 'Activation error: Could not activate license key. Please contact support.', 'license-wp' ), 107 );
+			throw new ApiException( __( '<strong>Activation error:</strong> Could not activate license key. Please contact support.', 'license-wp' ), 107 );
 		}
 
 		// calculate activations left
