@@ -22,7 +22,7 @@ class Upgrade {
 		// WooCommerce filters to make the renewal work
 		add_filter( 'woocommerce_add_cart_item', array( $this, 'add_cart_item' ), 10, 1 );
 		add_filter( 'woocommerce_get_cart_item_from_session', array( $this, 'get_cart_item_from_session' ), 10, 2 );
-		add_action( 'woocommerce_add_order_item_meta', array( $this, 'order_item_meta' ), 10, 2 );
+		add_action( 'woocommerce_new_order_item', array( $this, 'order_item_meta' ), 10, 2 );
 	}
 
 	/**
