@@ -164,8 +164,10 @@ class Product {
 				// get variation product
 				$variation_product = wc_get_product( $variation['variation_id'] );
 
+				$license_activation_limit = absint ( get_post_meta( $variation_product->get_id(), '_license_activation_limit', true ) );
+
 				// check
-				if ( ! empty( $variation_product ) && $variation_product->is_purchasable() && absint( $variation_product->license_activation_limit ) > $license->get_activation_limit() ) {
+				if ( ! empty( $variation_product ) && $variation_product->is_purchasable() && $license_activation_limit > $license->get_activation_limit() ) {
 
 					// take first variation attribute of an API licensed product
 					foreach ( $variation_product->get_variation_attributes() as $vp_key => $vp_val ) {
@@ -183,7 +185,7 @@ class Product {
 							$license_options[] = array(
 								'id'            => $variation_product->get_id(),
 								'slug'          => $term->slug,
-								'title'         => $term->name . ' - ' . sprintf( __( 'Up to %d Websites', 'license-wp' ), absint( $variation_product->license_activation_limit ) ),
+								'title'         => $term->name . ' - ' . sprintf( __( 'Up to %d Websites', 'license-wp' ), $license_activation_limit ),
 								'price'         => $variation_product->get_price(),
 								'upgrade_price' => $variation_product->get_price() - $license_worth
 							);
