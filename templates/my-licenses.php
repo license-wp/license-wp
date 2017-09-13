@@ -24,8 +24,8 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 			$activations = $license->get_activations();
 			?>
 			<tr>
-				<td rowspan="<?php echo( ( ! $license->is_expired() ) ? sizeof( $activations ) + 1 : 1 ); ?>"><?php echo esc_html( $wc_product->post_title ); ?></td>
-				<td>
+				<td rowspan="<?php echo( ( ! $license->is_expired() ) ? sizeof( $activations ) + 1 : 1 ); ?>" class="lwp_licenses_name"><?php echo esc_html( $wc_product->post_title ); ?></td>
+				<td class="lwp_licenses_code">
 					<code style="display:block;"><?php echo $license->get_key(); ?></code>
 					<small>
 						<?php printf( __( 'Activation email: %s', 'license-wp' ), $license->get_activation_email() ); ?><br/>
@@ -38,7 +38,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 						<?php endif; ?>
 					</small>
 				</td>
-				<td><?php
+				<td class="lwp_licenses_activation_limit"><?php
 					if ( $license->get_activation_limit() > 0 ) {
 						printf( __( '%d per product', 'license-wp' ), absint( $license->get_activation_limit() ) );
 
@@ -49,7 +49,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 
 							// check if there are upgrade options available
 							if ( count( $license_options ) > 0 ) {
-								echo '<br/><a class="button" href="' . $license->get_upgrade_url() . '">' . __( 'Upgrade License', 'license-wp' ) . '</a>';
+								echo '<br/><a class="button lwp_button_upgrade" href="' . $license->get_upgrade_url() . '">' . __( 'Upgrade License', 'license-wp' ) . '</a>';
 							}
 						}
 
@@ -57,9 +57,9 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 						_e( 'Unlimited', 'license-wp' );
 					}
 					?></td>
-				<td><?php
+				<td class="lwp_licenses_download"><?php
 					if ( $license->is_expired() ) {
-						echo '<a class="button" href="' . $license->get_renewal_url() . '">' . __( 'Renew License', 'license-wp' ) . '</a>';
+						echo '<a class="button lwp_button_renew" href="' . $license->get_renewal_url() . '">' . __( 'Renew License', 'license-wp' ) . '</a>';
 					} else {
 
 						// get API products
@@ -81,7 +81,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 			/** @var \Never5\LicenseWP\Activation\Activation $activation */
 			?>
 			<tr>
-				<td colspan="3">
+				<td colspan="3" class="lwp_licenses_activation">
 					<?php echo get_the_title(  $activation->get_api_product_post_id() ); ?> &mdash; <a href="<?php echo esc_attr( $activation->get_instance() ); ?>" target="_blank"><?php echo esc_html( $activation->get_instance() ); ?></a> <a class="button" style="float:right" href="<?php echo $activation->get_deactivate_url($license); ?>"><?php _e( 'Deactivate', 'license-wp' ); ?></a>
 				</td>
 			</tr>
