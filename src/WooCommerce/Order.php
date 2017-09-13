@@ -60,17 +60,35 @@ class Order {
 				 */
 				$product = $item->get_product();
 
+
+				// fetch if it's an API license product
+				$is_api_product = false;
+				if ( $product->is_type( 'variation' ) ) {
+				    error_log( 'is variable product', 0);
+					$is_api_product = ( 'yes' === get_post_meta( $product->get_parent_id(), '_is_api_product_license', true ) );
+				} else {
+					$is_api_product = ( 'yes' === get_post_meta( $product->get_id(), '_is_api_product_license', true ) );
+				}
+
 				// check if this is an API license product
-				if ( 'yes' === get_post_meta( $product->get_id(), '_is_api_product_license', true ) ) {
+				if ( $is_api_product ) {
 
 					// get activation limit
 					if ( ! $product->get_id() || ( ! $activation_limit = get_post_meta( $product->get_id(), '_license_activation_limit', true ) ) ) {
 						$activation_limit = get_post_meta( $product->get_id(), '_license_activation_limit', true );
+
+						if ( empty( $activation_limit ) && $product->is_type( 'variation' ) ) {
+							$activation_limit = get_post_meta( $product->get_parent_id(), '_license_activation_limit', true );
+						}
 					}
 
 					// get expiry days
 					if ( ! $product->get_id() || ( ! $license_expiry_days = get_post_meta( $product->get_id(), '_license_expiry_days', true ) ) ) {
 						$license_expiry_days = get_post_meta( $product->get_id(), '_license_expiry_days', true );
+
+						if ( empty( $license_expiry_days ) && $product->is_type( 'variation' ) ) {
+							$license_expiry_days = get_post_meta( $product->get_parent_id(), '_license_expiry_days', true );
+						}
 					}
 
 					// search for upgrade key
