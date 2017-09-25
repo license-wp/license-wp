@@ -64,7 +64,6 @@ class Order {
 				// fetch if it's an API license product
 				$is_api_product = false;
 				if ( $product->is_type( 'variation' ) ) {
-				    error_log( 'is variable product', 0);
 					$is_api_product = ( 'yes' === get_post_meta( $product->get_parent_id(), '_is_api_product_license', true ) );
 				} else {
 					$is_api_product = ( 'yes' === get_post_meta( $product->get_id(), '_is_api_product_license', true ) );
