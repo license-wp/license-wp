@@ -95,9 +95,9 @@ class Renewal {
 			$discount         = ( $price / 100 ) * 30; // @todo this should become an option
 			$discounted_price = $price - $discount;
 
+
 			$cart_item['data']->set_price( $discounted_price );
-			$cart_item['data']->get_post_data();
-			$cart_item['data']->post->post_title .= ' (' . __( 'Renewal', 'license-wp' ) . ')';
+			$cart_item['data']->set_name( $cart_item['data']->get_name() . ' (' . __( 'Renewal', 'license-wp' ) . ')' );
 		}
 		return $cart_item;
 	}
@@ -117,8 +117,7 @@ class Renewal {
 			$discounted_price = $price - $discount;
 
 			$cart_item['data']->set_price( $discounted_price );
-			$cart_item['data']->get_post_data();
-			$cart_item['data']->post->post_title .= ' (' . __( 'Renewal', 'license-wp' ) . ')';
+			$cart_item['data']->set_name( $cart_item['data']->get_name() . ' (' . __( 'Renewal', 'license-wp' ) . ')' );
 
 			$cart_item['renewing_key'] = $values['renewing_key'];
 		}

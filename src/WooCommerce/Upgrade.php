@@ -106,7 +106,7 @@ class Upgrade {
 		if ( $cart_item['upgrading_key'] == $license->get_key() ) {
 			$price            = $cart_item['data']->get_price();
 			$discounted_price = $price - $license->calculate_worth();
-			
+
 			$cart_item['data']->set_price( $discounted_price );
 			$cart_item['data']->set_name( $cart_item['data']->get_name() . ' (' . __( 'Upgrade', 'license-wp' ) . ')' );
 		}
