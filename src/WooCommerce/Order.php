@@ -50,6 +50,33 @@ class Order {
 		$order   = new \WC_Order( $order_id );
 		$has_key = false;
 
+		// check for global subscription renewal
+        $is_subscription_renewal = false;
+		foreach ( $order->get_meta_data() as $meta ) {
+			if ( $meta->key == '_subscription_renewal' ) {
+				$is_subscription_renewal = true;
+
+				$subscription = new \WC_Subscription( $meta->value );
+
+				if( $subscription ) {
+
+				    // get parent order id
+				    $parent_order_id = $subscription->get_parent_id();
+
+				    // fetch license of parent order
+					$licenses = license_wp()->service( 'license_manager' )->get_licenses_by_order( $parent_order_id );
+
+					if(!empty($licenses)) {
+					    $license = array_shift($licenses);
+
+						// set renewing key
+						$_renewing_key = $license->get_key();
+                    }
+
+                }
+			}
+		}
+
 		// loop items
 		if ( sizeof( $order->get_items() ) > 0 ) {
 			foreach ( $order->get_items() as $item ) {
@@ -81,14 +108,41 @@ class Order {
 						}
 					}
 
-					// get expiry days
-					if ( ! $product->get_id() || ( ! $license_expiry_days = get_post_meta( $product->get_id(), '_license_expiry_days', true ) ) ) {
-						$license_expiry_days = get_post_meta( $product->get_id(), '_license_expiry_days', true );
+					// get expiry date
+					$expiry_modify_string = "";
 
-						if ( empty( $license_expiry_days ) && $product->is_type( 'variation' ) ) {
-							$license_expiry_days = get_post_meta( $product->get_parent_id(), '_license_expiry_days', true );
+					$license_expiry_amount = get_post_meta( $product->get_id(), '_license_expiry_amount', true );
+					$license_expiry_type   = get_post_meta( $product->get_id(), '_license_expiry_type', true );
+
+					if ( empty( $license_expiry_amount ) && $product->is_type( 'variation' ) ) {
+						$license_expiry_amount = get_post_meta( $product->get_parent_id(), '_license_expiry_amount', true );
+					}
+
+					if ( empty( $license_expiry_type ) && $product->is_type( 'variation' ) ) {
+						$license_expiry_type = get_post_meta( $product->get_parent_id(), '_license_expiry_type', true );
+					}
+
+					if ( ! empty( $license_expiry_amount ) && 0 != $license_expiry_amount ) {
+						$expiry_modify_string = "+".$license_expiry_amount." ";
+						switch ( $license_expiry_type ) {
+							case 'years':
+								$expiry_modify_string .= "years";
+								break;
+							case 'months':
+								$expiry_modify_string .= "months";
+								break;
+							case 'days':
+							default:
+								$expiry_modify_string .= "days";
+								break;
 						}
 					}
+
+//					error_log( '--------------------BEGIN------------------------', 0);
+//					error_log(print_r($item,1),0);
+//					error_log( '--------------------------------------------', 0);
+//					error_log(print_r($order,1),0);
+//					error_log( '--------------------END------------------------', 0);
 
 					// search for upgrade key
 					$_upgrading_key = false;
@@ -99,12 +153,14 @@ class Order {
 					}
 
 					// search for renewal key
-					$_renewing_key = false;
-					foreach ( $item['item_meta'] as $meta_key => $meta_value ) {
-						if ( $meta_key == '_renewing_key' ) {
-							$_renewing_key = $meta_value[0];
-						}
-					}
+                    if( ! $is_subscription_renewal ) {
+	                    $_renewing_key = false;
+	                    foreach ( $item['item_meta'] as $meta_key => $meta_value ) {
+		                    if ( $meta_key == '_renewing_key' ) {
+			                    $_renewing_key = $meta_value[0];
+		                    }
+	                    }
+                    }
 
 					// check on renewal
 					if ( $_renewing_key ) {
@@ -114,9 +170,9 @@ class Order {
 						$license = license_wp()->service( 'license_factory' )->make( $_renewing_key );
 
 						// set new expiration date
-						if ( ! empty( $license_expiry_days ) ) {
-							$renew_datetime = $license->get_date_expires() && ! $license->is_expired() ? $license->get_date_expires() : new \DateTime();
-							$license->set_date_expires( $renew_datetime->modify( "+{$license_expiry_days} days" ) );
+						if ( ! empty( $expiry_modify_string ) ) {
+							$renew_datetime = (  ! $license->is_expired() ) ? $license->get_date_expires() : new \DateTime();
+							$license->set_date_expires( $renew_datetime->setTime( 0, 0, 0 )->modify( $expiry_modify_string ) );
 						}
 
 						// set new order id for license, store old order id with new order
@@ -133,9 +189,9 @@ class Order {
 						$license = license_wp()->service( 'license_factory' )->make( $_upgrading_key );
 
 						// set new expiration date
-						if ( ! empty( $license_expiry_days ) ) {
+						if ( ! empty( $expiry_modify_string ) ) {
 							$current_datetime = new \DateTime();
-							$license->set_date_expires( $current_datetime->modify( "+{$license_expiry_days} days" ) );
+							$license->set_date_expires( $current_datetime->setTime( 0, 0, 0 )->modify( $expiry_modify_string ) );
 						}
 
 						// set new activation limit
@@ -150,7 +206,7 @@ class Order {
 						// store license
 						license_wp()->service( 'license_repository' )->persist( $license );
 
-					} else { // no renewal, new key
+					} else { // no renewal, no upgrade, new key
 
 						// Generate new keys
 						for ( $i = 0; $i < absint( $item['qty'] ); $i ++ ) {
@@ -171,9 +227,9 @@ class Order {
 							$license->set_date_created( $date_created->setTime( 0, 0, 0 ) );
 
 							// set correct expiry days
-							if ( ! empty( $license_expiry_days ) ) {
+							if ( ! empty( $expiry_modify_string ) ) {
 								$exp_date = new \DateTime();
-								$license->set_date_expires( $exp_date->setTime( 0, 0, 0 )->modify( "+{$license_expiry_days} days" ) );
+								$license->set_date_expires( $exp_date->setTime( 0, 0, 0 )->modify( $expiry_modify_string ) );
 							}
 
 							// store license
