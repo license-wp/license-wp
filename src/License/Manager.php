@@ -229,7 +229,7 @@ class Manager {
 				if ( false !== $date->modify( $email_data['date_modify'] ) ) {
 
 					// get licenses that expire on modified date object
-					$licenses = $this->get_licenses_that_expire_on( $date );
+					$licenses = apply_filters( 'license_wp_renewal_emails_licenses', $this->get_licenses_that_expire_on( $date ), $email_data, $date );
 
 					// check if there are licenses
 					if ( count( $licenses ) > 0 ) {
@@ -245,7 +245,6 @@ class Manager {
 
 							// send email
 							license_wp()->service( 'email_manager' )->send( $email, $license->get_activation_email() );
-							exit;
 						}
 					}
 
