@@ -186,10 +186,11 @@ class Order {
 						$license = license_wp()->service( 'license_factory' )->make( $_upgrading_key );
 
 						// set new expiration date
-						if ( apply_filters( 'lwp_upgrade_update_date_expires', true, $license, $order ) ) {
+						if ( apply_filters( 'lwp_upgrade_update_date_expires', true, $license, $order, $item ) ) {
 							if ( ! empty( $expiry_modify_string ) ) {
 								$current_datetime = new \DateTime();
-								$license->set_date_expires( $current_datetime->setTime( 0, 0, 0 )->modify( $expiry_modify_string ) );
+								$current_datetime->setTime( 0, 0, 0 )->modify( $expiry_modify_string );
+								$license->set_date_expires( apply_filters( 'lwp_upgrade_date_expires', $current_datetime, $license, $order, $item )  );
 							}
 						}
 
@@ -198,8 +199,11 @@ class Order {
 							$license->set_activation_limit( $activation_limit );
 						}
 
+						// set new product id
+						$license->set_product_id( $product->get_id() );
+
 						// set new order id for license, store old order id with new order
-						if ( apply_filters( 'lwp_upgrade_update_order_id', true, $license, $order ) ) {
+						if ( apply_filters( 'lwp_upgrade_update_order_id', true, $license, $order, $item ) ) {
 							update_post_meta( $order_id, 'original_order_id', $license->get_order_id() );
 							$license->set_order_id( $order_id );
 						}
