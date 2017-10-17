@@ -22,9 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php woocommerce_wp_text_input( array(
 		'id'                => '_license_activation_limit',
-		'label'             => __( 'License activation limit', 'wp-plugin-licencing' ),
-		'placeholder'       => __( 'Unlimited', 'wp-plugin-licencing' ),
-		'description'       => __( 'The maximum number of activations allowed. Leave blank for unlimited.', 'wp-plugin-licencing' ),
+		'label'             => __( 'License activation limit', 'license-wp' ),
+		'placeholder'       => __( 'Unlimited', 'license-wp' ),
+		'description'       => __( 'The maximum number of activations allowed. Leave blank for unlimited.', 'license-wp' ),
 		'value'             => get_post_meta( $post_id, '_license_activation_limit', true ),
 		'desc_tip'          => true,
 		'type'              => 'number',
@@ -34,11 +34,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 		) ) ); ?>
 
 	<?php woocommerce_wp_text_input( array(
-		'id'                => '_license_expiry_days',
-		'label'             => __( 'License expiry days', 'wp-plugin-licencing' ),
-		'placeholder'       => __( 'Never expire', 'wp-plugin-licencing' ),
-		'description'       => __( 'How many days until the license expires. Leave blank for never.', 'wp-plugin-licencing' ),
-		'value'             => get_post_meta( $post_id, '_license_expiry_days', true ),
+		'id'                => '_license_expiry_amount',
+		'label'             => __( 'License expiry amount', 'license-wp' ),
+		'placeholder'       => __( 'Never expire', 'license-wp' ),
+		'description'       => __( 'How many days/months/years until the license expires. Leave blank for never.', 'license-wp' ),
+		'value'             => get_post_meta( $post_id, '_license_expiry_amount', true ),
 		'desc_tip'          => true,
 		'type'              => 'number',
 		'custom_attributes' => array(
@@ -46,6 +46,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 			'step' 	=> '1'
 		) ) ); ?>
 
+	<?php woocommerce_wp_select( array(
+		'id'                => '_license_expiry_type',
+		'label'             => __( 'License expiry type', 'license-wp' ),
+		'placeholder'       => __( 'Days', 'license-wp' ),
+		'description'       => __( 'The date type used for license expiry amount.', 'license-wp' ),
+		'value'             => get_post_meta( $post_id, '_license_expiry_type', true ),
+		'desc_tip'          => true,
+		'type'              => 'number',
+		'options'           => array(
+			'days'   => 'Days',
+			'months' => 'Months',
+			'years'  => 'Years',
+		) ) ); ?>
+    
 </div>
 <script type="text/javascript">
 	jQuery(function() {

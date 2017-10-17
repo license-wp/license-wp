@@ -32,7 +32,7 @@ class Update {
 		// check for required things
 		try {
 
-			$purchase_url = get_permalink( woocommerce_get_page_id( 'shop' ) );
+			$purchase_url = get_permalink( wc_get_page_id( 'shop' ) );
 
 			// check for request var
 			if ( ! isset( $request['request'] ) || empty( $request['request'] ) ) {

@@ -73,7 +73,7 @@ class Upgrade {
 
 		// Add to cart
 		WC()->cart->empty_cart();
-		WC()->cart->add_to_cart( $new_product->parent->get_id(), 1, $new_product->get_id(), array( 'License' => $new_product_license_term->name ), array(
+		WC()->cart->add_to_cart( $new_product->get_parent_id(), 1, $new_product->get_id(), array( 'License' => $new_product_license_term->name ), array(
 			'upgrading_key' => $license->get_key()
 		) );
 
@@ -108,8 +108,7 @@ class Upgrade {
 			$discounted_price = $price - $license->calculate_worth();
 
 			$cart_item['data']->set_price( $discounted_price );
-			$cart_item['data']->get_post_data();
-			$cart_item['data']->post->post_title .= ' (' . __( 'Upgrade', 'license-wp' ) . ')';
+			$cart_item['data']->set_name( $cart_item['data']->get_name() . ' (' . __( 'Upgrade', 'license-wp' ) . ')' );
 		}
 
 		return $cart_item;

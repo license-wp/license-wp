@@ -55,6 +55,10 @@ class Product {
 	public function save_license_data() {
 		global $post;
 
+		error_log( 'save_license_data triggered', 0 );
+		error_log( 'Post ID: '. $post->ID, 0 );
+		error_log( print_r($_POST, 1), 0 );
+
 		if ( ! empty( $_POST['_is_api_product_license'] ) ) {
 			update_post_meta( $post->ID, '_is_api_product_license', 'yes' );
 		} else {
@@ -63,7 +67,8 @@ class Product {
 
 		update_post_meta( $post->ID, '_api_product_permissions', json_encode( array_map( 'absint', (array) ( isset( $_POST['api_product_permissions'] ) ? $_POST['api_product_permissions'] : array() ) ) ) );
 		update_post_meta( $post->ID, '_license_activation_limit', sanitize_text_field( $_POST['_license_activation_limit'] ) );
-		update_post_meta( $post->ID, '_license_expiry_days', sanitize_text_field( $_POST['_license_expiry_days'] ) );
+		update_post_meta( $post->ID, '_license_expiry_amount', sanitize_text_field( $_POST['_license_expiry_amount'] ) );
+		update_post_meta( $post->ID, '_license_expiry_type', sanitize_text_field( $_POST['_license_expiry_type'] ) );
 	}
 
 	/**
@@ -85,11 +90,13 @@ class Product {
 	 * @param $i
 	 */
 	public function save_variable_license_data( $variation_id, $i ) {
-		$variation_license_activation_limit = $_POST['_variation_license_activation_limit'];
-		$variation_license_expiry_days      = $_POST['_variation_license_expiry_days'];
+		$variation_license_activation_limit     = $_POST['_variation_license_activation_limit'];
+		$variation_license_expiry_amount        = $_POST['_variation_license_expiry_amount'];
+		$variation_license_expiry_type          = $_POST['_variation_license_expiry_type'];
 
 		update_post_meta( $variation_id, '_license_activation_limit', sanitize_text_field( $variation_license_activation_limit[ $i ] ) );
-		update_post_meta( $variation_id, '_license_expiry_days', sanitize_text_field( $variation_license_expiry_days[ $i ] ) );
+		update_post_meta( $variation_id, '_license_expiry_amount', sanitize_text_field( $variation_license_expiry_amount[ $i ] ) );
+		update_post_meta( $variation_id, '_license_expiry_type', sanitize_text_field( $variation_license_expiry_type[ $i ] ) );
 	}
 
 	/**
