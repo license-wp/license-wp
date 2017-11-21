@@ -22,7 +22,7 @@ class Renewal {
 		// WooCommerce filters to make the renewal work
 		add_filter( 'woocommerce_add_cart_item', array( $this, 'add_cart_item' ), 10, 1 );
 		add_filter( 'woocommerce_get_cart_item_from_session', array( $this, 'get_cart_item_from_session' ), 10, 2 );
-		add_action( 'woocommerce_new_order_item', array( $this, 'order_item_meta' ), 10, 2 );
+		add_action( 'woocommerce_checkout_create_order_line_item', array( $this, 'order_item_meta' ), 10, 4 );
 	}
 
 	/**
@@ -95,7 +95,6 @@ class Renewal {
 			$discount         = ( $price / 100 ) * 30; // @todo this should become an option
 			$discounted_price = $price - $discount;
 
-
 			$cart_item['data']->set_price( $discounted_price );
 			$cart_item['data']->set_name( $cart_item['data']->get_name() . ' (' . __( 'Renewal', 'license-wp' ) . ')' );
 		}
@@ -127,12 +126,14 @@ class Renewal {
 	/**
 	 * order_item_meta function for storing the meta in the order line items
 	 *
-	 * @param int $item_id
-	 * @param array $values
+	 * @param \WC_Order_Item $item
+	 * @param string        $cart_item_key
+	 * @param array         $values
+	 * @param \WC_Order      $order
 	 */
-	public function order_item_meta( $item_id, $values ) {
+	public function order_item_meta( $item, $cart_item_key, $values, $order ) {
 		if ( isset( $values['renewing_key'] ) ) {
-			wc_add_order_item_meta( $item_id, __('_renewing_key', 'license-wp' ), $values['renewing_key'] );
+			$item->add_meta_data( __('_renewing_key', 'license-wp' ), $values['renewing_key'], true );
 		}
 	}
 
