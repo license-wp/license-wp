@@ -89,7 +89,6 @@ class Order {
 
 
 				// fetch if it's an API license product
-				$is_api_product = false;
 				if ( $product->is_type( 'variation' ) ) {
 					$is_api_product = ( 'yes' === get_post_meta( $product->get_parent_id(), '_is_api_product_license', true ) );
 				} else {
@@ -150,14 +149,10 @@ class Order {
 					$_upgrading_key = apply_filters( 'lwp_order_upgrading_key', $_upgrading_key, $item, $order );
 
 					// search for renewal key
-                    if( ! $is_subscription_renewal ) {
-	                    $_renewing_key = false;
-	                    foreach ( $item['item_meta'] as $meta_key => $meta_value ) {
-		                    if ( $meta_key == '_renewing_key' ) {
-			                    $_renewing_key = $meta_value[0];
-		                    }
-	                    }
-                    }
+					if ( ! $is_subscription_renewal ) {
+						// search for renewal key
+						$_renewing_key = ! empty( $item['item_meta']['_renewing_key'] ) ? $item['item_meta']['_renewing_key'] : false;
+					}
 
 					// check on renewal
 					if ( $_renewing_key ) {
