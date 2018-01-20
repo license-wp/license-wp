@@ -133,7 +133,7 @@ class Update {
 			}
 
 			$response->errors = $e->__toArray();
-			die( serialize( $response ) );
+			$this->send_data( $response );
 		}
 
 	}
@@ -157,7 +157,7 @@ class Update {
 		$data->package     = $api_product->get_download_url( $license );
 
 		// send data
-		die( serialize( $data ) );
+		$this->send_data( $data );
 
 	}
 
@@ -211,6 +211,22 @@ class Update {
 		$data->download_link = $api_product->get_download_url( $license );
 
 		// send data
-		die( serialize( $data ) );
+		$this->send_data( $data );
+	}
+
+	/**
+	 * Send API response back to client.
+	 *
+	 * @param array|object $data
+	 */
+	private function send_data( $data ) {
+		if ( isset( $_SERVER['HTTP_ACCEPT'] ) && 'application/json' === $_SERVER['HTTP_ACCEPT'] ) {
+			wp_send_json( $data );
+			exit;
+		}
+
+		header( 'Content-type: text/plain' );
+		echo serialize( $data );
+		exit;
 	}
 }
