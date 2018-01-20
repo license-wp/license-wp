@@ -3,6 +3,8 @@
 namespace Never5\LicenseWP\WooCommerce;
 
 class Order {
+	const KEY_ACTION_RENEW = 'renew';
+	const KEY_ACTION_RECONNECT = 'reconnect';
 
 	/**
 	 * Setup hooks and filters
@@ -50,29 +52,26 @@ class Order {
 		$order   = new \WC_Order( $order_id );
 		$has_key = false;
 
-		// check for global subscription renewal
-        $is_subscription_renewal = false;
-		foreach ( $order->get_meta_data() as $meta ) {
-			if ( $meta->key == '_subscription_renewal' ) {
-				$is_subscription_renewal = true;
+		$previous_license_keys = array();
 
-				$subscription = new \WC_Subscription( $meta->value );
-
-				if ( $subscription ) {
-
+		// check for subscription renewal
+		$order_types = array( 'renewal' => self::KEY_ACTION_RENEW, 'resubscribe' => self::KEY_ACTION_RECONNECT );
+		foreach ( $order_types as $order_type => $key_action ) {
+			$subscriptions = self::get_order_subscriptions( $order_id, $order_type );
+			if ( ! empty( $subscriptions ) ) {
+				foreach ( $subscriptions as $subscription ) {
 					// get parent order id
 					$parent_order_id = $subscription->get_parent_id();
 
-					// fetch license of parent order
 					$licenses = license_wp()->service( 'license_manager' )->get_licenses_by_order( $parent_order_id );
 
 					if ( ! empty( $licenses ) ) {
+						/**
+						 * @var \Never5\LicenseWP\License\License $license
+						 */
 						$license = array_shift( $licenses );
-
-						// set renewing key
-						$_renewing_key = $license->get_key();
+						$previous_license_keys[ $license->get_product_id() ] = array( 'action' => $key_action, 'key' => $license->get_key() );
 					}
-
 				}
 			}
 		}
@@ -86,7 +85,6 @@ class Order {
 				 * @var \WC_Product $product
 				 */
 				$product = $item->get_product();
-
 
 				// fetch if it's an API license product
 				if ( $product->is_type( 'variation' ) ) {
@@ -148,21 +146,23 @@ class Order {
 					// Make $_upgrading_key filterable
 					$_upgrading_key = apply_filters( 'lwp_order_upgrading_key', $_upgrading_key, $item, $order );
 
-					// search for renewal key
-					if ( ! $is_subscription_renewal ) {
-						// search for renewal key
-						$_renewing_key = ! empty( $item['item_meta']['_renewing_key'] ) ? $item['item_meta']['_renewing_key'] : false;
+					// check for standard product renewing
+					if ( ! isset( $previous_license_keys[ $product->get_id() ] ) && ! empty( $item['item_meta']['_renewing_key'] ) ) {
+						$previous_license_keys[ $product->get_id() ] = array( 'key' => $item['item_meta']['_renewing_key'],  'action' => self::KEY_ACTION_RENEW  );
 					}
 
 					// check on renewal
-					if ( $_renewing_key ) {
+					if ( isset( $previous_license_keys[ $product->get_id() ] ) ) {
+						$previous_license_record = $previous_license_keys[ $product->get_id() ];
+						$previous_license_key = $previous_license_record['key'];
+						$previous_license_action = $previous_license_record['action'];
 
 						// get license
 						/** @var \Never5\LicenseWP\License\License $license */
-						$license = license_wp()->service( 'license_factory' )->make( $_renewing_key );
+						$license = license_wp()->service( 'license_factory' )->make( $previous_license_key );
 
 						// set new expiration date
-						if ( ! empty( $expiry_modify_string ) ) {
+						if ( $previous_license_action === self::KEY_ACTION_RENEW && ! empty( $expiry_modify_string ) ) {
 							$renew_datetime = (  ! $license->is_expired() ) ? $license->get_date_expires() : new \DateTime();
 							$license->set_date_expires( $renew_datetime->setTime( 0, 0, 0 )->modify( $expiry_modify_string ) );
 						}
@@ -272,5 +272,23 @@ class Order {
 				license_wp()->service( 'license_manager' )->remove_license_data_by_order( $order_id );
 			}
 		}
+	}
+
+	/**
+	 * Returns the previous subscriptions (renewals or resubscriptions) tied to this order.
+	 *
+	 * @param int               $order_id
+	 * @param string|array|null $order_type Order type for subscription query. Default (set to null) is `[ 'renewal', 'resubscribe' ]`.
+	 *
+	 * @return array|bool
+	 */
+	public static function get_order_subscriptions( $order_id, $order_type = null ) {
+		if ( ! class_exists( 'WC_Subscription' ) || ! function_exists( 'wcs_get_subscriptions_for_order' ) ) {
+			return false;
+		}
+		if ( null === $order_type ) {
+			$order_type = array( 'renewal', 'resubscribe' );
+		}
+		return wcs_get_subscriptions_for_order( $order_id, array( 'order_type' => $order_type ) );
 	}
 }
