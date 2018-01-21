@@ -167,10 +167,6 @@ class Order {
 							$license->set_date_expires( $renew_datetime->setTime( 0, 0, 0 )->modify( $expiry_modify_string ) );
 						}
 
-						// set new order id for license, store old order id with new order
-						update_post_meta( $order_id, 'original_order_id', $license->get_order_id() );
-						$license->set_order_id( $order_id );
-
 						// store license
 						license_wp()->service( 'license_repository' )->persist( $license );
 
