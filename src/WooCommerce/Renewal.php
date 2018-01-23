@@ -20,9 +20,9 @@ class Renewal {
 		} );
 
 		// WooCommerce filters to make the renewal work
-		add_filter( 'woocommerce_add_cart_item', array( $this, 'add_cart_item' ), 10, 1 );
-		add_filter( 'woocommerce_get_cart_item_from_session', array( $this, 'get_cart_item_from_session' ), 10, 2 );
-		add_action( 'woocommerce_checkout_create_order_line_item', array( $this, 'order_item_meta' ), 10, 4 );
+		add_filter( 'woocommerce_add_cart_item', array( __CLASS__, 'add_cart_item' ), 10, 1 );
+		add_filter( 'woocommerce_get_cart_item_from_session', array( __CLASS__, 'get_cart_item_from_session' ), 10, 2 );
+		add_action( 'woocommerce_checkout_create_order_line_item', array( __CLASS__, 'order_item_meta' ), 10, 4 );
 	}
 
 	/**
@@ -89,7 +89,7 @@ class Renewal {
 	 *
 	 * @return array
 	 */
-	public function add_cart_item( $cart_item ) {
+	public static function add_cart_item( $cart_item ) {
 		if ( isset( $cart_item['renewing_key'] ) ) {
 			$price            = $cart_item['data']->get_price();
 			$discount         = ( $price / 100 ) * 30; // @todo this should become an option
@@ -109,7 +109,7 @@ class Renewal {
 	 *
 	 * @return array
 	 */
-	public function get_cart_item_from_session( $cart_item, $values ) {
+	public static function get_cart_item_from_session( $cart_item, $values ) {
 		if ( isset( $values['renewing_key'] ) ) {
 			$price            = $cart_item['data']->get_price();
 			$discount         = ( $price / 100 ) * 30;  // @todo this should become an option
@@ -131,7 +131,7 @@ class Renewal {
 	 * @param array         $values
 	 * @param \WC_Order      $order
 	 */
-	public function order_item_meta( $item, $cart_item_key, $values, $order ) {
+	public static function order_item_meta( $item, $cart_item_key, $values, $order ) {
 		if ( isset( $values['renewing_key'] ) ) {
 			$item->add_meta_data( __( '_renewing_key', 'license-wp' ), $values['renewing_key'], true );
 		}
