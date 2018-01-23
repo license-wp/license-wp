@@ -2,6 +2,8 @@
 
 namespace Never5\LicenseWP\License;
 
+use Never5\LicenseWP\WooCommerce\Order;
+
 /**
  * Class License
  * @package Never5\LicenseWP\License
@@ -232,10 +234,26 @@ class License {
 	 * @return string
 	 */
 	public function get_renewal_url() {
-		return apply_filters( 'license_wp_license_renewal_url', add_query_arg( array(
+		$renewal_url = add_query_arg( array(
 			'renew_license'    => $this->get_key(),
 			'activation_email' => $this->get_activation_email()
-		), apply_filters( 'woocommerce_get_cart_url', wc_get_page_permalink( 'cart' ) ) ), $this );
+		), apply_filters( 'woocommerce_get_cart_url', wc_get_page_permalink( 'cart' ) ) );
+
+		$subscription = $this->get_subscription();
+		if ( $subscription ) {
+			$renewal_url = $subscription->get_view_order_url();
+		}
+
+		return apply_filters( 'license_wp_license_renewal_url', $renewal_url, $this, $subscription );
+	}
+
+	/**
+	 * Returns the subscription tied to this license.
+	 *
+	 * @return bool|\WC_Subscription
+	 */
+	public function get_subscription() {
+		return Order::get_order_subscription_for_product( $this->get_product_id(), $this->get_order_id() );
 	}
 
 	/**

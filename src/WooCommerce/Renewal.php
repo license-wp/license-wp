@@ -56,6 +56,13 @@ class Renewal {
 			wc_add_notice( __( 'Invalid activation email address.', 'license-wp' ) );
 		}
 
+		$subscription = $license->get_subscription();
+		if ( $subscription ) {
+			wp_redirect( $subscription->get_view_order_url() );
+
+			return;
+		}
+
 		// get WooCommerce product
 		$product = wc_get_product( $license->get_product_id() );
 
