@@ -150,9 +150,10 @@ class License {
 	 * @return bool
 	 */
 	public function is_expired() {
+		$start_of_day = ( new \DateTime() )->setTime( 0, 0, 0 );
 
 		// check if license expired
-		if ( $this->get_date_expires() && $this->get_date_expires() < new \DateTime() ) {
+		if ( $this->get_date_expires() && $this->get_date_expires() < $start_of_day ) {
 			return true;
 		}
 
