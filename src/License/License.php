@@ -131,7 +131,7 @@ class License {
 	}
 
 	/**
-	 * @return \DateTime
+	 * @return \DateTimeImmutable
 	 */
 	public function get_date_expires() {
 		return $this->date_expires;
