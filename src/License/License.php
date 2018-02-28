@@ -152,7 +152,7 @@ class License {
 	public function is_expired() {
 
 		// check if license expired
-		if ( $this->get_date_expires() && $this->get_date_expires() < new \DateTime() ) {
+		if ( $this->get_date_expires() && $this->get_date_expires()->modify( "+1 day" ) < new \DateTime() ) {
 			return true;
 		}
 
