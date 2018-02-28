@@ -29,7 +29,7 @@ class License {
 	/** @var \DateTime */
 	private $date_created;
 
-	/** @var \DateTime|bool */
+	/** @var \DateTimeImmutable|bool */
 	private $date_expires = false;
 
 	/**
