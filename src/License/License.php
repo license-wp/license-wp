@@ -160,6 +160,32 @@ class License {
 	}
 
 	/**
+	 * First we check if there is an order attached to this license.
+	 * If there is an order attached, we check if it has an 'allowed' status
+	 *
+	 * @return bool
+	 */
+	public function has_valid_order_status() {
+
+		if ( $this->get_order_id() > 0 ) {
+
+			// get order
+			$order = wc_get_order( $this->get_order_id() );
+
+			if ( false !== $order ) {
+
+				if ( ! in_array( $order->get_status(), apply_filters( 'license_wp_license_valid_order_statuses', array( 'completed' ) ) ) ) {
+					return false;
+				}
+
+			}
+
+		}
+
+		return true;
+	}
+
+	/**
 	 * Get API products this license gives access to
 	 *
 	 * @return array<\Never5\LicenseWP\ApiProduct\ApiProduct>
