@@ -58,6 +58,11 @@ class Update {
 				throw new UpdateException( sprintf( __( '<strong>Update error:</strong> The provided license is invalid. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 'invalid_key' );
 			}
 
+			// check if license is linked to order and if so, if the order is not refunded
+			if ( ! $license->has_valid_order_status() ) {
+				throw new UpdateException( sprintf( __( '<strong>Update error:</strong> The order used to purchase this license has an invalid status. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 'invalid_order_status' );
+			}
+
 			// get api product by given api product id (slug)
 			$api_product = $license->get_api_product_by_slug( $request['api_product_id'] );
 
@@ -70,7 +75,6 @@ class Update {
 			if ( $license->is_expired() ) {
 				throw new UpdateException( sprintf( __( '<strong>Update error:</strong> License of <strong>%s</strong> has expired. You must <a href="%s" target="_blank">renew your license</a> if you want to use it again.', 'license-wp' ), $api_product->get_name(), $license->get_renewal_url() ), 'expired_key' );
 			}
-
 
 			// get activations
 			$activations = $license->get_activations( $api_product );
