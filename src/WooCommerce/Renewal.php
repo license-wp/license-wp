@@ -52,7 +52,7 @@ class Renewal {
 		}
 
 		// check if activation email is correct
-		if ( ! is_email( $activation_email ) || $activation_email != $license->get_activation_email() ) {
+		if ( ! is_email( $activation_email ) || strtolower( $activation_email ) !== strtolower( $license->get_activation_email() ) ) {
 			wc_add_notice( __( 'Invalid activation email address.', 'license-wp' ) );
 		}
 

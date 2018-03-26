@@ -90,7 +90,7 @@ class Activation {
 					}
 
 					// check if activation email is correct
-					if ( ! is_email( $request['email'] ) || $request['email'] != $license->get_activation_email() ) {
+					if ( ! is_email( $request['email'] ) || strtolower( $request['email'] ) !== strtolower( $license->get_activation_email() ) ) {
 						throw new ApiException( sprintf( $email_err_message, $request['email'], $purchase_url ), 103 );
 					}
 
