@@ -63,6 +63,11 @@ class DownloadHandler {
 			wp_die( __( 'Invalid activation email address.', 'license-wp' ) );
 		}
 
+		// check if license is linked to order and if so, if the order is not refunded
+		if ( ! $license->has_valid_order_status() ) {
+			wp_die( __( 'The order used to purchase this license has an invalid status.', 'license-wp' ) );
+		}
+
 		// get api products linked to license
 		$api_products = $license->get_api_products();
 

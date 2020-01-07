@@ -26,7 +26,7 @@ class Email {
 		}
 
 		// fetch license keys
-		$licenses = license_wp()->service( 'license_manager' )->get_licenses_by_order( $order->id );
+		$licenses = license_wp()->service( 'license_manager' )->get_licenses_by_order( $order->get_id() );
 
 		// check if we've found license keys
 		if ( is_array( $licenses ) && count( $licenses ) > 0 ) {

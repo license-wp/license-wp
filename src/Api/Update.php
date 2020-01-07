@@ -32,19 +32,21 @@ class Update {
 		// check for required things
 		try {
 
+			$purchase_url = get_permalink( wc_get_page_id( 'shop' ) );
+
 			// check for request var
 			if ( ! isset( $request['request'] ) || empty( $request['request'] ) ) {
-				throw new UpdateException( __( 'Update error: No API Request set.', 'license-wp' ), 'invalid_request' );
+				throw new UpdateException( __( '<strong>Update error:</strong> No API Request set.', 'license-wp' ), 'invalid_request' );
 			}
 
 			// check for license var
 			if ( ! isset( $request['license_key'] ) || empty( $request['license_key'] ) ) {
-				throw new UpdateException( __( 'Update error: No license key set.', 'license-wp' ), 'no_key' );
+				throw new UpdateException( sprintf( __( '<strong>Update error:</strong> No license key set. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 'no_key' );
 			}
 
 			// check for api product ID var
 			if ( ! isset( $request['api_product_id'] ) || empty( $request['api_product_id'] ) ) {
-				throw new UpdateException( __( 'Update error: No API Product ID set.', 'license-wp' ), 'no_api_product_id' );
+				throw new UpdateException( __( '<strong>Update error:</strong> No API Product ID set.', 'license-wp' ), 'no_api_product_id' );
 			}
 
 			// get license
@@ -53,12 +55,12 @@ class Update {
 
 			// check if license exists
 			if ( '' == $license->get_key() ) {
-				throw new UpdateException( __( 'Update error: The provided license is invalid.', 'license-wp' ), 'invalid_key' );
+				throw new UpdateException( sprintf( __( '<strong>Update error:</strong> The provided license is invalid. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 'invalid_key' );
 			}
 
-			// check if license expired
-			if ( $license->is_expired() ) {
-				throw new UpdateException( __( 'Update error: The provided license has expired.', 'license-wp' ), 'expired_key' );
+			// check if license is linked to order and if so, if the order is not refunded
+			if ( ! $license->has_valid_order_status() ) {
+				throw new UpdateException( sprintf( __( '<strong>Update error:</strong> The order used to purchase this license has an invalid status. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 'invalid_order_status' );
 			}
 
 			// get api product by given api product id (slug)
@@ -66,7 +68,12 @@ class Update {
 
 			// check if license grants access to request api product
 			if ( null === $api_product ) {
-				throw new UpdateException( __( 'Update error: This license does not allow access to the requested product.', 'license-wp' ), 'no_api_product_access' );
+				throw new UpdateException( sprintf( __( '<strong>Update error:</strong> This license does not allow access to the requested product. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url), 'no_api_product_access' );
+			}
+
+			// check if license expired
+			if ( $license->is_expired() ) {
+				throw new UpdateException( sprintf( __( '<strong>Update error:</strong> License of <strong>%s</strong> has expired. You must <a href="%s" target="_blank">renew your license</a> if you want to use it again.', 'license-wp' ), $api_product->get_name(), $license->get_renewal_url() ), 'expired_key' );
 			}
 
 			// get activations
@@ -88,7 +95,7 @@ class Update {
 
 			// throw exception if given instance is not activated
 			if ( false === $is_activated ) {
-				throw new UpdateException( sprintf( __( 'Update error: This license is not activated on this website. Manage your activations on your My Account page: %s', 'license-wp' ), get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) ), 'no_activation' );
+				throw new UpdateException( sprintf( __( '<strong>Update error:</strong> License of <strong>%s</strong> is not activated on this website. Manage your activations on your <a href="%s" target="_blank">My Account page</a>.', 'license-wp' ), $api_product->get_name(), get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) ), 'no_activation' );
 			}
 
 			// do given request
@@ -130,7 +137,7 @@ class Update {
 			}
 
 			$response->errors = $e->__toArray();
-			die( serialize( $response ) );
+			$this->send_data( $response );
 		}
 
 	}
@@ -154,7 +161,7 @@ class Update {
 		$data->package     = $api_product->get_download_url( $license );
 
 		// send data
-		die( serialize( $data ) );
+		$this->send_data( $data );
 
 	}
 
@@ -208,6 +215,22 @@ class Update {
 		$data->download_link = $api_product->get_download_url( $license );
 
 		// send data
-		die( serialize( $data ) );
+		$this->send_data( $data );
+	}
+
+	/**
+	 * Send API response back to client.
+	 *
+	 * @param array|object $data
+	 */
+	private function send_data( $data ) {
+		if ( isset( $_SERVER['HTTP_ACCEPT'] ) && 'application/json' === $_SERVER['HTTP_ACCEPT'] ) {
+			wp_send_json( $data );
+			exit;
+		}
+
+		header( 'Content-type: text/plain' );
+		echo serialize( $data );
+		exit;
 	}
 }

@@ -30,7 +30,7 @@ class WordPressRepository implements Repository {
 			$data->product_id       = $row->product_id;
 			$data->activation_limit = $row->activation_limit;
 			$data->date_created     = new \DateTime( $row->date_created );
-			$data->date_expires     = $row->date_expires > 0 ? new \DateTime( $row->date_expires ) : false;
+			$data->date_expires     = $row->date_expires > 0 ? new \DateTimeImmutable( $row->date_expires ) : false;
 		}
 
 		return $data;

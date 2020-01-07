@@ -12,8 +12,14 @@ class MyAccount {
 	 * Setup hooks
 	 */
 	public function setup() {
-		add_action( 'woocommerce_before_my_account', array( $this, 'print_licenses' ) );
+		add_action( 'woocommerce_before_my_account', array( $this, 'print_licenses_on_dashboard' ) );
 		add_action( 'init', array( $this, 'catch_deactivate_activation' ) );
+	}
+
+	public function print_licenses_on_dashboard() {
+		if ( apply_filters( 'lwp_print_licenses_on_dashboard', true ) ) {
+			$this->print_licenses();
+		}
 	}
 
 	/**

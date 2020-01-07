@@ -2,7 +2,7 @@
 
 namespace Never5\LicenseWP\WooCommerce;
 
-class Renewal {
+class Upgrade {
 
 	/**
 	 * Setup renewal actions/hooks
@@ -11,10 +11,10 @@ class Renewal {
 		add_action( 'wp', function () {
 
 			// check if we need to renew a license
-			if ( isset( $_GET['renew_license'] ) && isset( $_GET['activation_email'] ) ) {
+			if ( isset( $_GET['upgrade_license'] ) && ! empty( $_GET['upgrade_license'] ) ) {
 
 				// add renewal to cart
-				$this->add_renewal_to_cart( $_GET['renew_license'], $_GET['activation_email'] );
+				$this->add_upgrade_to_cart( $_GET['upgrade_license'], $_GET['new_license'] );
 			}
 
 		} );
@@ -29,17 +29,20 @@ class Renewal {
 	 * Add license renewal to cart
 	 *
 	 * @param string $license_key
-	 * @param string $activation_email
+	 * @param string $new_license
 	 */
-	private function add_renewal_to_cart( $license_key, $activation_email ) {
+	private function add_upgrade_to_cart( $license_key, $new_license ) {
 
 		// sanitize license key & activation email
-		$license_key      = sanitize_text_field( $license_key );
-		$activation_email = sanitize_text_field( $activation_email );
+		$license_key = sanitize_text_field( $license_key );
+		$new_license = absint( $new_license );
 
 		// get license
 		/** @var \Never5\LicenseWP\License\License $license */
 		$license = license_wp()->service( 'license_factory' )->make( $license_key );
+
+		// get the new WooCommerce Product (license)
+		$new_product = wc_get_product( $new_license );
 
 		// check if license exists
 		if ( '' == $license->get_key() ) {
@@ -51,35 +54,64 @@ class Renewal {
 			wc_add_notice( __( 'This license does not appear to be yours.', 'license-wp' ) );
 		}
 
-		// check if activation email is correct
-		if ( ! is_email( $activation_email ) || $activation_email != $license->get_activation_email() ) {
-			wc_add_notice( __( 'Invalid activation email address.', 'license-wp' ) );
+		// check if WooCommerce product exists
+		if ( false === $new_product ) {
+			wc_add_notice( __( "This product can't be found.", 'license-wp' ), 'error' );
+
+			return;
 		}
 
-		// get WooCommerce product
-		$product = wc_get_product( $license->get_product_id() );
-
 		// check if product is purchasable
-		if ( ! $product->is_purchasable() ) {
+		if ( ! $new_product->is_purchasable() ) {
 			wc_add_notice( __( 'This product can no longer be purchased', 'license-wp' ), 'error' );
 
 			return;
 		}
 
+		// get WP term object of license
+		$new_product_license_term = Product::get_license_term_of_product( $new_product );
+
 		// Add to cart
 		WC()->cart->empty_cart();
-		WC()->cart->add_to_cart( $license->get_product_id(), 1, '', '', array(
-			'renewing_key' => $license->get_key()
+		WC()->cart->add_to_cart( $new_product->get_parent_id(), 1, $new_product->get_id(), array( 'License' => $new_product_license_term->name ), array(
+			'upgrading_key' => $license->get_key()
 		) );
 
+		//renewing_key
+
 		// Message
-		wc_add_notice( sprintf( __( 'The product has been added to your cart with a %d%% discount.', 'license-wp' ), 30 ), 'success' ); // @todo this should become an option
+		wc_add_notice( __( 'The product upgrade has been added to your cart.', 'license-wp' ), 'success' );
 
 		// Redirect to checkout
 		wp_redirect( get_permalink( wc_get_page_id( 'checkout' ) ) );
 
 		// bye
 		exit;
+	}
+
+	/**
+	 * Generate new cart item with upgrading discount
+	 *
+	 * @param array $cart_item
+	 *
+	 * @return array
+	 */
+	private function generate_new_cart_item( $cart_item ) {
+
+		// get license
+		/** @var \Never5\LicenseWP\License\License $license */
+		$license = license_wp()->service( 'license_factory' )->make( $cart_item['upgrading_key'] );
+
+		// check if license is found and matches
+		if ( $cart_item['upgrading_key'] == $license->get_key() ) {
+			$price            = $cart_item['data']->get_price();
+			$discounted_price = $price - $license->calculate_worth();
+
+			$cart_item['data']->set_price( $discounted_price );
+			$cart_item['data']->set_name( $cart_item['data']->get_name() . ' (' . __( 'Upgrade', 'license-wp' ) . ')' );
+		}
+
+		return $cart_item;
 	}
 
 	/**
@@ -90,14 +122,13 @@ class Renewal {
 	 * @return array
 	 */
 	public function add_cart_item( $cart_item ) {
-		if ( isset( $cart_item['renewing_key'] ) ) {
-			$price            = $cart_item['data']->get_price();
-			$discount         = ( $price / 100 ) * 30; // @todo this should become an option
-			$discounted_price = $price - $discount;
+		if ( isset( $cart_item['upgrading_key'] ) ) {
 
-			$cart_item['data']->set_price( $discounted_price );
-			$cart_item['data']->set_name( $cart_item['data']->get_name() . ' (' . __( 'Renewal', 'license-wp' ) . ')' );
+			// generate new cart item
+			$cart_item = $this->generate_new_cart_item( $cart_item );
+
 		}
+
 		return $cart_item;
 	}
 
@@ -110,16 +141,13 @@ class Renewal {
 	 * @return array
 	 */
 	public function get_cart_item_from_session( $cart_item, $values ) {
-		if ( isset( $values['renewing_key'] ) ) {
-			$price            = $cart_item['data']->get_price();
-			$discount         = ( $price / 100 ) * 30;  // @todo this should become an option
-			$discounted_price = $price - $discount;
+		if ( isset( $cart_item['upgrading_key'] ) ) {
 
-			$cart_item['data']->set_price( $discounted_price );
-			$cart_item['data']->set_name( $cart_item['data']->get_name() . ' (' . __( 'Renewal', 'license-wp' ) . ')' );
+			// generate new cart item
+			$cart_item = $this->generate_new_cart_item( $cart_item );
 
-			$cart_item['renewing_key'] = $values['renewing_key'];
 		}
+
 		return $cart_item;
 	}
 
@@ -132,8 +160,8 @@ class Renewal {
 	 * @param \WC_Order      $order
 	 */
 	public function order_item_meta( $item, $cart_item_key, $values, $order ) {
-		if ( isset( $values['renewing_key'] ) ) {
-			$item->add_meta_data( __( '_renewing_key', 'license-wp' ), $values['renewing_key'], true );
+		if ( isset( $values['upgrading_key'] ) ) {
+			$item->add_meta_data( __( '_upgrading_key', 'license-wp' ), $values['upgrading_key'], true );
 		}
 	}
 

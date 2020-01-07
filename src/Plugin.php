@@ -124,7 +124,14 @@ class Plugin extends Pimple\Container {
 		} else { // Frontend
 
 			// setup lost license form shortcode
-			new Shortcode\LostLicenseForm();
+			add_action( 'init', function () {
+				new Shortcode\LostLicenseForm();
+			} );
+
+			// setup upgrade license form shortcode
+			add_action( 'init', function () {
+				new Shortcode\UpgradeLicenseForm();
+			} );
 
 			// frontend assets
 			add_action( 'wp_enqueue_scripts', array( 'Never5\\LicenseWP\\Assets', 'enqueue_frontend' ) );
@@ -139,6 +146,10 @@ class Plugin extends Pimple\Container {
 
 			// WooCommerce license renewals
 			$renewals = new WooCommerce\Renewal();
+			$renewals->setup();
+
+			// WooCommerce license upgrades
+			$renewals = new WooCommerce\Upgrade();
 			$renewals->setup();
 
 		}

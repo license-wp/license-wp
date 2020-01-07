@@ -229,7 +229,7 @@ class Manager {
 				if ( false !== $date->modify( $email_data['date_modify'] ) ) {
 
 					// get licenses that expire on modified date object
-					$licenses = $this->get_licenses_that_expire_on( $date );
+					$licenses = apply_filters( 'license_wp_renewal_emails_licenses', $this->get_licenses_that_expire_on( $date ), $email_data, $date );
 
 					// check if there are licenses
 					if ( count( $licenses ) > 0 ) {
@@ -274,18 +274,22 @@ class Manager {
 		}
 
 		// get WooCommerce product object
-		$wc_product = new \WC_Product( $license->get_product_id() );
+		$wc_product = wc_get_product( $license->get_product_id() );
 
 		// get parent product if the product has one
-		if ( 0 != $wc_product->get_parent() ) {
-			$wc_product = new \WC_Product( $wc_product->get_parent() );
+		if ( false != $wc_product && 0 != $wc_product->get_parent_id() ) {
+			$wc_product = wc_get_product( $wc_product->get_parent_id() );
 		}
 
 		$content = str_ireplace( ':fname:', $fname, $content );
-		$content = str_ireplace( ':product:', $wc_product->get_title(), $content );
+
+		if ( false != $wc_product ) {
+			$content = str_ireplace( ':product:', $wc_product->get_title(), $content );
+		}
+
 		$content = str_ireplace( ':license-key:', $license->get_key(), $content );
 		$content = str_ireplace( ':license-expiration-date:', $license->get_date_expires() ? $license->get_date_expires()->format( 'M d Y' ) : '', $content );
-		$content = str_ireplace( ':renewal-link:', $license->get_renewal_url(), $content );
+		$content = str_ireplace( ':renewal-link:', apply_filters( 'license_wp_license_renewal_url_email', $license->get_renewal_url(), $license ), $content );
 
 		return $content;
 	}
