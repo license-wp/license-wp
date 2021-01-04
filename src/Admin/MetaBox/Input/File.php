@@ -39,7 +39,7 @@ class File extends Input {
 			var file_frame;
 			var file_target_input;
 
-			jQuery( '.upload_image_button' ).live( 'click', function ( event ) {
+			jQuery( '.upload_image_button' ).on( 'click', function ( event ) {
 
 				event.preventDefault();
 
