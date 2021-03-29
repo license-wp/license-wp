@@ -239,8 +239,8 @@ class ApiProduct {
 	public function get_download_url( $license ) {
 		return add_query_arg( array(
 			'download_api_product' => $this->get_id(),
-			'license_key'          => $license->get_key(),
-			'activation_email'     => $license->get_activation_email()
+			'license_key'          => urlencode( $license->get_key() ),
+			'activation_email'     => urlencode( $license->get_activation_email() ),
 		), home_url( '/' ) );
 	}
 }

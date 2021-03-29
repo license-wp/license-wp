@@ -259,8 +259,8 @@ class License {
 	 */
 	public function get_renewal_url() {
 		return apply_filters( 'license_wp_license_renewal_url', add_query_arg( array(
-			'renew_license'    => $this->get_key(),
-			'activation_email' => $this->get_activation_email()
+			'renew_license'    => urlencode( $this->get_key() ),
+			'activation_email' => urlencode( $this->get_activation_email() ),
 		), apply_filters( 'woocommerce_get_cart_url', wc_get_page_permalink( 'cart' ) ) ), $this );
 	}
 
@@ -273,7 +273,7 @@ class License {
 		$page = get_page_by_title( apply_filters( 'license_wp_license_upgrade_page_title', 'upgrade license' ) );
 
 		return apply_filters( 'license_wp_license_upgrade_url', add_query_arg( array(
-			'license_key' => $this->get_key()
+			'license_key' => urlencode( $this->get_key() ),
 		), get_permalink( $page->ID ) ) );
 	}
 
