@@ -271,10 +271,10 @@ class Order {
 	}
 
 	/**
-	 * Returns the previous subscriptions (renewals or resubscriptions) tied to this order.
+	 * Returns the related subscriptions tied to this order.
 	 *
 	 * @param int               $order_id
-	 * @param string|array|null $order_type Order type for subscription query. Default (set to null) is `[ 'renewal', 'resubscribe' ]`.
+	 * @param string|array|null $order_type Order type for subscription query.
 	 *
 	 * @return array|bool
 	 */
@@ -282,9 +282,31 @@ class Order {
 		if ( ! class_exists( 'WC_Subscription' ) || ! function_exists( 'wcs_get_subscriptions_for_order' ) ) {
 			return false;
 		}
-		if ( null === $order_type ) {
-			$order_type = array( 'renewal', 'resubscribe' );
+		$args = array();
+		if ( null !== $order_type ) {
+			$args['order_type'] = $order_type;
 		}
-		return wcs_get_subscriptions_for_order( $order_id, array( 'order_type' => $order_type ) );
+		return wcs_get_subscriptions_for_order( $order_id, $args );
+	}
+
+	/**
+	 * Returns the related subscription tied to this order for a specific product.
+	 *
+	 * @param int               $product_id
+	 * @param int               $order_id
+	 * @param string|array|null $order_type Order type for subscription query.
+	 *
+	 * @return \WC_Subscription|bool
+	 */
+	public static function get_order_subscription_for_product( $product_id, $order_id, $order_type = null ) {
+		$subscriptions = self::get_order_subscriptions( $order_id, $order_type );
+		if ( ! empty( $subscriptions ) ) {
+			foreach ( $subscriptions as $subscription ) {
+				if ( $subscription->has_product( $product_id ) ) {
+					return $subscription;
+				}
+			}
+		}
+		return false;
 	}
 }
