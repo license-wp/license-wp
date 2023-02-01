@@ -58,7 +58,7 @@ class ListTable extends \WP_List_Table {
 			case 'date_created' :
 				return $item->date_created > 0 ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_created ) ) : __( 'n/a', 'license-wp' );
 			case 'date_expires' :
-				return $item->date_expires > 0 ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_expires ) ) : __( 'n/a', 'license-wp' );
+				return strtotime( $item->date_expires ) > 0 ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_expires ) ) : __( 'n/a', 'license-wp' );
 		}
 	}
 
