@@ -44,6 +44,7 @@ class Plugin extends Pimple\Container {
 		$wpdb->lwp_licenses     = $wpdb->prefix . 'license_wp_licenses';
 		$wpdb->lwp_activations  = $wpdb->prefix . 'license_wp_activations';
 		$wpdb->lwp_download_log = $wpdb->prefix . 'license_wp_download_log';
+		$wpdb->dlm_api_log      = $wpdb->prefix . 'dlm_api_log';
 
 	}
 

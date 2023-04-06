@@ -67,6 +67,15 @@ api_product_id varchar(200) NOT NULL,
 user_ip_address varchar(200) NOT NULL,
 PRIMARY KEY  (log_id)
 );
+CREATE TABLE " . $wpdb->prefix . "dlm_api_log (
+			ID bigint(20) NOT NULL auto_increment,
+			license_id bigint(20) NOT NULL,
+			extension_id varchar(200) NOT NULL,
+			action varchar(200) NOT NULL,
+			site varchar(200) NOT NULL,
+			date datetime DEFAULT NULL,
+			PRIMARY KEY  (ID)
+			);
 		";
 
 		dbDelta( $sql );

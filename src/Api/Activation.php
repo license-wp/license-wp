@@ -4,6 +4,7 @@ namespace Never5\LicenseWP\Api;
 
 /**
  * Class Activation
+ *
  * @package Never5\LicenseWP\Api
  */
 class Activation {
@@ -30,6 +31,8 @@ class Activation {
 
 		// set request
 		$request = array_map( 'sanitize_text_field', apply_filters( 'license_wp_api_activation_request', $_GET ) );
+
+		// print_r($request);
 
 		try {
 
@@ -69,43 +72,110 @@ class Activation {
 				throw new ApiException( sprintf( __( '<strong>Update error:</strong> The order used to purchase this license has an invalid status. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 111 );
 			}
 
-			// get api product by given api product id (slug)
-			$api_product = $license->get_api_product_by_slug( $request['api_product_id'] );
+			// If comma is in string means it is a multi extension license.
+			if ( false !== strpos( $request['api_product_id'], ',' ) ) {
+				$extensions           = $license->get_api_products();
+				$available_extensions = array();
+				$licensed_extensions  = array();
+				foreach ( $extensions as $extension ) {
+					$available_extensions[] = $extension->get_slug();
+				}
+				$installed_extensions = explode( ',', $request['api_product_id'] );
 
-			// check if license grants access to request api product
-			if ( null === $api_product ) {
-				throw new ApiException( sprintf( __( '<strong>Activation error:</strong> This license does not allow access to the requested product. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 104 );
-			}
+				foreach ( $installed_extensions as $extension ) {
+					$api_product                      = $license->get_api_product_by_slug( $extension );
+					$single_request                   = $request;
+					$single_request['api_product_id'] = $extension;
 
-			switch ( $request['request'] ) {
-				case 'activate' :
+					if ( ! empty( $api_product ) && in_array( $extension, $available_extensions ) ) {
+						$licensed_extensions[$api_product->get_slug()] = $api_product->get_name();
 
-					// we do the email check here because email var is not passed for deactivations
+						switch ( $single_request['request'] ) {
+							case 'activate':
+								// we do the email check here because email var is not passed for deactivations.
 
-					$email_err_message = __( '<strong>Activation error:</strong> The email provided (%s) is invalid. Please enter the correct email address or <a href="%s" target="_blank">purchase a valid license</a> to receive updates and support.', 'license-wp' );
+								$email_err_message = __( '<strong>Activation error:</strong> The email provided (%1$s) is invalid. Please enter the correct email address or <a href="%2$s" target="_blank">purchase a valid license</a> to receive updates and support.', 'license-wp' );
 
-					// check for email var
-					if ( ! isset( $request['email'] ) || empty( $request['email'] ) ) {
-						throw new ApiException( sprintf( $email_err_message, $request['email'], $purchase_url ), 103 );
+								// check for email var.
+								if ( ! isset( $request['email'] ) || empty( $request['email'] ) ) {
+									throw new ApiException( sprintf( $email_err_message, $request['email'], $purchase_url ), 103 );
+								}
+
+								// check if activation email is correct.
+								if ( ! is_email( $request['email'] ) || $request['email'] != $license->get_activation_email() ) {
+									throw new ApiException( sprintf( $email_err_message, $request['email'], $purchase_url ), 103 );
+								}
+
+								// activate the license.
+								$this->activate( $license, $api_product, $single_request, false );
+								break;
+							case 'deactivate':
+								$this->deactivate( $license, $api_product, $single_request, false );
+								break;
+							default:
+								throw new ApiException( __( 'Invalid API Request.', 'license-wp' ), 100 );
+								break;
+						}
+						$args = array(
+							'license_id'   => $license->get_product_id(),
+							'extension_id' => $api_product->get_id(),
+							'action'       => $single_request['request'] . ' ' . $single_request['action_trigger'],
+							'site'         => $single_request['instance'],
+						);
+						$this->log_api_call( $args );
+					} else {
+						$args = array(
+							'license_id'   => $license->get_product_id(),
+							'extension_id' => $api_product->get_id(),
+							'action'       => 'failed attempt' . ' ' . $single_request['action_trigger'],
+							'site'         => $single_request['instance'],
+						);
+						$this->log_api_call( $args );
 					}
+				}
+				wp_send_json( $licensed_extensions );
+			} else {
+				// get api product by given api product id (slug)
+				$api_product = $license->get_api_product_by_slug( $request['api_product_id'] );
 
-					// check if activation email is correct
-					if ( ! is_email( $request['email'] ) || $request['email'] != $license->get_activation_email() ) {
-						throw new ApiException( sprintf( $email_err_message, $request['email'], $purchase_url ), 103 );
-					}
+				// check if license grants access to request api product
+				if ( null === $api_product ) {
+					throw new ApiException( sprintf( __( '<strong>Activation error:</strong> This license does not allow access to the requested product. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 104 );
+				}
+				$args = array(
+					'license_id'   => $license->get_product_id(),
+					'extension_id' => $api_product->get_id(),
+					'action'       => $request['request'] . ' ' . $request['action_trigger'],
+					'site'         => $request['instance'],
+				);
+				$this->log_api_call( $args );
+				switch ( $request['request'] ) {
+					case 'activate':
+						// we do the email check here because email var is not passed for deactivations
 
-					// activate the license
-					$this->activate( $license, $api_product, $request );
-					break;
-				case 'deactivate' :
-					$this->deactivate( $license, $api_product, $request );
-					break;
-				default :
-					throw new ApiException( __( 'Invalid API Request.', 'license-wp' ), 100 );
-					break;
+						$email_err_message = __( '<strong>Activation error:</strong> The email provided (%1$s) is invalid. Please enter the correct email address or <a href="%2$s" target="_blank">purchase a valid license</a> to receive updates and support.', 'license-wp' );
+
+						// check for email var
+						if ( ! isset( $request['email'] ) || empty( $request['email'] ) ) {
+							throw new ApiException( sprintf( $email_err_message, $request['email'], $purchase_url ), 103 );
+						}
+
+						// check if activation email is correct
+						if ( ! is_email( $request['email'] ) || $request['email'] != $license->get_activation_email() ) {
+							throw new ApiException( sprintf( $email_err_message, $request['email'], $purchase_url ), 103 );
+						}
+
+						// activate the license
+						$this->activate( $license, $api_product, $request );
+						break;
+					case 'deactivate':
+						$this->deactivate( $license, $api_product, $request );
+						break;
+					default:
+						throw new ApiException( __( 'Invalid API Request.', 'license-wp' ), 100 );
+						break;
+				}
 			}
-
-
 		} catch ( ApiException $e ) {
 			header( 'Content-Type: application/json' );
 			echo $e->__toString();
@@ -120,13 +190,13 @@ class Activation {
 	/**
 	 * Activate an instance of a license
 	 *
-	 * @param \Never5\LicenseWP\License\License $license
+	 * @param \Never5\LicenseWP\License\License       $license
 	 * @param \Never5\LicenseWP\ApiProduct\ApiProduct $api_product
-	 * @param array $request
+	 * @param array                                   $request
 	 *
 	 * @throws ApiException
 	 */
-	private function activate( $license, $api_product, $request ) {
+	private function activate( $license, $api_product, $request, $end_activation = true ) {
 
 		// Format the instance
 		$request['instance'] = str_replace( array( 'http://', 'https://' ), '', trim( $request['instance'] ) );
@@ -148,7 +218,6 @@ class Activation {
 					$existing_active_activation_instances[] = $existing_activation->get_instance();
 
 				}
-
 			}
 		}
 
@@ -169,7 +238,6 @@ class Activation {
 					$activation = $existing_activation;
 					break;
 				}
-
 			}
 		}
 
@@ -192,7 +260,6 @@ class Activation {
 			$activation->set_activation_active( 1 );
 		}
 
-
 		// persist activation
 		$activation = license_wp()->service( 'activation_repository' )->persist( $activation );
 
@@ -205,28 +272,34 @@ class Activation {
 		$activations_left = ( ( $license->get_activation_limit() > 0 ) ? $license->get_activation_limit() - count( $license->get_activations( $api_product ) ) : - 1 );
 
 		// response
-		$response = apply_filters( 'license_wp_api_activation_response', array(
-			'success'   => true,
-			'activated' => true,
-			'remaining' => $activations_left
-		) );
+		$response = apply_filters(
+			'license_wp_api_activation_response',
+			array(
+				'success'   => true,
+				'activated' => true,
+				'remaining' => $activations_left,
+			)
+		);
 
-		// send JSON the WP way
-		wp_send_json( $response );
-		exit;
-
+		if ( $end_activation ) {
+			// send JSON the WP way
+			wp_send_json( $response );
+			exit;
+		} else {
+			return;
+		}
 	}
 
 	/**
 	 * Deactivates an instance of a license
 	 *
-	 * @param \Never5\LicenseWP\License\License $license
+	 * @param \Never5\LicenseWP\License\License       $license
 	 * @param \Never5\LicenseWP\ApiProduct\ApiProduct $api_product
-	 * @param array $request
+	 * @param array                                   $request
 	 *
 	 * @throws ApiException
 	 */
-	private function deactivate( $license, $api_product, $request ) {
+	private function deactivate( $license, $api_product, $request, $end_activation = true ) {
 
 		// get activations
 		$activations = $license->get_activations( $api_product );
@@ -236,7 +309,6 @@ class Activation {
 
 			/** @var \Never5\LicenseWP\Activation\Activation $activation */
 			foreach ( $activations as $activation ) {
-
 
 				// check if given instance equals activation instance
 				if ( $activation->format_instance( $request['instance'] ) === $activation->get_instance() ) {
@@ -256,18 +328,45 @@ class Activation {
 					}
 
 					// response
-					$response = apply_filters( 'license_wp_api_activation_response', array(
-						'success' => true,
-					) );
-
-					// send JSON the WP way
-					wp_send_json( $response );
-					exit;
+					$response = apply_filters(
+						'license_wp_api_activation_response',
+						array(
+							'success' => true,
+						)
+					);
+					if ( $end_activation ) {
+						// send JSON the WP way
+						wp_send_json( $response );
+						exit;
+					}
 				}
 			}
+			return;
 		}
 
-		throw new ApiException( __( 'Deactivation error: instance not found.', 'license-wp' ), 109 );
+		//throw new ApiException( __( 'Deactivation error: instance not found.', 'license-wp' ), 109 );
 
+	}
+
+	/**
+	 * Add API call to log.
+	 *
+	 * @param array $args Arguments.
+	 *
+	 * @return void
+	 */
+	private function log_api_call( $args ) {
+		global $wpdb;
+
+		$response = $wpdb->insert(
+			$wpdb->dlm_api_log,
+			array(
+				'license_id'   => $args['license_id'],
+				'extension_id' => $args['extension_id'],
+				'action'       => $args['action'],
+				'site'         => $args['site'],
+				'date'         => current_time( 'mysql', 0 ),
+			)
+		);
 	}
 }
