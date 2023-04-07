@@ -2,6 +2,7 @@
 
 namespace Never5\LicenseWP\Api;
 
+use Never5\LicenseWP\Email;
 use Never5\LicenseWP\WooCommerce;
 
 class Update {
@@ -12,6 +13,7 @@ class Update {
 	public function setup() {
 		add_action( 'woocommerce_api_wp_plugin_licencing_update_api', array( $this, 'handle' ) );
 		add_action( 'woocommerce_api_license_wp_api_update', array( $this, 'handle' ) );
+		add_action( 'woocommerce_api_dlm_forgotten_license_api', array( $this, 'email_license' ) );
 	}
 
 	/**
@@ -68,7 +70,7 @@ class Update {
 
 			// check if license grants access to request api product
 			if ( null === $api_product ) {
-				throw new UpdateException( sprintf( __( '<strong>Update error:</strong> This license does not allow access to the requested product. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url), 'no_api_product_access' );
+				throw new UpdateException( sprintf( __( '<strong>Update error:</strong> This license does not allow access to the requested product. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 'no_api_product_access' );
 			}
 
 			// check if license expired
@@ -232,5 +234,86 @@ class Update {
 		header( 'Content-type: text/plain' );
 		echo serialize( $data );
 		exit;
+	}
+
+	/**
+	 * Forgotten license key functionality
+	 *
+	 * @return void
+	 */
+	public function email_license() {
+		global $wpdb;
+
+		// hide DB errors
+		$wpdb->hide_errors();
+
+		// send no-cache header
+		nocache_headers();
+
+		// set request
+		$request = array_map( 'sanitize_text_field', apply_filters( 'dlm_forgotten_license_api', $_GET ) );
+
+		// check for required things
+		try {
+			$activation_email = sanitize_email( wp_unslash( $request['email'] ) );
+			// Get licenses based on email address.
+			$licenses = license_wp()->service( 'license_manager' )->get_licenses_by_email( $activation_email );
+
+			// loop
+			foreach ( $licenses as $license_key => $license ) {
+
+				// unset when license has expired
+				if ( $license->is_expired() ) {
+					unset( $licenses[ $license_key ] );
+				}
+
+			}
+
+			// check if we found licenses
+			if ( count( $licenses ) > 0 ) {
+
+				// get user email address
+				$user = get_user_by( 'email', $activation_email );
+
+				// try to get a first name
+				if ( ! empty( $user ) && ! empty( $user->first_name ) ) {
+					$user_first_name = $user->first_name;
+				} else {
+					$user_first_name = false;
+				}
+
+				// send email to activation email
+				$sent = license_wp()->service( 'email_manager' )->send( new Email\LostLicense(
+					                                                        $licenses,
+					                                                        $user_first_name
+				                                                        ), $activation_email );
+
+				// correct notice
+				if ( $sent ) {
+					wp_send_json(
+						array(
+							'result' => 'success',
+							'message' => __( 'Your license key has been sent to your email address.', 'license-wp' )
+						)
+					);
+				} else {
+					wp_send_json(
+						array(
+							'result'  => 'error',
+							'message' => __( 'An error occurred while sending the email.', 'license-wp' )
+						)
+					);
+				}
+			} else {
+				wp_send_json(
+					array(
+						'result'  => 'error',
+						'message' => __( 'No licenses found for this email address.', 'license-wp' )
+					)
+				);
+			}
+		} catch ( UpdateException $e ) {
+			wp_send_json_error( array( 'result' => 'failed', 'message' => $e->getMessage() ) );
+		}
 	}
 }

@@ -119,7 +119,7 @@ class Activation {
 						$args = array(
 							'license_id'   => $license->get_product_id(),
 							'extension_id' => $api_product->get_id(),
-							'action'       => $single_request['request'] . ' ' . $single_request['action_trigger'],
+							'action'       => $single_request['request'] . $single_request['action_trigger'],
 							'site'         => $single_request['instance'],
 						);
 						$this->log_api_call( $args );
@@ -127,7 +127,7 @@ class Activation {
 						$args = array(
 							'license_id'   => $license->get_product_id(),
 							'extension_id' => $api_product->get_id(),
-							'action'       => 'failed attempt' . ' ' . $single_request['action_trigger'],
+							'action'       => 'failed attempt' . $single_request['action_trigger'],
 							'site'         => $single_request['instance'],
 						);
 						$this->log_api_call( $args );
@@ -145,7 +145,7 @@ class Activation {
 				$args = array(
 					'license_id'   => $license->get_product_id(),
 					'extension_id' => $api_product->get_id(),
-					'action'       => $request['request'] . ' ' . $request['action_trigger'],
+					'action'       => $request['request'] . $request['action_trigger'],
 					'site'         => $request['instance'],
 				);
 				$this->log_api_call( $args );
