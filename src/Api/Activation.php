@@ -73,7 +73,7 @@ class Activation {
 			}
 
 			// If comma is in string means it is a multi extension license.
-			if ( false !== strpos( $request['api_product_id'], ',' ) ) {
+			if ( false !== strpos( $request['api_product_id'], ',' ) || '' !== $request['api_product_id'] ) {
 				$extensions           = $license->get_api_products();
 				$available_extensions = array();
 				$licensed_extensions  = array();
