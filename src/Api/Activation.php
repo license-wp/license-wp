@@ -32,19 +32,54 @@ class Activation {
 		// set request
 		$request = array_map( 'sanitize_text_field', apply_filters( 'license_wp_api_activation_request', $_GET ) );
 
+		// Log to file also.
+		global $wp_filesystem;
+		require_once( ABSPATH . '/wp-admin/includes/file.php' );
+		WP_Filesystem();
+		$txt      = urldecode( http_build_query( $_REQUEST, '', ', ' ) );
+		$txt      = '[' . date( 'Y-m-d H:i:s' ) . '] - ' . $txt;
+		$old_text = $wp_filesystem->get_contents( License_WP_Dir . '/log_file.txt' );
+		$text     = $old_text ? $old_text . "\n" . $txt : $txt;
+		// Need double quotes around the \n to make it work.
+		$wp_filesystem->put_contents( License_WP_Dir . '/log_file.txt', $text );
+
 		// print_r($request);
 
 		try {
 
 			$purchase_url = get_permalink( wc_get_page_id( 'shop' ) );
 
-			// check for request var
+			// check for request var.
 			if ( ! isset( $request['request'] ) || empty( $request['request'] ) ) {
 				throw new ApiException( __( 'Invalid API Request.', 'license-wp' ), 100 );
 			}
-
-			// check for license var
+			// check for license var.
 			if ( ! isset( $request['license_key'] ) || empty( $request['license_key'] ) ) {
+				if ( empty( $request['license_key'] ) ) {
+					$set_api = isset( $request['api_product_id'] );
+					if ( $set_api && false !== strpos( $request['api_product_id'], ',' ) ) {
+						$installed_extensions = explode( ',', $request['api_product_id'] );
+
+						foreach ( $installed_extensions as $extension ) {
+							$object                           = wc_get_product_id_by_sku( $request['api_product_id'] );
+							$single_request                   = $request;
+							$single_request['extension_id']   = isset( $object ) ? $object : 0;
+							$single_request['license_id']     = '-1';
+							$single_request['api_product_id'] = $extension;
+							$single_request['site']           = $request['instance'];
+							$this->log_api_call( $single_request );
+						}
+					} else {
+						$args                 = array(
+							'action' => $request['request'] . $request['action_trigger'],
+							'site'   => $request['instance'],
+						);
+						$args['license_id']   = '-1';
+						$object               = $set_api ? wc_get_product_id_by_sku( $request['api_product_id'] ) : null;
+						$args['extension_id'] = isset( $object ) ? $object : 0;
+						$this->log_api_call( $args );
+					}
+				}
 				throw new ApiException( __( '<strong>Activation error:</strong> The provided license is invalid.', 'license-wp' ), 101 );
 			}
 
@@ -59,21 +94,88 @@ class Activation {
 
 			// check if license exists
 			if ( '' == $license->get_key() ) {
+				if ( false !== strpos( $request['api_product_id'], ',' ) ) {
+					$installed_extensions = explode( ',', $request['api_product_id'] );
+					foreach ( $installed_extensions as $extension ) {
+						$single_request                 = array(
+							'license_id' => 0,
+							'action'     => $request['request'] . $request['action_trigger'],
+							'site'       => $request['instance'],
+						);
+						$object                         = wc_get_product_id_by_sku( $request['api_product_id'] );
+						$single_request['extension_id'] = isset( $object ) ? $object : 0;
+						$this->log_api_call( $single_request );
+					}
+				} else {
+					$args                 = array(
+						'license_id' => 0,
+						'action'     => $request['request'] . $request['action_trigger'],
+						'site'       => $request['instance'],
+					);
+					$object               = wc_get_product_id_by_sku( $request['api_product_id'] );
+					$args['extension_id'] = isset( $object ) ? $object : 0;
+					$this->log_api_call( $args );
+				}
+
 				throw new ApiException( sprintf( __( '<strong>Activation error:</strong> The provided license is invalid. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 101 );
 			}
 
 			// check if license expired
 			if ( $license->is_expired() ) {
+				if ( false !== strpos( $request['api_product_id'], ',' ) ) {
+					$installed_extensions = explode( ',', $request['api_product_id'] );
+					foreach ( $installed_extensions as $extension ) {
+						$single_request                 = array(
+							'license_id' => 0,
+							'action'     => $request['request'] . $request['action_trigger'],
+							'site'       => $request['instance'],
+						);
+						$object               = wc_get_product_id_by_sku( $request['api_product_id'] );
+						$single_request['extension_id'] = isset( $object ) ? $object : 0;
+						$this->log_api_call( $single_request );
+					}
+				} else {
+					$args                 = array(
+						'license_id' => 0,
+						'action'     => $request['request'] . $request['action_trigger'],
+						'site'       => $request['instance'],
+					);
+					$object               = wc_get_product_id_by_sku( $request['api_product_id'] );
+					$args['extension_id'] = isset( $object ) ? $object : 0;
+					$this->log_api_call( $args );
+				}
+
 				throw new ApiException( sprintf( __( '<strong>Activation error:</strong> Your license has expired. You must <a href="%s" target="_blank">renew your license</a> if you want to use it again.', 'license-wp' ), $license->get_renewal_url() ), 110 ); // @todo add renew link
 			}
-
 			// check if license is linked to order and if so, if the order is not refunded
 			if ( ! $license->has_valid_order_status() ) {
+				if ( false !== strpos( $request['api_product_id'], ',' ) ) {
+					$installed_extensions = explode( ',', $request['api_product_id'] );
+					foreach ( $installed_extensions as $extension ) {
+						$args                 = array(
+							'license_id' => 0,
+							'action'     => $request['request'] . $request['action_trigger'],
+							'site'       => $request['instance'],
+						);
+						$object               = wc_get_product_id_by_sku( $request['api_product_id'] );
+						$args['extension_id'] = isset( $object ) ? $object : 0;
+						$this->log_api_call( $args );
+					}
+				} else {
+					$single_request                 = array(
+						'license_id' => 0,
+						'action'     => $request['request'] . $request['action_trigger'],
+						'site'       => $request['instance'],
+					);
+					$object               = wc_get_product_id_by_sku( $request['api_product_id'] );
+					$single_request['extension_id'] = isset( $object ) ? $object : 0;
+					$this->log_api_call( $single_request );
+				}
 				throw new ApiException( sprintf( __( '<strong>Update error:</strong> The order used to purchase this license has an invalid status. <a href="%s" target="_blank">Purchase a valid license</a> to receive updates and support.', 'license-wp' ), $purchase_url ), 111 );
 			}
 
 			// If comma is in string means it is a multi extension license.
-			if ( false !== strpos( $request['api_product_id'], ',' ) || '' !== $request['api_product_id'] ) {
+			if ( false !== strpos( $request['api_product_id'], ',' ) ) {
 				$extensions           = $license->get_api_products();
 				$available_extensions = array();
 				$licensed_extensions  = array();

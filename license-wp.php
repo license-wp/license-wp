@@ -52,6 +52,9 @@ function __load_license_wp() {
 	license_wp();
 }
 
+define( 'License_WP_File', __FILE__ );
+define( 'License_WP_Dir', __DIR__ );
+
 // check PHP version
 $updatePhp = new WPUpdatePhp( '5.3.0' );
 if ( $updatePhp->does_it_meet_required_php_version( PHP_VERSION ) ) {
