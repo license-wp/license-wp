@@ -175,7 +175,8 @@ class Activation {
 			}
 
 			// If comma is in string means it is a multi extension license.
-			if ( false !== strpos( $request['api_product_id'], ',' ) ) {
+			// $request['action_trigger'] is only set from DLM 4.8.0 and upwards for the new license logging system.
+			if ( false !== strpos( $request['api_product_id'], ',' ) || isset( $request['action_trigger'] ) ) {
 				$extensions           = $license->get_api_products();
 				$available_extensions = array();
 				$licensed_extensions  = array();
@@ -247,7 +248,7 @@ class Activation {
 				$args = array(
 					'license_id'   => $license->get_product_id(),
 					'extension_id' => $api_product->get_id(),
-					'action'       => $request['request'] . $request['action_trigger'],
+					'action'       => $request['request'] . '-old',
 					'site'         => $request['instance'],
 				);
 				$this->log_api_call( $args );
