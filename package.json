@@ -1,7 +1,7 @@
 {
   "name": "license-wp",
   "title": "License WP",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "http://www.never5.com",
   "main": "Gruntfile.js",
   "devDependencies": {
