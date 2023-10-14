@@ -107,7 +107,7 @@ class AddLicense extends SubPage {
 			$product = \wc_get_product( $product_id );
 
 			// product must be an API license product
-			if ( 'yes' !== get_post_meta( $product->id, '_is_api_product_license', true ) ) {
+			if ( 'yes' !== get_post_meta( $product->get_id(), '_is_api_product_license', true ) ) {
 				throw new \Exception( __( 'Invalid product', 'license-wp' ) );
 			}
 

@@ -28,9 +28,24 @@ class Order {
 	 */
 	public function display_keys( $order_id ) {
 		if ( get_post_meta( $order_id, 'has_api_product_license_keys', true ) ) {
+
+			$order            = wc_get_order( $order_id );
+			$license_page_url = 'admin.php?page=license_wp_licenses';
+			foreach ( $order->get_items() as $item_id => $item ) {
+				$renewing_key = $item->get_meta( '_renewing_key' );
+				if ( $renewing_key ) {
+					$license_page_url .= '&license_key=' . $renewing_key;
+					break;
+				}
+			}
+
+			if ( empty( $renewing_key ) ) {
+				$license_page_url .= '&order_id=' . $order_id;
+			}
+
 			?>
 			<li class="wide">
-				<a href="<?php echo admin_url( 'admin.php?page=license_wp_licenses&order_id=' . $order_id ); ?>"><?php _e( 'View license keys &rarr;', 'license-wp' ); ?></a>
+				<a href="<?php echo admin_url( $license_page_url ); ?>"><?php _e( 'View license keys &rarr;', 'license-wp' ); ?></a>
 			</li>
 			<?php
 		}
