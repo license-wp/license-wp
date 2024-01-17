@@ -4,6 +4,6 @@
   },
   "require": {
     "wpupdatephp/wp-update-php": "~1.0",
-    "erusev/parsedown": "~1.5.4"
+    "erusev/parsedown": "~1.7.2"
   }
 }
