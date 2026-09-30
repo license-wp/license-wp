@@ -67,13 +67,13 @@ class UpgradeLicenseForm {
 
 				// check if license is expired
 				if ( $license->is_expired() ) {
-					wc_add_notice( sprintf( __( 'License with key %s has expired, please %srenew license%s before upgrading.', 'license-wp' ), '<strong>' . esc_attr( $this->license_key ) . '</strong>', '<a href="' . $license->get_renewal_url() . '">', '</a>' ), 'notice' );
+					wc_add_notice( sprintf( __( 'License with key %s has expired, please %srenew license%s before upgrading.', 'license-wp' ), '<strong>' . esc_html( $this->license_key ) . '</strong>', '<a href="' . esc_url( $license->get_renewal_url() ) . '">', '</a>' ), 'notice' );
 					$this->is_upgradable = false;
 				}
 
 				$this->license = $license;
 			} else {
-				wc_add_notice( sprintf( __( 'License key %s could not be found, please try again.', 'license-wp' ), '<strong>' . esc_attr( $this->license_key ) . '</strong>' ), 'error' );
+				wc_add_notice( sprintf( __( 'License key %s could not be found, please try again.', 'license-wp' ), '<strong>' . esc_html( $this->license_key ) . '</strong>' ), 'error' );
 				$this->is_upgradable = false;
 			}
 

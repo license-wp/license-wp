@@ -30,7 +30,7 @@ class Order {
 		if ( get_post_meta( $order_id, 'has_api_product_license_keys', true ) ) {
 			?>
 			<li class="wide">
-				<a href="<?php echo admin_url( 'admin.php?page=license_wp_licenses&order_id=' . $order_id ); ?>"><?php _e( 'View license keys &rarr;', 'license-wp' ); ?></a>
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=license_wp_licenses&order_id=' . absint( $order_id ) ) ); ?>"><?php _e( 'View license keys &rarr;', 'license-wp' ); ?></a>
 			</li>
 			<?php
 		}

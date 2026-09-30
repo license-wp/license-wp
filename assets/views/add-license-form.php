@@ -49,12 +49,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 									foreach ( $children_products as $child ) {
 										$child_product = wc_get_product( $child );
 										$attributes    = $child_product->get_variation_attributes();
-										$extra_data    = ' &ndash; ' . implode( ', ', $attributes ) . ' &ndash; ' . wc_price( $child_product->get_price() );
-										echo '<option value="' . absint( $child->ID ) . '">&nbsp;&nbsp;&mdash;&nbsp;' . $child_product->get_title() . $extra_data . '</option>';
+										$extra_data    = ' &ndash; ' . esc_html( implode( ', ', $attributes ) ) . ' &ndash; ' . wc_price( $child_product->get_price() );
+										echo '<option value="' . absint( $child->ID ) . '">&nbsp;&nbsp;&mdash;&nbsp;' . esc_html( $child_product->get_title() ) . $extra_data . '</option>';
 									}
 									echo '</optgroup>';
 								} else {
-									echo '<option value="' . $product->ID . '">' . $product->post_title . '</option>';
+									echo '<option value="' . absint( $product->ID ) . '">' . esc_html( $product->post_title ) . '</option>';
 								}
 							}
 						}

@@ -156,7 +156,7 @@ class Licenses extends Page {
 			$license = license_wp()->service( 'license_repository' )->persist( $license );
 
 		} catch ( \Exception $e ) {
-			echo sprintf( '<div class="error"><p>%s</p></div>', $e->getMessage() );
+			echo sprintf( '<div class="error"><p>%s</p></div>', esc_html( $e->getMessage() ) );
 		}
 	}
 }

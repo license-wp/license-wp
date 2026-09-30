@@ -281,15 +281,15 @@ class Manager {
 			$wc_product = wc_get_product( $wc_product->get_parent_id() );
 		}
 
-		$content = str_ireplace( ':fname:', $fname, $content );
+		$content = str_ireplace( ':fname:', esc_html( $fname ), $content );
 
 		if ( false != $wc_product ) {
-			$content = str_ireplace( ':product:', $wc_product->get_title(), $content );
+			$content = str_ireplace( ':product:', esc_html( $wc_product->get_title() ), $content );
 		}
 
-		$content = str_ireplace( ':license-key:', $license->get_key(), $content );
+		$content = str_ireplace( ':license-key:', esc_html( $license->get_key() ), $content );
 		$content = str_ireplace( ':license-expiration-date:', $license->get_date_expires() ? $license->get_date_expires()->format( 'M d Y' ) : '', $content );
-		$content = str_ireplace( ':renewal-link:', apply_filters( 'license_wp_license_renewal_url_email', $license->get_renewal_url(), $license ), $content );
+		$content = str_ireplace( ':renewal-link:', esc_url( apply_filters( 'license_wp_license_renewal_url_email', $license->get_renewal_url(), $license ) ), $content );
 
 		return $content;
 	}

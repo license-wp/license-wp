@@ -42,12 +42,12 @@ $license_options = \Never5\LicenseWP\WooCommerce\Product::get_available_upgrade_
 		<h3><?php _e( 'Current License', 'license-wp' ); ?></h3>
 		<p class="form-row form-row-wide">
 			<label><?php _e( 'License Key', 'license-wp' ); ?></label>
-			<span><?php echo $license->get_key(); ?></span>
+			<span><?php echo esc_html( $license->get_key() ); ?></span>
 		</p>
 
 		<p class="form-row form-row-wide">
 			<label><?php _e( 'Current License', 'license-wp' ); ?></label>
-			<span><?php echo $product->get_title(); ?> - <?php echo $current_license_term->name; ?>
+			<span><?php echo esc_html( $product->get_title() ); ?> - <?php echo esc_html( $current_license_term ? $current_license_term->name : '' ); ?>
 				<small>(<?php echo( ( $license->get_activation_limit() > 0 ) ? sprintf( __( '%d websites per product', 'license-wp' ), absint( $license->get_activation_limit() ) ) : __( 'Unlimited', 'license-wp' ) ); ?>)</small></span>
 		</p>
 
@@ -64,7 +64,7 @@ $license_options = \Never5\LicenseWP\WooCommerce\Product::get_available_upgrade_
 			<select name="new_license" id="lwp_new_license">
 				<?php if ( ! empty( $license_options ) ) : ?>
 					<?php foreach ( $license_options as $license_option ) : ?>
-						<option value="<?php echo esc_attr( $license_option['id'] ); ?>" data-upgrade_price="<?php echo esc_attr( $license_option['upgrade_price'] ); ?>"><?php echo $license_option['title']; ?></option>
+						<option value="<?php echo esc_attr( $license_option['id'] ); ?>" data-upgrade_price="<?php echo esc_attr( $license_option['upgrade_price'] ); ?>"><?php echo esc_html( $license_option['title'] ); ?></option>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</select>

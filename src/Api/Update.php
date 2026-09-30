@@ -192,9 +192,9 @@ class Update {
 
 			// set author
 			if ( '' != $api_product->get_author_uri() ) {
-				$data->author = '<a href="' . $api_product->get_author_uri() . '">' . $api_product->get_author() . '</a>';
+				$data->author = '<a href="' . esc_url( $api_product->get_author_uri() ) . '">' . esc_html( $api_product->get_author() ) . '</a>';
 			} else {
-				$data->author = $api_product->get_author();
+				$data->author = esc_html( $api_product->get_author() );
 			}
 
 			// set properties

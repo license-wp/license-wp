@@ -31,7 +31,7 @@ class ListTable extends \WP_List_Table {
 	public function column_default( $item, $column_name ) {
 		switch( $column_name ) {
 			case 'license_key' :
-				return '<a href="' . admin_url( 'admin.php?page=license_wp_licenses&amp;license_key=' . esc_attr( $item->license_key ) ) . '">' . '<code>' . esc_html( $item->license_key ) . '</code>' . '</a>';
+				return '<a href="' . esc_url( admin_url( 'admin.php?page=license_wp_licenses&license_key=' . rawurlencode( $item->license_key ) ) ) . '">' . '<code>' . esc_html( $item->license_key ) . '</code>' . '</a>';
 			case 'api_product_id' :
 				return esc_html( $item->api_product_id );
 			case 'instance' :
@@ -54,7 +54,7 @@ class ListTable extends \WP_List_Table {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			'activation_id',
-			$item->activation_id
+			absint( $item->activation_id )
 		);
 	}
 

@@ -37,9 +37,9 @@ class ListTable extends \WP_List_Table {
 
 		switch ( $column_name ) {
 			case 'license_key' :
-				return '<a href="' . admin_url( 'admin.php?page=license_wp_licenses&amp;edit=' . $item->license_key ) . '"><code>' . $item->license_key . '</code></a>';
+				return '<a href="' . esc_url( admin_url( 'admin.php?page=license_wp_licenses&edit=' . rawurlencode( $item->license_key ) ) ) . '"><code>' . esc_html( $item->license_key ) . '</code></a>';
 			case 'activation_email' :
-				return $item->activation_email;
+				return esc_html( $item->activation_email );
 			case 'product_id' :
 
 				$product = WooCommerce\Product::get_product( $item->product_id );
@@ -50,7 +50,7 @@ class ListTable extends \WP_List_Table {
 			case 'activations' :
 				$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT( activation_id ) FROM {$wpdb->lwp_activations} WHERE activation_active = 1 AND license_key=%s;", $item->license_key ) );
 
-				return '<a href="' . admin_url( 'admin.php?page=license_wp_activations&amp;license_key=' . $item->license_key ) . '">' . absint( $count ) . ' &rarr;</a>';
+				return '<a href="' . esc_url( admin_url( 'admin.php?page=license_wp_activations&license_key=' . rawurlencode( $item->license_key ) ) ) . '">' . absint( $count ) . ' &rarr;</a>';
 			case 'activation_limit' :
 				return $item->activation_limit ? sprintf( __( '%d per product', 'license-wp' ), absint( $item->activation_limit ) ) : __( 'n/a', 'license-wp' );
 			case 'order_id' :
@@ -75,7 +75,7 @@ class ListTable extends \WP_List_Table {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			'license_key_id',
-			$item->license_key
+			esc_attr( $item->license_key )
 		);
 	}
 

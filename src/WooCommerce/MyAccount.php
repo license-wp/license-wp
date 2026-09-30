@@ -62,7 +62,7 @@ class MyAccount {
 
 			// check if license expired
 			if ( $license->is_expired() ) {
-				wp_die( sprintf( __( 'License has expired. You can renew it here: %s', 'license-wp' ), $license->get_renewal_url() ) );
+				wp_die( sprintf( __( 'License has expired. You can renew it here: %s', 'license-wp' ), '<a href="' . esc_url( $license->get_renewal_url() ) . '">' . esc_html__( 'renew your license', 'license-wp' ) . '</a>' ) );
 			}
 
 			// check if this license is owned by logged in user
