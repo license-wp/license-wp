@@ -23,7 +23,7 @@ class WordPressRepository implements Repository {
 			$data->name              = $post->post_title;
 			$data->slug              = $post->post_name;
 			$data->version           = get_post_meta( $post->ID, '_version', true );
-			$data->date              = get_post_meta( $post->ID, '_date', true );
+			$data->date              = get_post_meta( $post->ID, '_last_updated', true );
 			$data->package           = get_post_meta( $post->ID, '_package', true );
 			$data->uri               = get_post_meta( $post->ID, '_plugin_uri', true );
 			$data->author            = get_post_meta( $post->ID, '_author', true );
@@ -75,7 +75,7 @@ class WordPressRepository implements Repository {
 
 		// update meta data
 		update_post_meta( $product->get_id(), '_version', $product->get_version() );
-		update_post_meta( $product->get_id(), '_date', $product->get_date() );
+		update_post_meta( $product->get_id(), '_last_updated', $product->get_date() );
 		update_post_meta( $product->get_id(), '_package', $product->get_package() );
 		update_post_meta( $product->get_id(), '_plugin_uri', $product->get_uri() );
 		update_post_meta( $product->get_id(), '_author', $product->get_author() );
