@@ -18,7 +18,7 @@ class AddLicense extends SubPage {
 
 		// handle save
 		add_action( 'init', function () {
-			if ( isset( $_POST['add_license'] ) ) {
+			if ( isset( $_POST['add_license'] ) && current_user_can( 'manage_options' ) ) {
 				$this->save();
 			}
 		} );

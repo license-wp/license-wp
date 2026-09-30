@@ -109,11 +109,13 @@ class ListTable extends \WP_List_Table {
 	public function process_bulk_action() {
 		global $wpdb;
 
-		if ( ! isset( $_POST['activation_id'] ) ) {
+		if ( ! isset( $_POST['activation_id'] ) || ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
-		$items = array_map( 'absint', $_POST['activation_id'] );
+		check_admin_referer( 'bulk-' . $this->_args['plural'] );
+
+		$items = array_map( 'absint', (array) $_POST['activation_id'] );
 
 		if ( $items ) {
 			switch ( $this->current_action() ) {

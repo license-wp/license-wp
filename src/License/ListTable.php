@@ -138,11 +138,13 @@ class ListTable extends \WP_List_Table {
 	public function process_bulk_action() {
 		global $wpdb;
 
-		if ( ! isset( $_POST['license_key_id'] ) ) {
+		if ( ! isset( $_POST['license_key_id'] ) || ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
-		$items = array_map( 'sanitize_text_field', $_POST['license_key_id'] );
+		check_admin_referer( 'bulk-' . $this->_args['plural'] );
+
+		$items = array_map( 'sanitize_text_field', wp_unslash( (array) $_POST['license_key_id'] ) );
 
 		if ( $items ) {
 			switch ( $this->current_action() ) {

@@ -18,7 +18,7 @@ class Licenses extends Page {
 
 		// handle save
 		add_action( 'init', function () {
-			if ( isset( $_POST['edit_license'] ) ) {
+			if ( isset( $_POST['edit_license'] ) && current_user_can( 'manage_options' ) ) {
 				$this->save();
 			}
 		} );
