@@ -139,7 +139,7 @@ class Renewal {
 	 */
 	public function order_item_meta( $item, $cart_item_key, $values, $order ) {
 		if ( isset( $values['renewing_key'] ) ) {
-			$item->add_meta_data( __( '_renewing_key', 'license-wp' ), $values['renewing_key'], true );
+			$item->add_meta_data( '_renewing_key', $values['renewing_key'], true );
 		}
 	}
 

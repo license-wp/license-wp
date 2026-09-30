@@ -136,19 +136,14 @@ class Order {
 					}
 
 					// search for upgrade key
-					$_upgrading_key = false;
-					foreach ( $item['item_meta'] as $meta_key => $meta_value ) {
-						if ( $meta_key == '_upgrading_key' ) {
-							$_upgrading_key = $meta_value[0];
-						}
-					}
+					$_upgrading_key = $item->get_meta( '_upgrading_key' ) ?: false;
 
 					// Make $_upgrading_key filterable
 					$_upgrading_key = apply_filters( 'lwp_order_upgrading_key', $_upgrading_key, $item, $order );
 
 					// check for standard product renewing
-					if ( ! isset( $previous_license_keys[ $product->get_id() ] ) && ! empty( $item['item_meta']['_renewing_key'] ) ) {
-						$previous_license_keys[ $product->get_id() ] = array( 'key' => $item['item_meta']['_renewing_key'],  'action' => self::KEY_ACTION_RENEW  );
+					if ( ! isset( $previous_license_keys[ $product->get_id() ] ) && '' !== $item->get_meta( '_renewing_key' ) ) {
+						$previous_license_keys[ $product->get_id() ] = array( 'key' => $item->get_meta( '_renewing_key' ),  'action' => self::KEY_ACTION_RENEW  );
 					}
 
 					// check on renewal

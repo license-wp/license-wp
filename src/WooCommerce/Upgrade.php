@@ -188,7 +188,7 @@ class Upgrade {
 	 */
 	public function order_item_meta( $item, $cart_item_key, $values, $order ) {
 		if ( isset( $values['upgrading_key'] ) ) {
-			$item->add_meta_data( __( '_upgrading_key', 'license-wp' ), $values['upgrading_key'], true );
+			$item->add_meta_data( '_upgrading_key', $values['upgrading_key'], true );
 		}
 	}
 
