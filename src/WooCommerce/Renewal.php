@@ -14,7 +14,7 @@ class Renewal {
 			if ( isset( $_GET['renew_license'] ) && isset( $_GET['activation_email'] ) ) {
 
 				// add renewal to cart
-				$this->add_renewal_to_cart( $_GET['renew_license'], $_GET['activation_email'] );
+				$this->add_renewal_to_cart( wp_unslash( $_GET['renew_license'] ), wp_unslash( $_GET['activation_email'] ) );
 			}
 
 		} );
@@ -43,24 +43,30 @@ class Renewal {
 
 		// check if license exists
 		if ( '' == $license->get_key() ) {
-			wc_add_notice( __( 'Invalid license key.', 'license-wp' ) );
+			wc_add_notice( __( 'Invalid license key.', 'license-wp' ), 'error' );
+
+			return;
 		}
 
 		// check if this license is owned by logged in user
 		if ( is_user_logged_in() && $license->get_user_id() != get_current_user_id() ) {
-			wc_add_notice( __( 'This license does not appear to be yours.', 'license-wp' ) );
+			wc_add_notice( __( 'This license does not appear to be yours.', 'license-wp' ), 'error' );
+
+			return;
 		}
 
 		// check if activation email is correct
 		if ( ! is_email( $activation_email ) || $activation_email != $license->get_activation_email() ) {
-			wc_add_notice( __( 'Invalid activation email address.', 'license-wp' ) );
+			wc_add_notice( __( 'Invalid activation email address.', 'license-wp' ), 'error' );
+
+			return;
 		}
 
 		// get WooCommerce product
 		$product = wc_get_product( $license->get_product_id() );
 
 		// check if product is purchasable
-		if ( ! $product->is_purchasable() ) {
+		if ( ! $product || ! $product->is_purchasable() ) {
 			wc_add_notice( __( 'This product can no longer be purchased', 'license-wp' ), 'error' );
 
 			return;
