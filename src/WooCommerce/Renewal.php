@@ -79,13 +79,54 @@ class Renewal {
 		) );
 
 		// Message
-		wc_add_notice( sprintf( __( 'The product has been added to your cart with a %d%% discount.', 'license-wp' ), 30 ), 'success' ); // @todo this should become an option
+		$discount = $this->get_discount( $license );
+		if ( $discount > 0 ) {
+			wc_add_notice( sprintf( __( 'The product has been added to your cart with a %d%% discount.', 'license-wp' ), $discount ), 'success' );
+		} else {
+			wc_add_notice( __( 'The product has been added to your cart.', 'license-wp' ), 'success' );
+		}
 
 		// Redirect to checkout
 		wp_redirect( get_permalink( wc_get_page_id( 'checkout' ) ) );
 
 		// bye
 		exit;
+	}
+
+	/**
+	 * The renewal discount in percent: only for licenses that have not expired yet
+	 *
+	 * @param \Never5\LicenseWP\License\License $license
+	 *
+	 * @return int
+	 */
+	private function get_discount( $license ) {
+		if ( '' === $license->get_key() || $license->is_expired() ) {
+			return 0;
+		}
+
+		return absint( apply_filters( 'license_wp_renewal_discount', 30, $license ) );
+	}
+
+	/**
+	 * Set the renewal price and name of a cart item
+	 *
+	 * @param array $cart_item
+	 * @param string $license_key
+	 *
+	 * @return array
+	 */
+	private function apply_renewal( $cart_item, $license_key ) {
+		$discount = $this->get_discount( license_wp()->service( 'license_factory' )->make( $license_key ) );
+
+		if ( $discount > 0 ) {
+			$price = $cart_item['data']->get_price();
+			$cart_item['data']->set_price( $price - ( ( $price / 100 ) * $discount ) );
+		}
+
+		$cart_item['data']->set_name( $cart_item['data']->get_name() . ' (' . __( 'Renewal', 'license-wp' ) . ')' );
+
+		return $cart_item;
 	}
 
 	/**
@@ -97,12 +138,7 @@ class Renewal {
 	 */
 	public function add_cart_item( $cart_item ) {
 		if ( isset( $cart_item['renewing_key'] ) ) {
-			$price            = $cart_item['data']->get_price();
-			$discount         = ( $price / 100 ) * 30; // @todo this should become an option
-			$discounted_price = $price - $discount;
-
-			$cart_item['data']->set_price( $discounted_price );
-			$cart_item['data']->set_name( $cart_item['data']->get_name() . ' (' . __( 'Renewal', 'license-wp' ) . ')' );
+			$cart_item = $this->apply_renewal( $cart_item, $cart_item['renewing_key'] );
 		}
 		return $cart_item;
 	}
@@ -117,13 +153,7 @@ class Renewal {
 	 */
 	public function get_cart_item_from_session( $cart_item, $values ) {
 		if ( isset( $values['renewing_key'] ) ) {
-			$price            = $cart_item['data']->get_price();
-			$discount         = ( $price / 100 ) * 30;  // @todo this should become an option
-			$discounted_price = $price - $discount;
-
-			$cart_item['data']->set_price( $discounted_price );
-			$cart_item['data']->set_name( $cart_item['data']->get_name() . ' (' . __( 'Renewal', 'license-wp' ) . ')' );
-
+			$cart_item                 = $this->apply_renewal( $cart_item, $values['renewing_key'] );
 			$cart_item['renewing_key'] = $values['renewing_key'];
 		}
 		return $cart_item;
