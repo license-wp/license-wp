@@ -163,7 +163,7 @@ class Order {
 
 						// set new expiration date
 						if ( $previous_license_action === self::KEY_ACTION_RENEW && ! empty( $expiry_modify_string ) ) {
-							$renew_datetime = (  ! $license->is_expired() ) ? $license->get_date_expires() : new \DateTime();
+							$renew_datetime = ( $license->get_date_expires() && ! $license->is_expired() ) ? $license->get_date_expires() : new \DateTime();
 							$license->set_date_expires( $renew_datetime->setTime( 0, 0, 0 )->modify( $expiry_modify_string ) );
 						}
 

@@ -53,7 +53,7 @@ $license_options = \Never5\LicenseWP\WooCommerce\Product::get_available_upgrade_
 
 		<p class="form-row form-row-wide">
 			<label><?php _e( 'Expiration Date', 'license-wp' ); ?></label>
-			<span><?php echo $license->get_date_expires()->format( get_option( 'date_format' ) ); ?></span>
+			<span><?php echo $license->get_date_expires() ? esc_html( $license->get_date_expires()->format( get_option( 'date_format' ) ) ) : esc_html__( 'Never', 'license-wp' ); ?></span>
 		</p>
 	</div>
 

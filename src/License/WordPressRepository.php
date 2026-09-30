@@ -30,7 +30,7 @@ class WordPressRepository implements Repository {
 			$data->product_id       = $row->product_id;
 			$data->activation_limit = $row->activation_limit;
 			$data->date_created     = new \DateTime( $row->date_created );
-			$data->date_expires     = $row->date_expires > 0 ? new \DateTimeImmutable( $row->date_expires ) : false;
+			$data->date_expires     = ( ! empty( $row->date_expires ) && 0 !== strpos( $row->date_expires, '0000-00-00' ) ) ? new \DateTimeImmutable( $row->date_expires ) : false;
 		}
 
 		return $data;
@@ -58,14 +58,8 @@ class WordPressRepository implements Repository {
 			'date_created'     => ''
 		);
 
-		// get date expiration
+		// get date expiration, false for licenses that never expire
 		$date_expires = $license->get_date_expires();
-
-		// set correct DateTime for non expiring licenses
-		if ( ! $date_expires ) {
-			$date_expires = new \DateTime( '0000-00-00' );
-			$date_expires->setTime( 0, 0, 0 );
-		}
 
 		// setup array with data
 		$data = wp_parse_args( array(
@@ -76,7 +70,7 @@ class WordPressRepository implements Repository {
 			'product_id'       => $license->get_product_id(),
 			'activation_limit' => $license->get_activation_limit(),
 			'date_created'     => $license->get_date_created()->format( 'Y-m-d' ),
-			'date_expires'     => $date_expires->format( 'Y-m-d' )
+			'date_expires'     => $date_expires ? $date_expires->format( 'Y-m-d' ) : null
 		), $defaults );
 
 		// check if new license or existing
