@@ -28,7 +28,7 @@ class Log {
 			'activation_email' => $activation_email,
 			'api_product_id'   => $product_id,
 			'date_downloaded'  => current_time( 'mysql' ),
-			'user_ip_address'  => sanitize_text_field( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'] )
+			'user_ip_address'  => \WC_Geolocation::get_ip_address()
 		) );
 
 		// success
