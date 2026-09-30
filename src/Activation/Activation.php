@@ -154,7 +154,8 @@ class Activation {
 		return esc_url( add_query_arg( array(
 			'deactivate_license' => $this->get_id(),
 			'license_key'        => $license->get_key(),
-			'activation_email'   => $license->get_activation_email()
+			'activation_email'   => $license->get_activation_email(),
+			'_wpnonce'           => wp_create_nonce( 'lwp_deactivate_license_' . $this->get_id() ),
 		) ) );
 	}
 

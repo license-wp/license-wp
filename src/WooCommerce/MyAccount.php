@@ -44,8 +44,12 @@ class MyAccount {
 
 			// clean vars
 			$activation_id    = absint( $_GET['deactivate_license'] );
-			$license_key      = sanitize_text_field( $_GET['license_key'] );
-			$activation_email = sanitize_text_field( $_GET['activation_email'] );
+			$license_key      = sanitize_text_field( wp_unslash( $_GET['license_key'] ) );
+			$activation_email = sanitize_text_field( wp_unslash( $_GET['activation_email'] ) );
+
+			if ( empty( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'lwp_deactivate_license_' . $activation_id ) ) {
+				wp_die( __( 'This link has expired. Please go back to your account and try again.', 'license-wp' ) );
+			}
 
 			// get license
 			/** @var \Never5\LicenseWP\License\License $license */
