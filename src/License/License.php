@@ -151,8 +151,8 @@ class License {
 	 */
 	public function is_expired() {
 
-		// check if license expired
-		if ( $this->get_date_expires() && $this->get_date_expires()->modify( "+1 day" ) < new \DateTime() ) {
+		// check if license expired, on a copy: modify() changes a \DateTime in place
+		if ( $this->get_date_expires() && ( clone $this->get_date_expires() )->modify( "+1 day" ) < new \DateTime() ) {
 			return true;
 		}
 
