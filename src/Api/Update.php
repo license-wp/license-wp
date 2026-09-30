@@ -202,7 +202,6 @@ class Update {
 			// set data properties
 			$data               = new \stdClass();
 			$data->name         = $api_product->get_name();
-			$data->plugin       = $request['plugin_name'];
 			$data->slug         = $request['api_product_id'];
 			$data->version      = $shown['version'];
 			$data->last_updated = $api_product->get_date();
@@ -229,7 +228,8 @@ class Update {
 			set_transient( $transient_name, $data, DAY_IN_SECONDS );
 		}
 
-		// download link
+		// the plugin path and download link of the requesting site
+		$data->plugin        = $request['plugin_name'];
 		$data->download_link = ( null === $release ) ? '' : $api_product->get_download_url( $license, $release['legacy'] );
 
 		// send data
