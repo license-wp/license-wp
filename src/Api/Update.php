@@ -26,8 +26,8 @@ class Update {
 		// send no-cache header
 		nocache_headers();
 
-		// set request
-		$request = array_map( 'sanitize_text_field', apply_filters( 'license_wp_api_update_request', $_GET ) );
+		// set request, from the query string or a POST body
+		$request = array_map( 'sanitize_text_field', apply_filters( 'license_wp_api_update_request', wp_unslash( array_merge( $_GET, $_POST ) ) ) );
 
 		// check for required things
 		try {
