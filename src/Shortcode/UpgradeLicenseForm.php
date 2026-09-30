@@ -11,6 +11,8 @@ class UpgradeLicenseForm {
 
 	private $is_upgradable = true;
 
+	private $is_loaded = false;
+
 	/**
 	 * __constructor
 	 */
@@ -19,20 +21,14 @@ class UpgradeLicenseForm {
 		// add shortcode
 		add_shortcode( 'upgrade_license_key_form', array( $this, 'callback' ) );
 
-		// set license key
-		$this->set_license_key();
-
-		// load license
-		$this->load_license();
-
-		// bail if not upgradable
-		if ( ! $this->is_upgradable ) {
-			return;
-		}
-
 		// process the post
-		if ( ! empty( $_POST['new_license'] ) ) {
-			$this->process_post();
+		if ( ! empty( $_POST['submit_upgrade_license'] ) && ! empty( $_POST['new_license'] ) ) {
+			$this->set_license_key();
+			$this->load_license();
+
+			if ( $this->is_upgradable ) {
+				$this->process_post();
+			}
 		}
 
 	}
@@ -42,11 +38,11 @@ class UpgradeLicenseForm {
 	 */
 	private function set_license_key() {
 		if ( ! empty( $_GET['license_key'] ) ) {
-			$this->license_key = trim( $_GET['license_key'] );
+			$this->license_key = trim( sanitize_text_field( wp_unslash( $_GET['license_key'] ) ) );
 		}
 
 		if ( ! empty( $_POST['license_key'] ) ) {
-			$this->license_key = trim( $_POST['license_key'] );
+			$this->license_key = trim( sanitize_text_field( wp_unslash( $_POST['license_key'] ) ) );
 		}
 	}
 
@@ -54,6 +50,7 @@ class UpgradeLicenseForm {
 	 * Load license data based on set $this->license_key
 	 */
 	private function load_license() {
+		$this->is_loaded = true;
 
 		// check
 		if ( ! empty( $this->license_key ) ) {
@@ -84,6 +81,11 @@ class UpgradeLicenseForm {
 	 * Callback
 	 */
 	public function callback() {
+		if ( ! $this->is_loaded ) {
+			$this->set_license_key();
+			$this->load_license();
+		}
+
 		// load view
 		return $this->view();
 	}
