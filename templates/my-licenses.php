@@ -48,7 +48,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 							$license_options = \Never5\LicenseWP\WooCommerce\Product::get_available_upgrade_options( wc_get_product( $license->get_product_id() ), $license );
 
 							// check if there are upgrade options available
-							if ( count( $license_options ) > 0 ) {
+							if ( count( $license_options ) > 0 && '' !== $license->get_upgrade_url() ) {
 								echo '<br/><a class="button lwp_button_upgrade" href="' . esc_url( $license->get_upgrade_url() ) . '">' . __( 'Upgrade License', 'license-wp' ) . '</a>';
 							}
 						}

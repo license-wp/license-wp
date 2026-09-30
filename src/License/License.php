@@ -265,16 +265,24 @@ class License {
 	}
 
 	/**
-	 * Return upgrade URL
+	 * Return upgrade URL, empty when there is no upgrade page
 	 *
 	 * @return string
 	 */
 	public function get_upgrade_url() {
-		$page = get_page_by_title( apply_filters( 'license_wp_license_upgrade_page_title', 'upgrade license' ) );
+		$pages = get_posts( array(
+			'post_type'   => 'page',
+			'post_status' => 'publish',
+			'title'       => apply_filters( 'license_wp_license_upgrade_page_title', 'upgrade license' ),
+			'numberposts' => 1,
+			'fields'      => 'ids',
+		) );
 
-		return apply_filters( 'license_wp_license_upgrade_url', add_query_arg( array(
-			'license_key' => $this->get_key()
-		), get_permalink( $page->ID ) ) );
+		$url = empty( $pages ) ? '' : add_query_arg( array(
+			'license_key' => rawurlencode( $this->get_key() )
+		), get_permalink( $pages[0] ) );
+
+		return apply_filters( 'license_wp_license_upgrade_url', $url );
 	}
 
 	/**
