@@ -110,6 +110,9 @@ class Plugin extends Pimple\Container {
 
 		if ( is_admin() ) { // Backend
 
+			// add the indexes of newer versions to existing tables
+			add_action( 'admin_init', array( 'Never5\\LicenseWP\\Installer', 'maybe_upgrade' ) );
+
 			// meta box
 			$mb_api_product_data = new Admin\MetaBox\ApiProductData();
 			$mb_api_product_data->register();

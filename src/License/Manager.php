@@ -187,8 +187,9 @@ class Manager {
 		// keys
 		$licenses = array();
 
-		// generate query
-		$sql = $wpdb->prepare( "SELECT `license_key` FROM " . $wpdb->lwp_licenses . " WHERE DATE_FORMAT( `date_expires`, '%%Y-%%m-%%d' ) = '%s' ", $date->format( 'Y-m-d' ) );
+		// generate query, as a range so the index on date_expires is used
+		$day = \DateTimeImmutable::createFromFormat( 'Y-m-d', $date->format( 'Y-m-d' ) );
+		$sql = $wpdb->prepare( "SELECT `license_key` FROM " . $wpdb->lwp_licenses . " WHERE `date_expires` >= %s AND `date_expires` < %s", $day->format( 'Y-m-d 00:00:00' ), $day->modify( '+1 day' )->format( 'Y-m-d 00:00:00' ) );
 
 		// fetch keys
 		$results = $wpdb->get_results( $sql );
