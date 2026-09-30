@@ -82,11 +82,10 @@ class ListTable extends \WP_List_Table {
 	 */
 	public function get_sortable_columns() {
 		$sortable_columns = array(
-			'activation_date'  => array( 'activation_date', true ),     //true means its already sorted
-			'date_expires'     => array( 'date_expires', false ),
-			'order_id'         => array( 'order_id', false ),
-			'api_product_id'   => array( 'api_product_id', false ),
-			'activation_email' => array( 'activation_email', false ),
+			'activation_date'   => array( 'activation_date', true ),     //true means its already sorted
+			'api_product_id'    => array( 'api_product_id', false ),
+			'instance'          => array( 'instance', false ),
+			'activation_active' => array( 'activation_active', false ),
 		);
 		return $sortable_columns;
 	}
@@ -150,9 +149,10 @@ class ListTable extends \WP_List_Table {
 
 		$current_page = $this->get_pagenum();
 		$per_page     = 50;
-		$orderby      = ! empty( $_REQUEST['orderby'] ) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'activation_date';
+		$orderby      = ! empty( $_REQUEST['orderby'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : 'activation_date';
+		$orderby      = array_key_exists( $orderby, $this->get_sortable_columns() ) ? $orderby : 'activation_date';
 		$order        = empty( $_REQUEST['order'] ) || $_REQUEST['order'] === 'asc' ? 'ASC' : 'DESC';
-		$license_key  = ! empty( $_REQUEST['license_key'] ) ? sanitize_text_field( $_REQUEST['license_key'] ) : '';
+		$license_key  = ! empty( $_REQUEST['license_key'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['license_key'] ) ) : '';
 
 		/**
 		 * Init column headers
@@ -167,7 +167,7 @@ class ListTable extends \WP_List_Table {
 		$where = array( 'WHERE 1=1' );
 
 		if ( $license_key ) {
-			$where[] = "AND license_key='{$license_key}'";
+			$where[] = $wpdb->prepare( 'AND license_key = %s', $license_key );
 		}
 
 		$where = implode( ' ', $where );

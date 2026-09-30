@@ -173,10 +173,11 @@ class ListTable extends \WP_List_Table {
 
 		$current_page = $this->get_pagenum();
 		$per_page     = 50;
-		$orderby      = ! empty( $_REQUEST['orderby'] ) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'date_created';
+		$orderby      = ! empty( $_REQUEST['orderby'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : 'date_created';
+		$orderby      = array_key_exists( $orderby, $this->get_sortable_columns() ) ? $orderby : 'date_created';
 		$order        = empty( $_REQUEST['order'] ) || $_REQUEST['order'] === 'asc' ? 'ASC' : 'DESC';
 		$order_id     = ! empty( $_REQUEST['order_id'] ) ? absint( $_REQUEST['order_id'] ) : '';
-		$license_key  = ! empty( $_REQUEST['license_key'] ) ? sanitize_text_field( $_REQUEST['license_key'] ) : '';
+		$license_key  = ! empty( $_REQUEST['license_key'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['license_key'] ) ) : '';
 
 		// column headers
 		$this->_column_headers = array( $this->get_columns(), array(), $this->get_sortable_columns() );
@@ -187,11 +188,11 @@ class ListTable extends \WP_List_Table {
 		$where = array( 'WHERE 1=1' );
 
 		if ( $order_id ) {
-			$where[] = 'AND order_id=' . $order_id;
+			$where[] = $wpdb->prepare( 'AND order_id = %d', $order_id );
 		}
 
 		if ( $license_key ) {
-			$where[] = "AND license_key='{$license_key}'";
+			$where[] = $wpdb->prepare( 'AND license_key = %s', $license_key );
 		}
 
 		$where = implode( ' ', $where );
