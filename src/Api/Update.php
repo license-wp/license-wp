@@ -28,6 +28,7 @@ class Update {
 
 		// set request, from the query string or a POST body
 		$request = array_map( 'sanitize_text_field', apply_filters( 'license_wp_api_update_request', wp_unslash( array_merge( $_GET, $_POST ) ) ) );
+		$request = wp_parse_args( $request, array( 'request' => '', 'license_key' => '', 'api_product_id' => '', 'instance' => '', 'plugin_name' => '' ) );
 
 		// check for required things
 		try {
