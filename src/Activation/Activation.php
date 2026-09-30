@@ -12,8 +12,8 @@ class Activation {
 	/** @var string */
 	private $license_key = '';
 
-	/** @var int */
-	private $api_product_id = 0;
+	/** @var string The slug of the API product */
+	private $api_product_id = '';
 
 	/** @var string */
 	private $instance = '';
@@ -53,14 +53,14 @@ class Activation {
 	}
 
 	/**
-	 * @return int
+	 * @return string
 	 */
 	public function get_api_product_id() {
 		return $this->api_product_id;
 	}
 
 	/**
-	 * @param int $api_product_id
+	 * @param string $api_product_id
 	 */
 	public function set_api_product_id( $api_product_id ) {
 		$this->api_product_id = $api_product_id;
@@ -153,8 +153,9 @@ class Activation {
 	public function get_deactivate_url( $license ) {
 		return esc_url( add_query_arg( array(
 			'deactivate_license' => $this->get_id(),
-			'license_key'        => $license->get_key(),
-			'activation_email'   => $license->get_activation_email()
+			'license_key'        => rawurlencode( $license->get_key() ),
+			'activation_email'   => rawurlencode( $license->get_activation_email() ),
+			'_wpnonce'           => wp_create_nonce( 'lwp_deactivate_license_' . $this->get_id() ),
 		) ) );
 	}
 

@@ -7,14 +7,14 @@
 			$wc_product = \Never5\LicenseWP\WooCommerce\Product::get_product( $license->get_product_id() );
 			?>
 			<li>
-				<?php echo esc_html( $wc_product->post_title ); ?>: <strong><?php echo $license->get_key(); ?></strong>
+				<?php echo esc_html( $wc_product->post_title ); ?>: <strong><?php echo esc_html( $license->get_key() ); ?></strong>
 				<?php
 				// license products
 				$api_products = $license->get_api_products();
 				if ( count( $api_products ) > 0 ) {
 					echo '<ul class="digital-downloads">';
 					foreach ( $api_products as $api_product ) {
-						echo '<li><a class="lwp-download-button" href="' . $api_product->get_download_url( $license ) . '">' . sprintf( __( 'Download %s', 'license-wp' ), $api_product->get_name() ) . '</a></li>';
+						echo '<li><a class="lwp-download-button" href="' . esc_url( $api_product->get_download_url( $license ) ) . '">' . esc_html( sprintf( __( 'Download %s', 'license-wp' ), $api_product->get_name() ) ) . '</a></li>';
 					}
 					echo '</ul>';
 				}

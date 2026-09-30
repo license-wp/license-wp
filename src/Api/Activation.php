@@ -28,8 +28,9 @@ class Activation {
 		// send no-cache header
 		nocache_headers();
 
-		// set request
-		$request = array_map( 'sanitize_text_field', apply_filters( 'license_wp_api_activation_request', $_GET ) );
+		// set request, from the query string or a POST body
+		$request = array_map( 'sanitize_text_field', apply_filters( 'license_wp_api_activation_request', wp_unslash( array_merge( $_GET, $_POST ) ) ) );
+		$request = wp_parse_args( $request, array( 'request' => '', 'license_key' => '', 'api_product_id' => '', 'instance' => '', 'email' => '' ) );
 
 		try {
 
@@ -130,6 +131,10 @@ class Activation {
 
 		// Format the instance
 		$request['instance'] = str_replace( array( 'http://', 'https://' ), '', trim( $request['instance'] ) );
+
+		if ( '' === $request['instance'] ) {
+			throw new ApiException( __( '<strong>Activation error:</strong> No website given.', 'license-wp' ), 112 );
+		}
 
 		// get all activation, including deactivated activations
 		$existing_activations = license_wp()->service( 'activation_manager' )->get_activations( $license, $api_product, false );

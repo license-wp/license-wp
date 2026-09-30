@@ -11,10 +11,10 @@ class Upgrade {
 		add_action( 'wp', function () {
 
 			// check if we need to renew a license
-			if ( isset( $_GET['upgrade_license'] ) && ! empty( $_GET['upgrade_license'] ) ) {
+			if ( isset( $_GET['upgrade_license'] ) && ! empty( $_GET['upgrade_license'] ) && ! empty( $_GET['new_license'] ) ) {
 
 				// add renewal to cart
-				$this->add_upgrade_to_cart( $_GET['upgrade_license'], $_GET['new_license'] );
+				$this->add_upgrade_to_cart( wp_unslash( $_GET['upgrade_license'] ), $_GET['new_license'] );
 			}
 
 		} );
@@ -37,6 +37,13 @@ class Upgrade {
 		$license_key = sanitize_text_field( $license_key );
 		$new_license = absint( $new_license );
 
+		// only the link the upgrade form made adds an upgrade to the cart
+		if ( empty( $_GET['_lwpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_GET['_lwpnonce'] ), 'lwp_upgrade_license_' . $license_key ) ) {
+			wc_add_notice( __( 'This upgrade link has expired, please start the upgrade again.', 'license-wp' ), 'error' );
+
+			return;
+		}
+
 		// get license
 		/** @var \Never5\LicenseWP\License\License $license */
 		$license = license_wp()->service( 'license_factory' )->make( $license_key );
@@ -46,12 +53,23 @@ class Upgrade {
 
 		// check if license exists
 		if ( '' == $license->get_key() ) {
-			wc_add_notice( __( 'Invalid license key.', 'license-wp' ) );
+			wc_add_notice( __( 'Invalid license key.', 'license-wp' ), 'error' );
+
+			return;
 		}
 
 		// check if this license is owned by logged in user
 		if ( is_user_logged_in() && $license->get_user_id() != get_current_user_id() ) {
-			wc_add_notice( __( 'This license does not appear to be yours.', 'license-wp' ) );
+			wc_add_notice( __( 'This license does not appear to be yours.', 'license-wp' ), 'error' );
+
+			return;
+		}
+
+		// an expired license must be renewed first
+		if ( $license->is_expired() ) {
+			wc_add_notice( __( 'This license has expired, please renew it before upgrading.', 'license-wp' ), 'error' );
+
+			return;
 		}
 
 		// check if WooCommerce product exists
@@ -68,12 +86,21 @@ class Upgrade {
 			return;
 		}
 
+		// the new product must be one of the upgrade options of this license
+		$current_product = wc_get_product( $license->get_product_id() );
+		$upgrade_ids     = $current_product ? wp_list_pluck( Product::get_available_upgrade_options( $current_product, $license ), 'id' ) : array();
+		if ( ! in_array( $new_product->get_id(), array_map( 'absint', $upgrade_ids ), true ) ) {
+			wc_add_notice( __( 'This license can not be upgraded to this product.', 'license-wp' ), 'error' );
+
+			return;
+		}
+
 		// get WP term object of license
 		$new_product_license_term = Product::get_license_term_of_product( $new_product );
 
 		// Add to cart
 		WC()->cart->empty_cart();
-		WC()->cart->add_to_cart( $new_product->get_parent_id(), 1, $new_product->get_id(), array( 'License' => $new_product_license_term->name ), array(
+		WC()->cart->add_to_cart( $new_product->get_parent_id(), 1, $new_product->get_id(), array( 'License' => $new_product_license_term ? $new_product_license_term->name : '' ), array(
 			'upgrading_key' => $license->get_key()
 		) );
 
@@ -161,7 +188,7 @@ class Upgrade {
 	 */
 	public function order_item_meta( $item, $cart_item_key, $values, $order ) {
 		if ( isset( $values['upgrading_key'] ) ) {
-			$item->add_meta_data( __( '_upgrading_key', 'license-wp' ), $values['upgrading_key'], true );
+			$item->add_meta_data( '_upgrading_key', $values['upgrading_key'], true );
 		}
 	}
 

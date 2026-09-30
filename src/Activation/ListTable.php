@@ -31,7 +31,7 @@ class ListTable extends \WP_List_Table {
 	public function column_default( $item, $column_name ) {
 		switch( $column_name ) {
 			case 'license_key' :
-				return '<a href="' . admin_url( 'admin.php?page=license_wp_licenses&amp;license_key=' . esc_attr( $item->license_key ) ) . '">' . '<code>' . esc_html( $item->license_key ) . '</code>' . '</a>';
+				return '<a href="' . esc_url( admin_url( 'admin.php?page=license_wp_licenses&license_key=' . rawurlencode( $item->license_key ) ) ) . '">' . '<code>' . esc_html( $item->license_key ) . '</code>' . '</a>';
 			case 'api_product_id' :
 				return esc_html( $item->api_product_id );
 			case 'instance' :
@@ -54,7 +54,7 @@ class ListTable extends \WP_List_Table {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			'activation_id',
-			$item->activation_id
+			absint( $item->activation_id )
 		);
 	}
 
@@ -82,11 +82,10 @@ class ListTable extends \WP_List_Table {
 	 */
 	public function get_sortable_columns() {
 		$sortable_columns = array(
-			'activation_date'  => array( 'activation_date', true ),     //true means its already sorted
-			'date_expires'     => array( 'date_expires', false ),
-			'order_id'         => array( 'order_id', false ),
-			'api_product_id'   => array( 'api_product_id', false ),
-			'activation_email' => array( 'activation_email', false ),
+			'activation_date'   => array( 'activation_date', true ),     //true means its already sorted
+			'api_product_id'    => array( 'api_product_id', false ),
+			'instance'          => array( 'instance', false ),
+			'activation_active' => array( 'activation_active', false ),
 		);
 		return $sortable_columns;
 	}
@@ -110,11 +109,13 @@ class ListTable extends \WP_List_Table {
 	public function process_bulk_action() {
 		global $wpdb;
 
-		if ( ! isset( $_POST['activation_id'] ) ) {
+		if ( ! isset( $_POST['activation_id'] ) || ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
-		$items = array_map( 'absint', $_POST['activation_id'] );
+		check_admin_referer( 'bulk-' . $this->_args['plural'] );
+
+		$items = array_map( 'absint', (array) $_POST['activation_id'] );
 
 		if ( $items ) {
 			switch ( $this->current_action() ) {
@@ -150,9 +151,10 @@ class ListTable extends \WP_List_Table {
 
 		$current_page = $this->get_pagenum();
 		$per_page     = 50;
-		$orderby      = ! empty( $_REQUEST['orderby'] ) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'activation_date';
+		$orderby      = ! empty( $_REQUEST['orderby'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : 'activation_date';
+		$orderby      = array_key_exists( $orderby, $this->get_sortable_columns() ) ? $orderby : 'activation_date';
 		$order        = empty( $_REQUEST['order'] ) || $_REQUEST['order'] === 'asc' ? 'ASC' : 'DESC';
-		$license_key  = ! empty( $_REQUEST['license_key'] ) ? sanitize_text_field( $_REQUEST['license_key'] ) : '';
+		$license_key  = ! empty( $_REQUEST['license_key'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['license_key'] ) ) : '';
 
 		/**
 		 * Init column headers
@@ -167,7 +169,7 @@ class ListTable extends \WP_List_Table {
 		$where = array( 'WHERE 1=1' );
 
 		if ( $license_key ) {
-			$where[] = "AND license_key='{$license_key}'";
+			$where[] = $wpdb->prepare( 'AND license_key = %s', $license_key );
 		}
 
 		$where = implode( ' ', $where );

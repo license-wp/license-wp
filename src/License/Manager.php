@@ -18,10 +18,8 @@ class Manager {
 			// generate key
 			$key = apply_filters( 'license_wp_generate_license_key', strtoupper( sprintf(
 				'%04x-%04x-%04x-%04x',
-				mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
-				mt_rand( 0, 0x0fff ) | 0x4000,
-				mt_rand( 0, 0x3fff ) | 0x8000,
-				mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
+				random_int( 0, 0xffff ), random_int( 0, 0xffff ), random_int( 0, 0xffff ),
+				random_int( 0, 0x0fff ) | 0x4000
 			) ) );
 
 			// check if exists
@@ -189,8 +187,9 @@ class Manager {
 		// keys
 		$licenses = array();
 
-		// generate query
-		$sql = $wpdb->prepare( "SELECT `license_key` FROM " . $wpdb->lwp_licenses . " WHERE DATE_FORMAT( `date_expires`, '%%Y-%%m-%%d' ) = '%s' ", $date->format( 'Y-m-d' ) );
+		// generate query, as a range so the index on date_expires is used
+		$day = \DateTimeImmutable::createFromFormat( 'Y-m-d', $date->format( 'Y-m-d' ) );
+		$sql = $wpdb->prepare( "SELECT `license_key` FROM " . $wpdb->lwp_licenses . " WHERE `date_expires` >= %s AND `date_expires` < %s", $day->format( 'Y-m-d 00:00:00' ), $day->modify( '+1 day' )->format( 'Y-m-d 00:00:00' ) );
 
 		// fetch keys
 		$results = $wpdb->get_results( $sql );
@@ -281,15 +280,15 @@ class Manager {
 			$wc_product = wc_get_product( $wc_product->get_parent_id() );
 		}
 
-		$content = str_ireplace( ':fname:', $fname, $content );
+		$content = str_ireplace( ':fname:', esc_html( $fname ), $content );
 
 		if ( false != $wc_product ) {
-			$content = str_ireplace( ':product:', $wc_product->get_title(), $content );
+			$content = str_ireplace( ':product:', esc_html( $wc_product->get_title() ), $content );
 		}
 
-		$content = str_ireplace( ':license-key:', $license->get_key(), $content );
+		$content = str_ireplace( ':license-key:', esc_html( $license->get_key() ), $content );
 		$content = str_ireplace( ':license-expiration-date:', $license->get_date_expires() ? $license->get_date_expires()->format( 'M d Y' ) : '', $content );
-		$content = str_ireplace( ':renewal-link:', apply_filters( 'license_wp_license_renewal_url_email', $license->get_renewal_url(), $license ), $content );
+		$content = str_ireplace( ':renewal-link:', esc_url( apply_filters( 'license_wp_license_renewal_url_email', $license->get_renewal_url(), $license ) ), $content );
 
 		return $content;
 	}

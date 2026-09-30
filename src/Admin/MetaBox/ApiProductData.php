@@ -81,6 +81,32 @@ class ApiProductData {
 				'label'       => __( 'Tested up to', 'license-wp' ),
 				'placeholder' => __( 'e.g. 3.9', 'license-wp' )
 			),
+			'_requires_php'        => array(
+				'label'       => __( 'Requires PHP', 'license-wp' ),
+				'placeholder' => __( 'e.g. 8.0', 'license-wp' )
+			),
+			'_legacy_version'      => array(
+				'label'       => __( 'Legacy version', 'license-wp' ),
+				'placeholder' => __( 'x.x.x', 'license-wp' ),
+				'description' => __( 'Offered instead of the current version to sites whose WordPress or PHP is older than the current version requires. Leave empty to offer those sites nothing.', 'license-wp' )
+			),
+			'_legacy_package'      => array(
+				'label'       => __( 'Legacy package', 'license-wp' ),
+				'type'        => 'file',
+				'description' => __( 'The zip file of the legacy version.', 'license-wp' )
+			),
+			'_legacy_requires_wp_version' => array(
+				'label'       => __( 'Legacy requires at least', 'license-wp' ),
+				'placeholder' => __( 'e.g. 5.0', 'license-wp' )
+			),
+			'_legacy_requires_php' => array(
+				'label'       => __( 'Legacy requires PHP', 'license-wp' ),
+				'placeholder' => __( 'e.g. 7.2', 'license-wp' )
+			),
+			'_legacy_tested_wp_version' => array(
+				'label'       => __( 'Legacy tested up to', 'license-wp' ),
+				'placeholder' => __( 'e.g. 6.5', 'license-wp' )
+			),
 			'content'              => array(
 				'label'       => __( 'Description', 'license-wp' ),
 				'placeholder' => __( 'Content describing the plugin', 'license-wp' ),
@@ -199,10 +225,10 @@ class ApiProductData {
 			}
 		}
 
-		// Get the plugin version
-		$plugin_version = get_post_meta( $post_id, '_version', true );
-
-		delete_transient( 'plugininfo_' . md5( $post->post_name . $plugin_version ) );
+		// Clear the cached plugin information of both releases
+		foreach ( array( '_version', '_legacy_version' ) as $version_key ) {
+			delete_transient( 'plugininfo_' . md5( $post->post_name . get_post_meta( $post_id, $version_key, true ) ) );
+		}
 	}
 
 }

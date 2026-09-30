@@ -48,7 +48,7 @@ class WordPressRepository implements Repository {
 		// dem defaults
 		$defaults = array(
 			'license_key'       => '',
-			'api_product_id'    => 0,
+			'api_product_id'    => '',
 			'instance'          => '',
 			'activation_date'   => '',
 			'activation_active' => 0,

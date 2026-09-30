@@ -23,13 +23,19 @@ class WordPressRepository implements Repository {
 			$data->name              = $post->post_title;
 			$data->slug              = $post->post_name;
 			$data->version           = get_post_meta( $post->ID, '_version', true );
-			$data->date              = get_post_meta( $post->ID, '_date', true );
+			$data->date              = get_post_meta( $post->ID, '_last_updated', true );
 			$data->package           = get_post_meta( $post->ID, '_package', true );
 			$data->uri               = get_post_meta( $post->ID, '_plugin_uri', true );
 			$data->author            = get_post_meta( $post->ID, '_author', true );
 			$data->author_uri        = get_post_meta( $post->ID, '_author_uri', true );
 			$data->requires_at_least = get_post_meta( $post->ID, '_requires_wp_version', true );
 			$data->tested_up_to      = get_post_meta( $post->ID, '_tested_wp_version', true );
+			$data->requires_php      = get_post_meta( $post->ID, '_requires_php', true );
+			$data->legacy_version    = get_post_meta( $post->ID, '_legacy_version', true );
+			$data->legacy_package    = get_post_meta( $post->ID, '_legacy_package', true );
+			$data->legacy_requires_at_least = get_post_meta( $post->ID, '_legacy_requires_wp_version', true );
+			$data->legacy_requires_php      = get_post_meta( $post->ID, '_legacy_requires_php', true );
+			$data->legacy_tested_up_to      = get_post_meta( $post->ID, '_legacy_tested_wp_version', true );
 			$data->description       = $post->post_content;
 			$data->changelog         = get_post_meta( $post->ID, '_changelog', true );
 		}
@@ -75,13 +81,19 @@ class WordPressRepository implements Repository {
 
 		// update meta data
 		update_post_meta( $product->get_id(), '_version', $product->get_version() );
-		update_post_meta( $product->get_id(), '_date', $product->get_date() );
+		update_post_meta( $product->get_id(), '_last_updated', $product->get_date() );
 		update_post_meta( $product->get_id(), '_package', $product->get_package() );
 		update_post_meta( $product->get_id(), '_plugin_uri', $product->get_uri() );
 		update_post_meta( $product->get_id(), '_author', $product->get_author() );
 		update_post_meta( $product->get_id(), '_author_uri', $product->get_author_uri() );
 		update_post_meta( $product->get_id(), '_requires_wp_version', $product->get_requires_at_least() );
 		update_post_meta( $product->get_id(), '_tested_wp_version', $product->get_tested_up_to() );
+		update_post_meta( $product->get_id(), '_requires_php', $product->get_requires_php() );
+		update_post_meta( $product->get_id(), '_legacy_version', $product->get_legacy_version() );
+		update_post_meta( $product->get_id(), '_legacy_package', $product->get_legacy_package() );
+		update_post_meta( $product->get_id(), '_legacy_requires_wp_version', $product->get_legacy_requires_at_least() );
+		update_post_meta( $product->get_id(), '_legacy_requires_php', $product->get_legacy_requires_php() );
+		update_post_meta( $product->get_id(), '_legacy_tested_wp_version', $product->get_legacy_tested_up_to() );
 		update_post_meta( $product->get_id(), '_changelog', $product->get_changelog() );
 
 		return $product;

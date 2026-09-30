@@ -18,7 +18,7 @@ class AddLicense extends SubPage {
 
 		// handle save
 		add_action( 'init', function () {
-			if ( isset( $_POST['add_license'] ) ) {
+			if ( isset( $_POST['add_license'] ) && current_user_can( 'manage_options' ) ) {
 				$this->save();
 			}
 		} );
@@ -171,7 +171,7 @@ class AddLicense extends SubPage {
 					$user_first_name
 				), $activation_email );
 
-				$admin_message = sprintf( __( 'License key has been emailed to %s.', 'license-wp' ), $activation_email );
+				$admin_message = sprintf( __( 'License key has been emailed to %s.', 'license-wp' ), esc_html( $activation_email ) );
 				echo sprintf( '<div class="updated"><p>%s</p></div>', $admin_message );
 
 			} else {
@@ -180,7 +180,7 @@ class AddLicense extends SubPage {
 
 
 		} catch ( \Exception $e ) {
-			echo sprintf( '<div class="error"><p>%s</p></div>', $e->getMessage() );
+			echo sprintf( '<div class="error"><p>%s</p></div>', esc_html( $e->getMessage() ) );
 		}
 	}
 

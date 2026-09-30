@@ -151,8 +151,8 @@ class License {
 	 */
 	public function is_expired() {
 
-		// check if license expired
-		if ( $this->get_date_expires() && $this->get_date_expires()->modify( "+1 day" ) < new \DateTime() ) {
+		// check if license expired, on a copy: modify() changes a \DateTime in place
+		if ( $this->get_date_expires() && ( clone $this->get_date_expires() )->modify( "+1 day" ) < new \DateTime() ) {
 			return true;
 		}
 
@@ -259,22 +259,30 @@ class License {
 	 */
 	public function get_renewal_url() {
 		return apply_filters( 'license_wp_license_renewal_url', add_query_arg( array(
-			'renew_license'    => $this->get_key(),
-			'activation_email' => $this->get_activation_email()
+			'renew_license'    => rawurlencode( $this->get_key() ),
+			'activation_email' => rawurlencode( $this->get_activation_email() )
 		), apply_filters( 'woocommerce_get_cart_url', wc_get_page_permalink( 'cart' ) ) ), $this );
 	}
 
 	/**
-	 * Return upgrade URL
+	 * Return upgrade URL, empty when there is no upgrade page
 	 *
 	 * @return string
 	 */
 	public function get_upgrade_url() {
-		$page = get_page_by_title( apply_filters( 'license_wp_license_upgrade_page_title', 'upgrade license' ) );
+		$pages = get_posts( array(
+			'post_type'   => 'page',
+			'post_status' => 'publish',
+			'title'       => apply_filters( 'license_wp_license_upgrade_page_title', 'upgrade license' ),
+			'numberposts' => 1,
+			'fields'      => 'ids',
+		) );
 
-		return apply_filters( 'license_wp_license_upgrade_url', add_query_arg( array(
-			'license_key' => $this->get_key()
-		), get_permalink( $page->ID ) ) );
+		$url = empty( $pages ) ? '' : add_query_arg( array(
+			'license_key' => rawurlencode( $this->get_key() )
+		), get_permalink( $pages[0] ) );
+
+		return apply_filters( 'license_wp_license_upgrade_url', $url );
 	}
 
 	/**

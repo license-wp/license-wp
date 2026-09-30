@@ -26,9 +26,9 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 			<tr>
 				<td rowspan="<?php echo( ( ! $license->is_expired() ) ? sizeof( $activations ) + 1 : 1 ); ?>" class="lwp_licenses_name"><?php echo esc_html( $wc_product->post_title ); ?></td>
 				<td class="lwp_licenses_code">
-					<code style="display:block;"><?php echo $license->get_key(); ?></code>
+					<code style="display:block;"><?php echo esc_html( $license->get_key() ); ?></code>
 					<small>
-						<?php printf( __( 'Activation email: %s', 'license-wp' ), $license->get_activation_email() ); ?><br/>
+						<?php printf( __( 'Activation email: %s', 'license-wp' ), esc_html( $license->get_activation_email() ) ); ?><br/>
 						<?php if ( $license->get_date_expires() ) : ?>
 							<?php if ( ! $license->is_expired() ) : ?>
 								<?php printf( __( 'Expiry date: %s.', 'license-wp' ), $license->get_date_expires()->format( get_option( 'date_format' ) ) ); ?>
@@ -48,8 +48,8 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 							$license_options = \Never5\LicenseWP\WooCommerce\Product::get_available_upgrade_options( wc_get_product( $license->get_product_id() ), $license );
 
 							// check if there are upgrade options available
-							if ( count( $license_options ) > 0 ) {
-								echo '<br/><a class="button lwp_button_upgrade" href="' . $license->get_upgrade_url() . '">' . __( 'Upgrade License', 'license-wp' ) . '</a>';
+							if ( count( $license_options ) > 0 && '' !== $license->get_upgrade_url() ) {
+								echo '<br/><a class="button lwp_button_upgrade" href="' . esc_url( $license->get_upgrade_url() ) . '">' . __( 'Upgrade License', 'license-wp' ) . '</a>';
 							}
 						}
 
@@ -59,7 +59,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 					?></td>
 				<td class="lwp_licenses_download"><?php
 					if ( $license->is_expired() ) {
-						echo '<a class="button lwp_button_renew" href="' . $license->get_renewal_url() . '">' . __( 'Renew License', 'license-wp' ) . '</a>';
+						echo '<a class="button lwp_button_renew" href="' . esc_url( $license->get_renewal_url() ) . '">' . __( 'Renew License', 'license-wp' ) . '</a>';
 					} else {
 
 						// get API products
@@ -68,7 +68,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 						if ( count( $api_products ) > 0 ) {
 							echo '<ul class="digital-downloads">';
 							foreach ( $api_products as $api_product ) {
-								echo '<li><a class="lwp-download-button" href="' . $api_product->get_download_url( $license ) . '">' . $api_product->get_name() . ' (v' . $api_product->get_version() . ')</a></li>';
+								echo '<li><a class="lwp-download-button" href="' . esc_url( $api_product->get_download_url( $license ) ) . '">' . esc_html( $api_product->get_name() . ' (v' . $api_product->get_version() . ')' ) . '</a></li>';
 							}
 							echo '</ul>';
 						}
@@ -82,7 +82,7 @@ if ( sizeof( $licenses ) > 0 ) : ?>
 			?>
 			<tr>
 				<td colspan="3" class="lwp_licenses_activation">
-					<?php echo get_the_title(  $activation->get_api_product_post_id() ); ?> &mdash; <a href="<?php echo esc_attr( $activation->get_instance() ); ?>" target="_blank"><?php echo esc_html( $activation->get_instance() ); ?></a> <a class="button" style="float:right" href="<?php echo $activation->get_deactivate_url($license); ?>"><?php _e( 'Deactivate', 'license-wp' ); ?></a>
+					<?php echo esc_html( get_the_title( $activation->get_api_product_post_id() ) ); ?> &mdash; <a href="<?php echo esc_url( '//' . $activation->get_instance() ); ?>" target="_blank"><?php echo esc_html( $activation->get_instance() ); ?></a> <a class="button" style="float:right" href="<?php echo $activation->get_deactivate_url($license); ?>"><?php _e( 'Deactivate', 'license-wp' ); ?></a>
 				</td>
 			</tr>
 		<?php endforeach; ?>

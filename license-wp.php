@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // autoloader
-require 'vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 /**
  * @return \Never5\LicenseWP\Plugin
@@ -52,16 +52,18 @@ function __load_license_wp() {
 	license_wp();
 }
 
-// check PHP version
-$updatePhp = new WPUpdatePhp( '5.3.0' );
-if ( $updatePhp->does_it_meet_required_php_version( PHP_VERSION ) ) {
+// orders are only read through WooCommerce, so they may live in its own tables (HPOS)
+add_action( 'before_woocommerce_init', function () {
+	if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+	}
+} );
 
-	// create plugin object
-	add_action( 'plugins_loaded', '__load_license_wp', 20 );
+// create plugin object
+add_action( 'plugins_loaded', '__load_license_wp', 20 );
 
-	// Activation hook
-	register_activation_hook( __FILE__, array( 'Never5\\LicenseWP\\Installer', 'install' ) );
+// Activation hook
+register_activation_hook( __FILE__, array( 'Never5\\LicenseWP\\Installer', 'install' ) );
 
-	// Deactivation hook
-	register_deactivation_hook( __FILE__, array( 'Never5\\LicenseWP\\Installer', 'uninstall' ) );
-}
+// Deactivation hook
+register_deactivation_hook( __FILE__, array( 'Never5\\LicenseWP\\Installer', 'uninstall' ) );

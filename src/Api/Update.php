@@ -26,8 +26,9 @@ class Update {
 		// send no-cache header
 		nocache_headers();
 
-		// set request
-		$request = array_map( 'sanitize_text_field', apply_filters( 'license_wp_api_update_request', $_GET ) );
+		// set request, from the query string or a POST body
+		$request = array_map( 'sanitize_text_field', apply_filters( 'license_wp_api_update_request', wp_unslash( array_merge( $_GET, $_POST ) ) ) );
+		$request = wp_parse_args( $request, array( 'request' => '', 'license_key' => '', 'api_product_id' => '', 'instance' => '', 'plugin_name' => '', 'version' => '', 'wp_version' => '', 'php_version' => '' ) );
 
 		// check for required things
 		try {
@@ -153,12 +154,24 @@ class Update {
 	 */
 	private function plugin_update_check( $license, $api_product, $request ) {
 
-		$data              = new \stdClass();
-		$data->plugin      = $request['plugin_name'];
-		$data->slug        = $request['api_product_id'];
-		$data->new_version = $api_product->get_version();
-		$data->url         = $api_product->get_uri();
-		$data->package     = $api_product->get_download_url( $license );
+		$release = $this->get_release( $api_product, $request );
+
+		$data         = new \stdClass();
+		$data->plugin = $request['plugin_name'];
+		$data->slug   = $request['api_product_id'];
+		$data->url    = $api_product->get_uri();
+
+		if ( null === $release ) {
+			// the installed version, so the client sees no update
+			$data->new_version = $request['version'];
+			$data->package     = '';
+		} else {
+			$data->new_version  = $release['version'];
+			$data->package      = $api_product->get_download_url( $license, $release['legacy'] );
+			$data->requires     = $release['requires'];
+			$data->requires_php = $release['requires_php'];
+			$data->tested       = $release['tested'];
+		}
 
 		// send data
 		$this->send_data( $data );
@@ -176,8 +189,12 @@ class Update {
 	 */
 	private function plugin_information( $license, $api_product, $request ) {
 
+		// a site that can run no release sees the current one, without a download
+		$release = $this->get_release( $api_product, $request );
+		$shown   = ( null === $release ) ? $api_product->get_release() : $release;
+
 		// transient name
-		$transient_name = 'plugininfo_' . md5( $request['api_product_id'] . $api_product->get_version() );
+		$transient_name = 'plugininfo_' . md5( $request['api_product_id'] . $shown['version'] );
 
 		// check if transient exists
 		if ( false === ( $data = get_transient( $transient_name ) ) ) {
@@ -187,20 +204,21 @@ class Update {
 			$data->name         = $api_product->get_name();
 			$data->plugin       = $request['plugin_name'];
 			$data->slug         = $request['api_product_id'];
-			$data->version      = $api_product->get_version();
+			$data->version      = $shown['version'];
 			$data->last_updated = $api_product->get_date();
 
 			// set author
 			if ( '' != $api_product->get_author_uri() ) {
-				$data->author = '<a href="' . $api_product->get_author_uri() . '">' . $api_product->get_author() . '</a>';
+				$data->author = '<a href="' . esc_url( $api_product->get_author_uri() ) . '">' . esc_html( $api_product->get_author() ) . '</a>';
 			} else {
-				$data->author = $api_product->get_author();
+				$data->author = esc_html( $api_product->get_author() );
 			}
 
 			// set properties
-			$data->requires = $api_product->get_requires_at_least();
-			$data->tested   = $api_product->get_tested_up_to();
-			$data->homepage = $api_product->get_uri();
+			$data->requires     = $shown['requires'];
+			$data->requires_php = $shown['requires_php'];
+			$data->tested       = $shown['tested'];
+			$data->homepage     = $api_product->get_uri();
 
 			// set sections
 			$data->sections = array(
@@ -212,10 +230,33 @@ class Update {
 		}
 
 		// download link
-		$data->download_link = $api_product->get_download_url( $license );
+		$data->download_link = ( null === $release ) ? '' : $api_product->get_download_url( $license, $release['legacy'] );
 
 		// send data
 		$this->send_data( $data );
+	}
+
+	/**
+	 * The release of the API product the requesting site can run
+	 *
+	 * The WordPress version comes from the wp_version parameter, else from the User-Agent WordPress sends
+	 * ("WordPress/6.5.2; https://example.com"). The PHP version only comes from the php_version parameter.
+	 *
+	 * @param \Never5\LicenseWP\ApiProduct\ApiProduct $api_product
+	 * @param array $request
+	 *
+	 * @return array|null See ApiProduct::get_release().
+	 */
+	private function get_release( $api_product, $request ) {
+		$wp_version = $request['wp_version'];
+		if ( '' === $wp_version && isset( $_SERVER['HTTP_USER_AGENT'] ) && preg_match( '#^WordPress/(\d+(?:\.\d+)*)#', wp_unslash( $_SERVER['HTTP_USER_AGENT'] ), $matches ) ) {
+			$wp_version = $matches[1];
+		}
+
+		$wp_version  = preg_match( '/^\d+(\.\d+)*/', $wp_version, $matches ) ? $matches[0] : '';
+		$php_version = preg_match( '/^\d+(\.\d+)*/', $request['php_version'], $matches ) ? $matches[0] : '';
+
+		return $api_product->get_release( $wp_version, $php_version );
 	}
 
 	/**

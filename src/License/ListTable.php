@@ -37,9 +37,9 @@ class ListTable extends \WP_List_Table {
 
 		switch ( $column_name ) {
 			case 'license_key' :
-				return '<a href="' . admin_url( 'admin.php?page=license_wp_licenses&amp;edit=' . $item->license_key ) . '"><code>' . $item->license_key . '</code></a>';
+				return '<a href="' . esc_url( admin_url( 'admin.php?page=license_wp_licenses&edit=' . rawurlencode( $item->license_key ) ) ) . '"><code>' . esc_html( $item->license_key ) . '</code></a>';
 			case 'activation_email' :
-				return $item->activation_email;
+				return esc_html( $item->activation_email );
 			case 'product_id' :
 
 				$product = WooCommerce\Product::get_product( $item->product_id );
@@ -50,15 +50,15 @@ class ListTable extends \WP_List_Table {
 			case 'activations' :
 				$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT( activation_id ) FROM {$wpdb->lwp_activations} WHERE activation_active = 1 AND license_key=%s;", $item->license_key ) );
 
-				return '<a href="' . admin_url( 'admin.php?page=license_wp_activations&amp;license_key=' . $item->license_key ) . '">' . absint( $count ) . ' &rarr;</a>';
+				return '<a href="' . esc_url( admin_url( 'admin.php?page=license_wp_activations&license_key=' . rawurlencode( $item->license_key ) ) ) . '">' . absint( $count ) . ' &rarr;</a>';
 			case 'activation_limit' :
 				return $item->activation_limit ? sprintf( __( '%d per product', 'license-wp' ), absint( $item->activation_limit ) ) : __( 'n/a', 'license-wp' );
 			case 'order_id' :
-				return $item->order_id > 0 ? '<a href="' . admin_url( 'post.php?post=' . absint( $item->order_id ) . '&action=edit' ) . '">#' . absint( $item->order_id ) . ' &rarr;</a>' : __( 'n/a', 'license-wp' );
+				return $item->order_id > 0 ? '<a href="' . esc_url( \Automattic\WooCommerce\Utilities\OrderUtil::get_order_admin_edit_url( absint( $item->order_id ) ) ) . '">#' . absint( $item->order_id ) . ' &rarr;</a>' : __( 'n/a', 'license-wp' );
 			case 'date_created' :
-				return $item->date_created > 0 ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_created ) ) : __( 'n/a', 'license-wp' );
+				return ( ! empty( $item->date_created ) && 0 !== strpos( $item->date_created, '0000-00-00' ) ) ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_created ) ) : __( 'n/a', 'license-wp' );
 			case 'date_expires' :
-				return $item->date_expires > 0 ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_expires ) ) : __( 'n/a', 'license-wp' );
+				return ( ! empty( $item->date_expires ) && 0 !== strpos( $item->date_expires, '0000-00-00' ) ) ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_expires ) ) : __( 'n/a', 'license-wp' );
 		}
 	}
 
@@ -75,7 +75,7 @@ class ListTable extends \WP_List_Table {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			'license_key_id',
-			$item->license_key
+			esc_attr( $item->license_key )
 		);
 	}
 
@@ -138,11 +138,13 @@ class ListTable extends \WP_List_Table {
 	public function process_bulk_action() {
 		global $wpdb;
 
-		if ( ! isset( $_POST['license_key_id'] ) ) {
+		if ( ! isset( $_POST['license_key_id'] ) || ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
-		$items = array_map( 'sanitize_text_field', $_POST['license_key_id'] );
+		check_admin_referer( 'bulk-' . $this->_args['plural'] );
+
+		$items = array_map( 'sanitize_text_field', wp_unslash( (array) $_POST['license_key_id'] ) );
 
 		if ( $items ) {
 			switch ( $this->current_action() ) {
@@ -173,10 +175,11 @@ class ListTable extends \WP_List_Table {
 
 		$current_page = $this->get_pagenum();
 		$per_page     = 50;
-		$orderby      = ! empty( $_REQUEST['orderby'] ) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'date_created';
+		$orderby      = ! empty( $_REQUEST['orderby'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : 'date_created';
+		$orderby      = array_key_exists( $orderby, $this->get_sortable_columns() ) ? $orderby : 'date_created';
 		$order        = empty( $_REQUEST['order'] ) || $_REQUEST['order'] === 'asc' ? 'ASC' : 'DESC';
 		$order_id     = ! empty( $_REQUEST['order_id'] ) ? absint( $_REQUEST['order_id'] ) : '';
-		$license_key  = ! empty( $_REQUEST['license_key'] ) ? sanitize_text_field( $_REQUEST['license_key'] ) : '';
+		$license_key  = ! empty( $_REQUEST['license_key'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['license_key'] ) ) : '';
 
 		// column headers
 		$this->_column_headers = array( $this->get_columns(), array(), $this->get_sortable_columns() );
@@ -187,11 +190,11 @@ class ListTable extends \WP_List_Table {
 		$where = array( 'WHERE 1=1' );
 
 		if ( $order_id ) {
-			$where[] = 'AND order_id=' . $order_id;
+			$where[] = $wpdb->prepare( 'AND order_id = %d', $order_id );
 		}
 
 		if ( $license_key ) {
-			$where[] = "AND license_key='{$license_key}'";
+			$where[] = $wpdb->prepare( 'AND license_key = %s', $license_key );
 		}
 
 		$where = implode( ' ', $where );

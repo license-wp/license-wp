@@ -11,6 +11,8 @@ class UpgradeLicenseForm {
 
 	private $is_upgradable = true;
 
+	private $is_loaded = false;
+
 	/**
 	 * __constructor
 	 */
@@ -19,20 +21,18 @@ class UpgradeLicenseForm {
 		// add shortcode
 		add_shortcode( 'upgrade_license_key_form', array( $this, 'callback' ) );
 
-		// set license key
-		$this->set_license_key();
-
-		// load license
-		$this->load_license();
-
-		// bail if not upgradable
-		if ( ! $this->is_upgradable ) {
-			return;
-		}
-
 		// process the post
-		if ( ! empty( $_POST['new_license'] ) ) {
-			$this->process_post();
+		if ( ! empty( $_POST['submit_upgrade_license'] ) && ! empty( $_POST['new_license'] ) ) {
+			if ( empty( $_POST['lwp_upgrade_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['lwp_upgrade_nonce'] ), 'lwp_upgrade_license' ) ) {
+				return;
+			}
+
+			$this->set_license_key();
+			$this->load_license();
+
+			if ( $this->is_upgradable ) {
+				$this->process_post();
+			}
 		}
 
 	}
@@ -42,11 +42,11 @@ class UpgradeLicenseForm {
 	 */
 	private function set_license_key() {
 		if ( ! empty( $_GET['license_key'] ) ) {
-			$this->license_key = trim( $_GET['license_key'] );
+			$this->license_key = trim( sanitize_text_field( wp_unslash( $_GET['license_key'] ) ) );
 		}
 
 		if ( ! empty( $_POST['license_key'] ) ) {
-			$this->license_key = trim( $_POST['license_key'] );
+			$this->license_key = trim( sanitize_text_field( wp_unslash( $_POST['license_key'] ) ) );
 		}
 	}
 
@@ -54,6 +54,7 @@ class UpgradeLicenseForm {
 	 * Load license data based on set $this->license_key
 	 */
 	private function load_license() {
+		$this->is_loaded = true;
 
 		// check
 		if ( ! empty( $this->license_key ) ) {
@@ -66,13 +67,13 @@ class UpgradeLicenseForm {
 
 				// check if license is expired
 				if ( $license->is_expired() ) {
-					wc_add_notice( sprintf( __( 'License with key %s has expired, please %srenew license%s before upgrading.', 'license-wp' ), '<strong>' . esc_attr( $this->license_key ) . '</strong>', '<a href="' . $license->get_renewal_url() . '">', '</a>' ), 'notice' );
+					wc_add_notice( sprintf( __( 'License with key %s has expired, please %srenew license%s before upgrading.', 'license-wp' ), '<strong>' . esc_html( $this->license_key ) . '</strong>', '<a href="' . esc_url( $license->get_renewal_url() ) . '">', '</a>' ), 'notice' );
 					$this->is_upgradable = false;
 				}
 
 				$this->license = $license;
 			} else {
-				wc_add_notice( sprintf( __( 'License key %s could not be found, please try again.', 'license-wp' ), '<strong>' . esc_attr( $this->license_key ) . '</strong>' ), 'error' );
+				wc_add_notice( sprintf( __( 'License key %s could not be found, please try again.', 'license-wp' ), '<strong>' . esc_html( $this->license_key ) . '</strong>' ), 'error' );
 				$this->is_upgradable = false;
 			}
 
@@ -84,6 +85,11 @@ class UpgradeLicenseForm {
 	 * Callback
 	 */
 	public function callback() {
+		if ( ! $this->is_loaded ) {
+			$this->set_license_key();
+			$this->load_license();
+		}
+
 		// load view
 		return $this->view();
 	}
@@ -101,7 +107,8 @@ class UpgradeLicenseForm {
 			// setup add-to-cart upgrade URL
 			$redirect_url = apply_filters( 'license_wp_license_upgrade_url_cart', add_query_arg( array(
 				'upgrade_license' => $this->license->get_key(),
-				'new_license'     => $new_license
+				'new_license'     => $new_license,
+				'_lwpnonce'       => wp_create_nonce( 'lwp_upgrade_license_' . $this->license->get_key() ),
 			), apply_filters( 'woocommerce_get_cart_url', wc_get_page_permalink( 'cart' ) ) ), $this->license );
 
 			// redirect to cart
