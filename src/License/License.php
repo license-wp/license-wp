@@ -259,8 +259,8 @@ class License {
 	 */
 	public function get_renewal_url() {
 		return apply_filters( 'license_wp_license_renewal_url', add_query_arg( array(
-			'renew_license'    => $this->get_key(),
-			'activation_email' => $this->get_activation_email()
+			'renew_license'    => rawurlencode( $this->get_key() ),
+			'activation_email' => rawurlencode( $this->get_activation_email() )
 		), apply_filters( 'woocommerce_get_cart_url', wc_get_page_permalink( 'cart' ) ) ), $this );
 	}
 

@@ -18,7 +18,7 @@ class DownloadHandler {
 			if ( isset( $_GET['download_api_product'] ) && isset( $_GET['license_key'] ) && isset( $_GET['activation_email'] ) ) {
 
 				// trigger
-				$this->trigger( $_GET['download_api_product'], $_GET['license_key'], $_GET['activation_email'] );
+				$this->trigger( $_GET['download_api_product'], wp_unslash( $_GET['license_key'] ), wp_unslash( $_GET['activation_email'] ) );
 
 			}
 
