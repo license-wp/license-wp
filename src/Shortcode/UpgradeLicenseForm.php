@@ -23,6 +23,10 @@ class UpgradeLicenseForm {
 
 		// process the post
 		if ( ! empty( $_POST['submit_upgrade_license'] ) && ! empty( $_POST['new_license'] ) ) {
+			if ( empty( $_POST['lwp_upgrade_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['lwp_upgrade_nonce'] ), 'lwp_upgrade_license' ) ) {
+				return;
+			}
+
 			$this->set_license_key();
 			$this->load_license();
 
@@ -103,7 +107,8 @@ class UpgradeLicenseForm {
 			// setup add-to-cart upgrade URL
 			$redirect_url = apply_filters( 'license_wp_license_upgrade_url_cart', add_query_arg( array(
 				'upgrade_license' => $this->license->get_key(),
-				'new_license'     => $new_license
+				'new_license'     => $new_license,
+				'_lwpnonce'       => wp_create_nonce( 'lwp_upgrade_license_' . $this->license->get_key() ),
 			), apply_filters( 'woocommerce_get_cart_url', wc_get_page_permalink( 'cart' ) ) ), $this->license );
 
 			// redirect to cart

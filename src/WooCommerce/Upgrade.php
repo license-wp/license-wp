@@ -37,6 +37,13 @@ class Upgrade {
 		$license_key = sanitize_text_field( $license_key );
 		$new_license = absint( $new_license );
 
+		// only the link the upgrade form made adds an upgrade to the cart
+		if ( empty( $_GET['_lwpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_GET['_lwpnonce'] ), 'lwp_upgrade_license_' . $license_key ) ) {
+			wc_add_notice( __( 'This upgrade link has expired, please start the upgrade again.', 'license-wp' ), 'error' );
+
+			return;
+		}
+
 		// get license
 		/** @var \Never5\LicenseWP\License\License $license */
 		$license = license_wp()->service( 'license_factory' )->make( $license_key );

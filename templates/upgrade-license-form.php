@@ -82,6 +82,7 @@ $license_options = \Never5\LicenseWP\WooCommerce\Product::get_available_upgrade_
 	<div class="clear"></div>
 	<p>
 		<input type="hidden" name="license_key" value="<?php echo esc_attr( $license->get_key() ); ?>" />
+		<?php wp_nonce_field( 'lwp_upgrade_license', 'lwp_upgrade_nonce' ); ?>
 		<input type="submit" class="button" name="submit_upgrade_license" value="<?php _e( 'Upgrade License', 'license-wp' ); ?>"/>
 	</p>
 
