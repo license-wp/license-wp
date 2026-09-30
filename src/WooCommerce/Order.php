@@ -19,6 +19,7 @@ class Order {
 
 		// delete license related data on order delete
 		add_action( 'delete_post', array( $this, 'order_delete' ) );
+		add_action( 'woocommerce_delete_order', array( $this, 'order_deleted' ) );
 	}
 
 	/**
@@ -27,7 +28,8 @@ class Order {
 	 * @param int $order_id
 	 */
 	public function display_keys( $order_id ) {
-		if ( get_post_meta( $order_id, 'has_api_product_license_keys', true ) ) {
+		$order = wc_get_order( $order_id );
+		if ( $order && $order->get_meta( 'has_api_product_license_keys' ) ) {
 			?>
 			<li class="wide">
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=license_wp_licenses&order_id=' . absint( $order_id ) ) ); ?>"><?php _e( 'View license keys &rarr;', 'license-wp' ); ?></a>
@@ -43,13 +45,13 @@ class Order {
 	 */
 	public function order_completed( $order_id ) {
 
+		$order = wc_get_order( $order_id );
+
 		// only continue of this order doesn't have license keys yet
-		if ( get_post_meta( $order_id, 'has_api_product_license_keys', true ) ) {
+		if ( ! $order || $order->get_meta( 'has_api_product_license_keys' ) ) {
 			return;
 		}
 
-		// create \WC_Order
-		$order   = new \WC_Order( $order_id );
 		$has_key = false;
 
 		$previous_license_keys = array();
@@ -190,7 +192,8 @@ class Order {
 
 						// set new order id for license, store old order id with new order
 						if ( apply_filters( 'lwp_upgrade_update_order_id', true, $license, $order, $item ) ) {
-							update_post_meta( $order_id, 'original_order_id', $license->get_order_id() );
+							$order->update_meta_data( 'original_order_id', $license->get_order_id() );
+							$order->save_meta_data();
 							$license->set_order_id( $order_id );
 						}
 
@@ -237,7 +240,8 @@ class Order {
 
 		// set post meta if we created at least 1 key
 		if ( $has_key ) {
-			update_post_meta( $order_id, 'has_api_product_license_keys', 1 );
+			$order->update_meta_data( 'has_api_product_license_keys', 1 );
+			$order->save_meta_data();
 		}
 	}
 
@@ -263,6 +267,19 @@ class Order {
 				license_wp()->service( 'license_manager' )->remove_license_data_by_order( $order_id );
 			}
 		}
+	}
+
+	/**
+	 * On order delete, also when orders are stored in their own tables (HPOS)
+	 *
+	 * @param int $order_id
+	 */
+	public function order_deleted( $order_id ) {
+		if ( ! current_user_can( 'delete_posts' ) || $order_id <= 0 ) {
+			return;
+		}
+
+		license_wp()->service( 'license_manager' )->remove_license_data_by_order( $order_id );
 	}
 
 	/**

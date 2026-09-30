@@ -54,7 +54,7 @@ class ListTable extends \WP_List_Table {
 			case 'activation_limit' :
 				return $item->activation_limit ? sprintf( __( '%d per product', 'license-wp' ), absint( $item->activation_limit ) ) : __( 'n/a', 'license-wp' );
 			case 'order_id' :
-				return $item->order_id > 0 ? '<a href="' . admin_url( 'post.php?post=' . absint( $item->order_id ) . '&action=edit' ) . '">#' . absint( $item->order_id ) . ' &rarr;</a>' : __( 'n/a', 'license-wp' );
+				return $item->order_id > 0 ? '<a href="' . esc_url( \Automattic\WooCommerce\Utilities\OrderUtil::get_order_admin_edit_url( absint( $item->order_id ) ) ) . '">#' . absint( $item->order_id ) . ' &rarr;</a>' : __( 'n/a', 'license-wp' );
 			case 'date_created' :
 				return ( ! empty( $item->date_created ) && 0 !== strpos( $item->date_created, '0000-00-00' ) ) ? date_i18n( get_option( 'date_format' ), strtotime( $item->date_created ) ) : __( 'n/a', 'license-wp' );
 			case 'date_expires' :

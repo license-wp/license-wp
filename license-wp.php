@@ -56,6 +56,13 @@ function __load_license_wp() {
 $updatePhp = new WPUpdatePhp( '5.3.0' );
 if ( $updatePhp->does_it_meet_required_php_version( PHP_VERSION ) ) {
 
+	// orders are only read through WooCommerce, so they may live in its own tables (HPOS)
+	add_action( 'before_woocommerce_init', function () {
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	} );
+
 	// create plugin object
 	add_action( 'plugins_loaded', '__load_license_wp', 20 );
 
