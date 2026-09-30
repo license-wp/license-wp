@@ -32,7 +32,7 @@ class LostLicenseForm {
 	private function process_post() {
 
 		// sanitize text field
-		$activation_email = sanitize_text_field( $_POST['activation_email'] );
+		$activation_email = isset( $_POST['activation_email'] ) ? sanitize_text_field( wp_unslash( $_POST['activation_email'] ) ) : '';
 
 		// check email address
 		if ( ! is_email( $activation_email ) ) {
@@ -40,6 +40,18 @@ class LostLicenseForm {
 
 			return;
 		}
+
+		// the same answer whether or not the address has licenses, so the form can't tell which addresses are customers
+		$sent_notice = sprintf( __( 'If %s has active licenses, they have been emailed to it.', 'license-wp' ), esc_html( $activation_email ) );
+
+		// one email per address per 10 minutes
+		$throttle_key = 'lwp_lost_license_' . md5( strtolower( $activation_email ) );
+		if ( false !== get_transient( $throttle_key ) ) {
+			wc_add_notice( $sent_notice, 'success' );
+
+			return;
+		}
+		set_transient( $throttle_key, 1, 10 * MINUTE_IN_SECONDS );
 
 		// get license by email address
 		$licenses = license_wp()->service( 'license_manager' )->get_licenses_by_email( $activation_email );
@@ -75,13 +87,13 @@ class LostLicenseForm {
 
 			// correct notice
 			if ( $sent ) {
-				wc_add_notice( sprintf( __( 'Your licenses have been emailed to %s.', 'license-wp' ), $activation_email ), 'success' );
+				wc_add_notice( $sent_notice, 'success' );
 			} else {
 				wc_add_notice( __( 'Your licenses could not be sent. Please contact us for support.', 'license-wp' ), 'error' );
 			}
 
 		} else {
-			wc_add_notice( __( 'No active licenses found.', 'license-wp' ), 'error' );
+			wc_add_notice( $sent_notice, 'success' );
 		}
 
 	}
