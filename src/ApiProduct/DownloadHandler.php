@@ -18,7 +18,7 @@ class DownloadHandler {
 			if ( isset( $_GET['download_api_product'] ) && isset( $_GET['license_key'] ) && isset( $_GET['activation_email'] ) ) {
 
 				// trigger
-				$this->trigger( $_GET['download_api_product'], wp_unslash( $_GET['license_key'] ), wp_unslash( $_GET['activation_email'] ) );
+				$this->trigger( $_GET['download_api_product'], wp_unslash( $_GET['license_key'] ), wp_unslash( $_GET['activation_email'] ), isset( $_GET['release'] ) && 'legacy' === $_GET['release'] );
 
 			}
 
@@ -31,8 +31,9 @@ class DownloadHandler {
 	 * @param int $product_id
 	 * @param string $license_key
 	 * @param string $activation_email
+	 * @param bool $legacy Download the legacy release instead of the current one.
 	 */
-	private function trigger( $product_id, $license_key, $activation_email ) {
+	private function trigger( $product_id, $license_key, $activation_email, $legacy = false ) {
 
 		// clean vars
 		$product_id       = absint( $product_id );
@@ -89,7 +90,8 @@ class DownloadHandler {
 		$api_product = license_wp()->service( 'api_product_factory' )->make( $product_id );
 
 		// check if there's a package defined
-		if ( $api_product->get_package() == '' ) {
+		$package = $legacy ? $api_product->get_legacy_package() : $api_product->get_package();
+		if ( $package == '' ) {
 			wp_die( __( 'Download package is missing.', 'license-wp' ) );
 		}
 
@@ -97,7 +99,7 @@ class DownloadHandler {
 		license_wp()->service( 'log' )->insert( $product_id, $license_key, $activation_email );
 
 		// download file
-		$this->download( $api_product->get_package() );
+		$this->download( $package );
 
 	}
 
